@@ -1,0 +1,60 @@
+indicator: 'malaria_positive'
+country: 'Gambia'
+year: 2021
+covariates_file_format: 'tif'
+covariates_add_intercept: TRUE
+admin_id_fields: ['polygon_id', 'shapeName']
+crs: 'EPSG:4326'
+draws_link_function: 'plogis'
+n_samples: 250
+ui_width: 0.95
+covariate_settings:
+  tt_hcf:
+    annual: FALSE
+    transform: 'identity'
+    normalize: TRUE
+  worldpop_total:
+    annual: TRUE
+    transform: 'log1p'
+    normalize: TRUE
+pop_covariate_settings:
+  worldpop_total:
+    annual: TRUE
+    transform: 'identity'
+    normalize: FALSE
+inla_settings:
+  family: 'binomial'
+  link: 'logit'
+  sample_size_field: 'samplesize'
+versions:
+  results: 'v1'
+directories:
+  raw_data:
+    versioned: FALSE
+    path: '~/temp_data/geostats/mbg_inputs'
+    files: NULL
+  covariates:
+    versioned: FALSE
+    path: '~/temp_data/rr'
+  results:
+    versioned: TRUE
+    path: '~/temp_data/geostats/mbg_results'
+    files:
+      adm0_shp: 'adm0.shp'
+      adm1_shp: 'adm1.shp'
+      adm2_shp: 'adm2.shp'
+      id_raster: 'id_raster.tif'
+      covariate_rasters: 'covariate_rasters.tif'
+      inla_data_stack: 'inla_data_stack.RDS'
+      inla_model: 'inla_fitted_model.RDS'
+      parameter_draws: 'parameter_draws.RDS'
+      cell_draws: 'cell_draws.csv'
+      cell_pred_mean: 'cell_pred_mean.tif'
+      cell_pred_lower: 'cell_pred_lower.tif'
+      cell_pred_upper: 'cell_pred_upper.tif'
+      adm2_draws: 'adm2_draws.csv'
+      adm2_summary_table: 'adm2_summary_table.csv'
+      adm1_draws: 'adm1_draws.csv'
+      adm1_summary_table: 'adm1_summary_table.csv'
+      adm0_draws: 'adm0_draws.csv'
+      adm0_summary_table: 'adm0_summary_table.csv'
