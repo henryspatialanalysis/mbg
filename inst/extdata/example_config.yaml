@@ -1,5 +1,5 @@
 indicator: 'malaria_positive'
-country: 'Gambia'
+country: 'Gambia' # Pass a capitalized ISO3 code
 year: 2021
 covariates_file_format: 'tif'
 covariates_add_intercept: TRUE
@@ -31,7 +31,7 @@ versions:
 directories:
   raw_data:
     versioned: FALSE
-    path: '~/temp_data/geostats/mbg_inputs'
+    path: '~/temp_data/dhs_mbg/model_code/Geosp_Code/input_data'
     files: NULL
   covariates:
     versioned: FALSE

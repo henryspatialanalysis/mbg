@@ -4,46 +4,112 @@
 ##
 ## AUTHOR: Nathaniel Henry, nat@henryspatialanalysis.com
 ## CREATED: 4 September 2023
-## PURPOSE: Example MBG workflow using packages `mbg`, `versioning`, and `pixel2poly`
+## PURPOSE: MBG workflow using packages `mbg`, `versioning`, and `pixel2poly`
 ##
 ## #######################################################################################
 
-## SETTINGS
+## 00) SETTINGS ------------------------------------------------------------------------->
 
-# Eventually, only these settings will be changed for each script iteration. All other
-#  settings can be changed in the config file.
-custom_versions <- list(results = '20230904')
+# Default locations of repositories and configuration file, if not specified below
+
+DEFAULT_REPOS_PATH <- '~/repos'
+DEFAULT_CONFIG_PATH <- file.path(DEFAULT_REPOS_PATH, 'mbg/inst/extdata/example_config.yaml')
+
+
+# You can optionally update certain important settings by run without editing the config.
+#  All of these have default values that will be used if they are not set. These settings
+#  include:
+#   - `repos_path`: Path to the folder that contains all repositores. Defaults to "~/repos"
+#   - `config_path`: Path to the config.yaml file to use for this model run. Defaults to
+#       "<repos_path>/mbg/inst/extdata/example_config.yaml"
+#   - `indicator`: Model indicator to run. Defaults to config value.
+#   - `country`: ISO3 code to run. Defaults to config value.
+#   - `year`: Model year. Defaults to config value.
+#   - `results_version`: Determines the time-stamped folder where results will be saved.
+#       Defaults to config value.
+#
+# If you are running interactively, you can optionally update these settings on lines 
+#  28-31. Except for `repos_path` and `config_path`, which always need to be set, leaving
+#  any of these arguments blank will default to the settings already listed in the config.
+#
+# If you are running on the command line, you can pass these settings using named command
+#  line arguments. If an argument is not passed, the default settings will be used 
+#  instead. For example, this call to the script will update the "indicator" and "year",
+#  but use default settings otherwise:
+#
+# Rscript --vanilla mbg_package_workflow.R --indicator modern_cpr --year 2021
+
+if(interactive()){
+  # If running the script interactively, you can optionally update settings
+  run_specific_settings <- list(
+    repos_path = DEFAULT_REPOS_PATH,
+    config_path = DEFAULT_CONFIG_PATH,
+    indicator = 'wasted_test',
+    country = 'MDG',
+    year = 2021,
+    results_version = '20230911'
+  )
+} else {
+  library(argparse)
+  parser <- argparse::ArgumentParser()
+  parser$add_argument("--repos_path", type = 'character', default = DEFAULT_REPOS_PATH)
+  parser$add_argument("--config_path", type = 'character', default = DEFAULT_CONFIG_PATH)
+  parser$add_argument("--indicator", type = 'character', default = NULL)
+  parser$add_argument("--country", type = 'character', default = NULL)
+  parser$add_argument("--year", type = 'integer', default = NULL)
+  parser$add_argument("--results_version", type = "character", default = NULL)
+  run_specific_settings <- parser$parse_args(
+    commandArgs(trailingOnly = TRUE)
+  )
+}
 
 
 ## 01) SETUP ---------------------------------------------------------------------------->
 
 # Load standard packages
-load_packages <- c('data.table', 'INLA', 'rgeoboundaries', 'sf', 'terra', 'tictoc')
+load_packages <- c(
+  'assertthat', 'data.table', 'glue', 'INLA', 'rgeoboundaries', 'sf', 'terra', 'tictoc'
+)
 invisible(lapply(load_packages, library, character.only = TRUE))
+tictoc::tic("Full script execution")
 
-# Load custom packages
-custom_pkgs <- c('versioning', 'pixel2poly', 'mbg')
-load_locally <- TRUE
-if(load_locally){
-  repos_path <- '~/repos'
-  lapply(file.path(repos_path, custom_pkgs), devtools::load_all) |> invisible()
-} else {
-  github_acct <- 'henryspatialanalysis'
-  for(custom_pkg in custom_pkgs){
-    remotes::install_github(file.path(github_acct, custom_pkg))
-    library(custom_pkg, character.only = T)
-  }
+# Load custom packages from subfolders within the `repos_path` directory
+assertthat::assert_that(dir.exists(run_specific_settings$repos_path))
+for(custom_package in c('versioning', 'pixel2poly', 'mbg')){
+  custom_package_dir <- file.path(run_specific_settings$repos_path, custom_package)
+  assertthat::assert_that(dir.exists(custom_package_dir))
+  devtools::load_all(custom_package_dir)
 }
 
-# Make config and create results directory
-config_file_path <- system.file('extdata/example_config.yaml', package = 'mbg')
+# Set the custom results version, if one was passed 
+if(is.null(run_specific_settings$results_version)){
+  custom_versions <- NULL
+} else {
+  custom_versions <- list(results = run_specific_settings$results_version)
+}
 
+# Load the configuration object
 config <- versioning::Config$new(
-  config_list = config_file_path,
+  config_list = run_specific_settings$config_path,
   versions = custom_versions
 )
+
+# Update the config with run-specific settings, if they were passed
+for(setting_name in c('indicator', 'country', 'year')){
+  custom_value <- run_specific_settings[[setting_name]]
+  if(!is.null(custom_value)){
+    config$config_list[[setting_name]] <- custom_value
+  }
+}
+# The name of the input file is "<raw_data directory>/<indicator>.csv"
+config$config_list$directories$raw_data$files <- list(
+  input_data = paste0(config$get('indicator'), '.csv')
+)
+
+# Create the results directory
 results_dir <- config$get_dir_path('results')
 dir.create(results_dir, recursive = T, showWarnings = F)
+
 # Save a copy of the config in the results directory
 config$write_self('results')
 
@@ -87,20 +153,21 @@ population_raster <- mbg::load_covariates(
   add_intercept = FALSE
 )[[1]]
 
-# Load input data
+# Load input data from the `raw_data` directory
+# This file path was set based on the indicator on line 105
 input_data <- (
-  data.table::as.data.table(get(data(gambia, package = 'geoR')))
-  [, .(indicator = sum(pos), samplesize = .N), by = .(x, y)]
+  config$read("raw_data", "input_data")
+  [(year == config$get("year")) & (country == config$get("country")), ] |>
+  setnames(
+    old = c('longitude', 'latitude', 'N', config$get('indicator')),
+    new = c('x', 'y', 'samplesize', 'indicator'),
+    skip_absent = TRUE
+  )
 )
-# Convert to working CRS (typically unprojected lat-long)
-latlong <- (
-  sf::st_as_sf(input_data, coords = c('x', 'y'), crs = sf::st_crs('+proj=utm +zone=28')) |>
-  sf::st_transform(crs = sf::st_crs(config$get('crs'))) |>
-  sf::st_coordinates() |>
-  as.data.table()
+if(nrow(input_data) == 0) stop(
+  "After subsetting to data from ", config$get("country"), " in ", config$get("year"),
+  ", no rows of data remain."
 )
-input_data$x <- latlong$X
-input_data$y <- latlong$Y
 
 
 ## 03) PREPARE AND RUN INLA MODEL ------------------------------------------------------->
@@ -112,8 +179,9 @@ inla_inputs_list <- mbg::prepare_inla_data_stack(
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
-  formula = as.formula(inla_inputs_list$formula_string),
+  formula = inla_inputs_list$formula_string,
   data_stack = inla_inputs_list$inla_data_stack,
+  spde = inla_inputs_list$spde,
   family = config$get('inla_settings', 'family'),
   link = config$get('inla_settings', 'link')
 )
@@ -181,3 +249,6 @@ config$write(admin_predictions_list$adm1$admin_draws, 'results', 'adm1_draws')
 config$write(admin_predictions_list$adm1$admin_summaries, 'results', 'adm1_summary_table')
 config$write(admin_predictions_list$adm0$admin_draws, 'results', 'adm0_draws')
 config$write(admin_predictions_list$adm0$admin_summaries, 'results', 'adm0_summary_table')
+
+# End script timer
+tictoc::toc()
