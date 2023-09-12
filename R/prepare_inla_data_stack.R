@@ -24,8 +24,8 @@ prepare_inla_data_stack <- function(input_data, id_raster, covariates){
   # Build prediction mesh
   mesh <- INLA::inla.mesh.2d(
     loc.domain = id_raster_table[, .(x, y)],
-    max.edge = c(0.1, 5),
-    cutoff = 0.01
+    max.edge = c(0.3, 5),
+    cutoff = 0.05
   )
 
   # SPDE object
