@@ -8,6 +8,8 @@
 #'   among the draw fields?
 #' @param ui_width (numeric, default 0.95) Size of the uncertainty interval width when
 #'   calculating the upper and lower summary rasters
+#' @param na.rm (logical, default TRUE) Should NA values be removed when calculating
+#'   summaries across draws?
 #' 
 #' @return A data.table containing at least the following fields:
 #'   - The `id_fields`, if passed
@@ -19,7 +21,7 @@
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles
 #' @export
-summarize_draws <- function(draws, id_fields = NULL, ui_width = 0.95){
+summarize_draws <- function(draws, id_fields = NULL, ui_width = 0.95, na.rm = TRUE){
   if(inherits(draws, 'data.frame')){
     draws <- as.data.table(draws)
     draw_cols <- setdiff(colnames(draws), id_fields)
@@ -35,9 +37,9 @@ summarize_draws <- function(draws, id_fields = NULL, ui_width = 0.95){
   }
   # Summarize as a table
   summary_table <- data.table::data.table(
-    mean = Matrix::rowMeans(draws_mat),
-    lower = matrixStats::rowQuantiles(draws_mat, probs = (1 - ui_width)/2),
-    upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - (1 - ui_width)/2)
+    mean = Matrix::rowMeans(draws_mat, na.rm = na.rm),
+    lower = matrixStats::rowQuantiles(draws_mat, probs = (1 - ui_width)/2, na.rm = na.rm),
+    upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - (1 - ui_width)/2, na.rm = na.rm)
   )
   if(!is.null(ids_table)) summary_table <- cbind(ids_table, summary_table)
   return(summary_table)

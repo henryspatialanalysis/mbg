@@ -4,7 +4,7 @@
 \alias{summarize_draws}
 \title{Summarize draws}
 \usage{
-summarize_draws(draws, id_fields = NULL, ui_width = 0.95)
+summarize_draws(draws, id_fields = NULL, ui_width = 0.95, na.rm = TRUE)
 }
 \arguments{
 \item{draws}{A matrix, data.frame, or data.table of predictive draws.}
@@ -15,6 +15,9 @@ among the draw fields?}
 
 \item{ui_width}{(numeric, default 0.95) Size of the uncertainty interval width when
 calculating the upper and lower summary rasters}
+
+\item{na.rm}{(logical, default TRUE) Should NA values be removed when calculating
+summaries across draws?}
 }
 \value{
 A data.table containing at least the following fields:
