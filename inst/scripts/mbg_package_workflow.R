@@ -205,6 +205,7 @@ admin_levels <- names(boundaries_list)
 admin_predictions_list <- vector('list', length = length(admin_levels))
 names(admin_predictions_list) <- admin_levels
 for(admin_level in admin_levels){
+  message("Aggregating draws and creating summaries at the ", admin_level, " level.")
   aggregation_table <- pixel2poly::build_aggregation_table(
     polygons = terra::vect(boundaries_list[[admin_level]]),
     id_raster = id_raster,
