@@ -29,7 +29,7 @@ DEFAULT_CONFIG_PATH <- file.path(DEFAULT_REPOS_PATH, 'mbg/inst/extdata/example_c
 #       Defaults to config value.
 #
 # If you are running interactively, you can optionally update these settings on lines 
-#  28-31. Except for `repos_path` and `config_path`, which always need to be set, leaving
+#  45-51. Except for `repos_path` and `config_path`, which always need to be set, leaving
 #  any of these arguments blank will default to the settings already listed in the config.
 #
 # If you are running on the command line, you can pass these settings using named command
@@ -45,9 +45,10 @@ if(interactive()){
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
     indicator = 'wasted_test',
-    country = 'MDG',
+    iso3 = 'MDG',
+    country = 'Madagascar',
     year = 2021,
-    results_version = '20230911'
+    results_version = '20230926'
   )
 } else {
   library(argparse)
@@ -55,6 +56,7 @@ if(interactive()){
   parser$add_argument("--repos_path", type = 'character', default = DEFAULT_REPOS_PATH)
   parser$add_argument("--config_path", type = 'character', default = DEFAULT_CONFIG_PATH)
   parser$add_argument("--indicator", type = 'character', default = NULL)
+  parser$add_argument("--iso3", type = 'character', default = NULL)
   parser$add_argument("--country", type = 'character', default = NULL)
   parser$add_argument("--year", type = 'integer', default = NULL)
   parser$add_argument("--results_version", type = "character", default = NULL)
@@ -95,7 +97,7 @@ config <- versioning::Config$new(
 )
 
 # Update the config with run-specific settings, if they were passed
-for(setting_name in c('indicator', 'country', 'year')){
+for(setting_name in c('indicator', 'iso3', 'country', 'year')){
   custom_value <- run_specific_settings[[setting_name]]
   if(!is.null(custom_value)){
     config$config_list[[setting_name]] <- custom_value
@@ -118,38 +120,36 @@ config$write_self('results')
 
 # Load country boundaries
 country <- config$get('country')
-boundaries_list <- list(
-  adm0 = rgeoboundaries::geoboundaries(country, adm_lvl = 0),
-  adm1 = rgeoboundaries::geoboundaries(country, adm_lvl = 1),
-  adm2 = rgeoboundaries::geoboundaries(country, adm_lvl = 2)
+adm_level <- paste0('adm', config$get('shapefile_settings', 'modeling_level'))
+shp_id_cols <- config$get('shapefile_settings', 'ids', adm_level)
+shp_query <- glue::glue(
+  'SELECT {paste(shp_id_cols, collapse = ",")} ',
+  'FROM {tools::file_path_sans_ext(config$get("directories", "shps", "files", adm_level))} ',
+  'WHERE ADM0_NAME = \'{config$get("country")}\''
 )
-# Add a `polygon_id` to all boundaries objects
-for(ii in seq_along(boundaries_list)){
-  boundaries_list[[ii]]$polygon_id <- seq_len(nrow(boundaries_list[[ii]]))
-}
+adm_boundaries <- config$read(dir_name = "shps", file_name = adm_level, query = shp_query)
+adm_boundaries$polygon_id <- seq_len(nrow(adm_boundaries))
 
 # Create the ID raster from the admin2 spatial object
-id_raster <- pixel2poly::build_id_raster(
-  polygons = terra::vect(boundaries_list$adm2)
-)
+id_raster <- pixel2poly::build_id_raster(polygons = terra::vect(adm_boundaries))
 
 # Load a list of covariates
 covariates_list <- mbg::load_covariates(
   directory = config$get_dir_path('covariates'),
-  settings = config$get('covariate_settings'),
+  settings = config$get('covariates'),
   id_raster = id_raster,
   year = config$get('year'),
-  file_format = config$get('covariates_file_format'),
-  add_intercept = config$get('covariates_add_intercept')
+  file_format = config$get('covariate_settings', 'file_format'),
+  add_intercept = config$get('covariate_settings', 'add_intercept')
 )
 # Load the population raster
 # Used for population-weighted aggregation from grid cell to admin
 population_raster <- mbg::load_covariates(
   directory = config$get_dir_path('covariates'),
-  settings = config$get('pop_covariate_settings'),
+  settings = config$get('pop_covariate'),
   id_raster = id_raster,
   year = config$get('year'),
-  file_format = config$get('covariates_file_format'),
+  file_format = config$get('covariate_settings', 'file_format'),
   add_intercept = FALSE
 )[[1]]
 
@@ -157,7 +157,7 @@ population_raster <- mbg::load_covariates(
 # This file path was set based on the indicator on line 105
 input_data <- (
   config$read("raw_data", "input_data")
-  [(year == config$get("year")) & (country == config$get("country")), ] |>
+  [(year == config$get("year")) & (country == config$get("iso3")), ] |>
   setnames(
     old = c('longitude', 'latitude', 'N', config$get('indicator')),
     new = c('x', 'y', 'samplesize', 'indicator'),
@@ -200,56 +200,80 @@ grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   ui_width = config$get('ui_width')
 )
 
-# Aggregate to predictions by admin unit
-admin_levels <- names(boundaries_list)
-admin_predictions_list <- vector('list', length = length(admin_levels))
-names(admin_predictions_list) <- admin_levels
-for(admin_level in admin_levels){
-  message("Aggregating draws and creating summaries at the ", admin_level, " level.")
-  aggregation_table <- pixel2poly::build_aggregation_table(
-    polygons = terra::vect(boundaries_list[[admin_level]]),
-    id_raster = id_raster,
-    polygon_id_field = 'polygon_id'
-  )
-  admin_draws <- pixel2poly::aggregate_draws_to_polygons(
-    draws_matrix = grid_cell_predictions$cell_draws,
-    aggregation_table = aggregation_table,
-    aggregation_cols = config$get('admin_id_fields'),
-    method = 'weighted.mean',
-    weighting_raster = population_raster
-  )
-  admin_summaries <- mbg::summarize_draws(
-    draws = admin_draws,
-    id_fields = config$get('admin_id_fields'),
-    ui_width = config$get('ui_width')
-  )
-  admin_predictions_list[[admin_level]] <- list(
-    admin_draws = admin_draws,
-    admin_summaries = admin_summaries
+# Prepare objects to store admin draws and summaries
+max_adm_level <- config$get('shapefile_settings', 'modeling_level')
+max_adm_level_label <- paste0('adm', max_adm_level)
+all_adm_levels <- seq(0, max_adm_level)
+adm_draws_list <- adm_summaries_list <- vector('list', length = length(all_adm_levels))
+names(adm_draws_list) <- names(adm_summaries_list) <- paste0('adm', all_adm_levels)
+draw_fields <- paste0('draw_', seq_len(config$get('n_samples')))
+
+# Aggregate to the most detailed admin units
+message("Aggregating draws at the ", max_adm_level_label, " level.")
+aggregation_table <- pixel2poly::build_aggregation_table(
+  polygons = terra::vect(adm_boundaries),
+  id_raster = id_raster,
+  polygon_id_field = 'polygon_id'
+)
+agg_cols <- config$get("shapefile_settings", "ids", max_adm_level_label)
+detailed_adm_draws <- pixel2poly::aggregate_draws_to_polygons(
+  draws_matrix = grid_cell_predictions$cell_draws,
+  aggregation_table = aggregation_table,
+  aggregation_cols = agg_cols,
+  method = 'weighted.mean',
+  weighting_raster = population_raster
+)
+admin_pop <- pixel2poly::aggregate_raster_to_polygons(
+  data_raster = population_raster,
+  aggregation_table = aggregation_table,
+  aggregation_cols = agg_cols,
+  method = 'sum',
+  aggregated_field = 'population'
+)
+detailed_adm_draws[admin_pop, population := i.population, on = agg_cols]
+adm_draws_list[[max_adm_level_label]] <- data.table::copy(detailed_adm_draws)
+
+# Aggregate to less-detailed admin units
+for(higher_level in setdiff(names(adm_draws_list), max_adm_level_label)){
+  message("Aggregating draws at the ", higher_level, " level.")
+  agg_cols <- config$get("shapefile_settings", "ids", higher_level)
+  adm_draws_list[[higher_level]] <- detailed_adm_draws[
+    , c(
+      list(population = sum(population)),
+      lapply(.SD, weighted.mean, w = population)
+    ),
+    .SDcols = draw_fields,
+    by = agg_cols
+  ]
+}
+
+# Summarize admin draws at all levels
+for(adm_level in names(adm_summaries_list)){
+  adm_summaries_list[[adm_level]] <- mbg::summarize_draws(
+    draws = adm_draws_list[[adm_level]],
+    id_fields = config$get("shapefile_settings", "ids", adm_level),
+    draw_fields = draw_fields,
+    ui_width = config$get("ui_width")
   )
 }
 
 
 ## 06) SAVE RESULTS --------------------------------------------------------------------->
 
-config$write(boundaries_list$adm0, 'results', 'adm0_shp')
-config$write(boundaries_list$adm1, 'results', 'adm1_shp')
-config$write(boundaries_list$adm2, 'results', 'adm2_shp')
+config$write(adm_boundaries, 'results', 'adm_boundaries')
 config$write(id_raster, 'results', 'id_raster')
 config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
 config$write(inla_inputs_list, 'results', 'inla_data_stack')
-config$write(inla_fitted_model, 'results', 'inla_model')
+if(config$get('save_full_model')) config$write(inla_fitted_model, 'results', 'inla_model')
 config$write(grid_cell_predictions$parameter_draws, 'results', 'parameter_draws')
 config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws')
 config$write(grid_cell_predictions$cell_pred_mean, 'results', 'cell_pred_mean')
 config$write(grid_cell_predictions$cell_pred_lower, 'results', 'cell_pred_lower')
 config$write(grid_cell_predictions$cell_pred_upper, 'results', 'cell_pred_upper')
-config$write(admin_predictions_list$adm2$admin_draws, 'results', 'adm2_draws')
-config$write(admin_predictions_list$adm2$admin_summaries, 'results', 'adm2_summary_table')
-config$write(admin_predictions_list$adm1$admin_draws, 'results', 'adm1_draws')
-config$write(admin_predictions_list$adm1$admin_summaries, 'results', 'adm1_summary_table')
-config$write(admin_predictions_list$adm0$admin_draws, 'results', 'adm0_draws')
-config$write(admin_predictions_list$adm0$admin_summaries, 'results', 'adm0_summary_table')
+for(adm_level in names(adm_draws_list)){
+  config$write(adm_draws_list[[adm_level]], 'results', paste0(adm_level, '_draws'))
+  config$write(adm_summaries_list[[adm_level]], 'results', paste0(adm_level, '_summary_table'))
+}
 
 # End script timer
 tictoc::toc()

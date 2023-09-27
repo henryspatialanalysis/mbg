@@ -1,14 +1,22 @@
-indicator: 'malaria_positive'
-country: 'Gambia' # Pass a capitalized ISO3 code
-year: 2021
-covariates_file_format: 'tif'
-covariates_add_intercept: TRUE
-admin_id_fields: ['polygon_id', 'shapeName']
-crs: 'EPSG:4326'
+indicator: 'wasted_test'
+country: 'Madagascar' # Should match the ADM0_NAME in the shapefile
+iso3: 'MDG' # Capitalized ISO3 code
+year: 2022
+modeling_crs: 'EPSG:4326'
 draws_link_function: 'plogis'
 n_samples: 250
 ui_width: 0.95
+save_full_model: FALSE # Should the full INLA model be saved? Memory-intensive
+shapefile_settings:
+  modeling_level: 2
+  ids:
+    adm0: ['ADM0_CODE','ADM0_NAME']
+    adm1: ['ADM1_CODE','ADM1_NAME','ADM0_CODE','ADM0_NAME']
+    adm2: ['ADM2_CODE','ADM2_NAME','ADM1_CODE','ADM1_NAME','ADM0_CODE','ADM0_NAME']
 covariate_settings:
+  file_format: 'tif'
+  add_intercept: TRUE
+covariates:
   tt_hcf:
     annual: FALSE
     transform: 'identity'
@@ -17,7 +25,7 @@ covariate_settings:
     annual: TRUE
     transform: 'log1p'
     normalize: TRUE
-pop_covariate_settings:
+pop_covariate: 
   worldpop_total:
     annual: TRUE
     transform: 'identity'
@@ -29,6 +37,13 @@ inla_settings:
 versions:
   results: 'v1'
 directories:
+  shps:
+    versioned: FALSE
+    path: '/mnt/c/Users/Lenovo/OneDrive - Henry Spatial Analysis LLC/Henry Spatial Analysis/DHS/Sharing/Updated GAUL shapefile'
+    files:
+      adm0: 'g2015_2014_0.shp'
+      adm1: 'g2015_2014_1.shp'
+      adm2: 'g2015_2014_2.shp'
   raw_data:
     versioned: FALSE
     path: '~/temp_data/dhs_mbg/model_code/Geosp_Code/input_data'
@@ -40,9 +55,7 @@ directories:
     versioned: TRUE
     path: '~/temp_data/geostats/mbg_results'
     files:
-      adm0_shp: 'adm0.shp'
-      adm1_shp: 'adm1.shp'
-      adm2_shp: 'adm2.shp'
+      adm_boundaries: 'adm_boundaries.shp'
       id_raster: 'id_raster.tif'
       covariate_rasters: 'covariate_rasters.tif'
       inla_data_stack: 'inla_data_stack.RDS'
