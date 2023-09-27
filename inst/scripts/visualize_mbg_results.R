@@ -20,7 +20,7 @@ REPOS_PATH_DEFAULT <- '~/repos'
 #  - `repos_path`: the path to the directory that contains the `versioning` custom package
 
 if(interactive()){
-  config_path <- '~/temp_data/geostats/mbg_results/20230926/config.yaml'
+  config_path <- '~/temp_data/geostats/mbg_results/20230927/config.yaml'
   repos_path <- REPOS_PATH_DEFAULT
 } else {
   library(argparse)
@@ -63,6 +63,7 @@ summary_table <- config$read('results', glue::glue('adm{modeling_level}_summary_
 mean_raster <- config$read('results', 'cell_pred_mean')
 lower_raster <- config$read('results', 'cell_pred_lower')
 upper_raster <- config$read('results', 'cell_pred_upper')
+input_data <- config$read('results', 'formatted_input_data')
 mesh <- config$read('results', 'inla_data_stack')$mesh
 
 # Set some global variables that will be used in labels several times
@@ -75,6 +76,10 @@ low_is_better <- TRUE
 color_scheme <- RColorBrewer::brewer.pal(n = 9, name = 'Spectral')
 if(low_is_better) color_scheme <- rev(color_scheme)
 
+# Shortcut for element_blank()
+eb <- ggplot2::element_blank()
+map_theme <- ggplot2::theme_minimal() + 
+  ggplot2::theme(axis.ticks = eb, axis.text = eb, panel.grid = eb)
 
 ## 02) Plot the mesh -------------------------------------------------------------------->
 
@@ -110,12 +115,7 @@ raster_fig <- ggplot() +
     title = glue::glue("Summary rasters: {indicator} in {country}, {year}"),
     x = '', y = '', fill = indicator
   ) +
-  theme_minimal() + 
-  theme(
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    panel.grid = element_blank()
-  )
+  map_theme
 pdf(file.path(viz_dir, 'summary_rasters.pdf'), height = 6, width = 10)
 print(raster_fig)
 dev.off()
@@ -142,24 +142,42 @@ adm_fig <- ggplot() +
     data = adm_data_for_plotting,
     aes(fill = value), linewidth = 0.25, color = '#444444'
   ) + 
-  scale_fill_gradientn(
-    colors = color_scheme, limits = value_limits, oob = scales::squish,
-    labels = scales::percent
-  ) +
+  scale_fill_gradientn(colors = color_scheme, labels = scales::percent) +
   labs(
     title = glue::glue("Summary estimates: {indicator} in {country}, {year}"),
     x = '', y = '', fill = indicator
   ) +
-  theme_minimal() + 
-  theme(
-    axis.text = element_blank(),
-    axis.ticks = element_blank(),
-    panel.grid = element_blank()
-  )
+  map_theme
 pdf(file.path(viz_dir, 'summary_admin_estimates.pdf'), height = 6, width = 10)
 print(adm_fig)
 dev.off()
 
+
+## 04) Plot the input point data -------------------------------------------------------->
+
+input_data[, rate := indicator / samplesize ]
+point_color_limits <- quantile(na.omit(input_data$rate), probs = c(0.05, 0.95))
+
+data_point_fig <- ggplot() + 
+  geom_sf(data = adm_boundaries, fill = NA, linewidth = 0.25, color = "#444444") + 
+  geom_point(
+    data = input_data,
+    aes(x = x, y = y, fill = rate, size = samplesize),
+    shape = 21, alpha = .8
+  ) + 
+  scale_fill_gradientn(
+    colors = color_scheme, labels = scales::percent, limits = point_color_limits,
+    oob = scales::squish
+  ) + 
+  labs(
+    title = glue::glue("Raw data: {indicator} in {country}, {year}"),
+    x = '', y = '', fill = stringr::str_to_title(indicator), size = 'Number\nsampled'
+  ) +
+  map_theme
+
+pdf(file.path(viz_dir, 'input_data_map.pdf'), height = 8, width = 8)
+plot(data_point_fig)
+dev.off()
 
 ## 04) Plot mean vs. uncertainty bivariate maps ----------------------------------------->
 
