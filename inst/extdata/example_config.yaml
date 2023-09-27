@@ -26,7 +26,7 @@ covariates:
     transform: 'log1p'
     normalize: TRUE
 pop_covariate: 
-  worldpop_total:
+  worldpop_u5:
     annual: TRUE
     transform: 'identity'
     normalize: FALSE
@@ -39,7 +39,7 @@ versions:
 directories:
   shps:
     versioned: FALSE
-    path: '/mnt/c/Users/Lenovo/OneDrive - Henry Spatial Analysis LLC/Henry Spatial Analysis/DHS/Sharing/Updated GAUL shapefile'
+    path: '/mnt/c/Users/Lenovo/OneDrive - Henry Spatial Analysis LLC/Henry Spatial Analysis/DHS/Sharing/Updated GAUL shapefile/updated_gaul_v2'
     files:
       adm0: 'g2015_2014_0.shp'
       adm1: 'g2015_2014_1.shp'
@@ -58,6 +58,7 @@ directories:
       adm_boundaries: 'adm_boundaries.shp'
       id_raster: 'id_raster.tif'
       covariate_rasters: 'covariate_rasters.tif'
+      formatted_input_data: 'formatted_input_data.csv'
       inla_data_stack: 'inla_data_stack.RDS'
       inla_model: 'inla_fitted_model.RDS'
       parameter_draws: 'parameter_draws.RDS'
