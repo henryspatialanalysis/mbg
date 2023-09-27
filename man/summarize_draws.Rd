@@ -4,7 +4,13 @@
 \alias{summarize_draws}
 \title{Summarize draws}
 \usage{
-summarize_draws(draws, id_fields = NULL, ui_width = 0.95, na.rm = TRUE)
+summarize_draws(
+  draws,
+  id_fields = NULL,
+  draw_fields = NULL,
+  ui_width = 0.95,
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{draws}{A matrix, data.frame, or data.table of predictive draws.}
@@ -12,6 +18,11 @@ summarize_draws(draws, id_fields = NULL, ui_width = 0.95, na.rm = TRUE)
 \item{id_fields}{(default NULL) Only considered for data.frame-like \code{draws}. What
 identifier fields in the data should be kept in the summary table and not included
 among the draw fields?}
+
+\item{draw_fields}{(default NULL) Only considered for data.frame-like \code{draws}. What
+fields represent actual draws, as opposed to identifier fields or other metadata like
+population? If \code{NULL}, the default, automatically determines the draw fields as all
+columns not included in the \code{id_fields}.}
 
 \item{ui_width}{(numeric, default 0.95) Size of the uncertainty interval width when
 calculating the upper and lower summary rasters}
