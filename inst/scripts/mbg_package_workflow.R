@@ -44,11 +44,11 @@ if(interactive()){
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'wasted_test',
-    iso3 = 'MDG',
-    country = 'Madagascar',
-    year = 2021,
-    results_version = '20230926'
+    indicator = 'stunted',
+    iso3 = 'TZA',
+    country = 'Tanzania',
+    year = 2022,
+    results_version = '20230927'
   )
 } else {
   library(argparse)
@@ -249,12 +249,15 @@ for(higher_level in setdiff(names(adm_draws_list), max_adm_level_label)){
 
 # Summarize admin draws at all levels
 for(adm_level in names(adm_summaries_list)){
-  adm_summaries_list[[adm_level]] <- mbg::summarize_draws(
+  id_fields <- config$get("shapefile_settings", "ids", adm_level)
+  adm_summary <- mbg::summarize_draws(
     draws = adm_draws_list[[adm_level]],
-    id_fields = config$get("shapefile_settings", "ids", adm_level),
+    id_fields = id_fields,
     draw_fields = draw_fields,
     ui_width = config$get("ui_width")
   )
+  adm_summary[adm_draws_list[[adm_level]], population := i.population, on = id_fields]
+  adm_summaries_list[[adm_level]] <- adm_summary
 }
 
 
@@ -263,6 +266,7 @@ for(adm_level in names(adm_summaries_list)){
 config$write(adm_boundaries, 'results', 'adm_boundaries')
 config$write(id_raster, 'results', 'id_raster')
 config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
+config$write(input_data, 'results', 'formatted_input_data')
 config$write(inla_inputs_list, 'results', 'inla_data_stack')
 if(config$get('save_full_model')) config$write(inla_fitted_model, 'results', 'inla_model')
 config$write(grid_cell_predictions$parameter_draws, 'results', 'parameter_draws')
