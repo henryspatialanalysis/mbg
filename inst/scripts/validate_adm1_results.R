@@ -138,10 +138,10 @@ fig <- ggplot(data = fuzzy_matches, aes(x = sc_value, y = mean, color = in_ui)) 
     data = function(x) x[in_ui == "No", ],
     aes(label = adm_name),
     nudge_x = diff(range(fuzzy_matches$sc_value)) / 75,
-    hjust = 0, label.size = NA, fill = alpha("white", 0.6), show.legend = FALSE
+    hjust = 0, label.size = NA, fill = alpha("white", 0.75), show.legend = FALSE
   ) +
   scale_color_manual(values = ui_colors) + 
-  scale_x_continuous(labels = scales::percent) + 
+  scale_x_continuous(labels = scales::percent, limits = c(min(fuzzy_matches$sc_value) - 0.02, max(fuzzy_matches$sc_value) + .06)) + 
   scale_y_continuous(labels = scales::percent) +
   labs(
     x = "StatCompiler Estimates",
