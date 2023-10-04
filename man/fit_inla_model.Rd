@@ -4,7 +4,14 @@
 \alias{fit_inla_model}
 \title{Fit INLA model}
 \usage{
-fit_inla_model(formula, data_stack, spde, family = "binomial", link = "logit")
+fit_inla_model(
+  formula,
+  data_stack,
+  spde,
+  family = "binomial",
+  link = "logit",
+  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05)
+)
 }
 \arguments{
 \item{formula}{(character) INLA formula to fit. Generated in
@@ -21,6 +28,11 @@ see \code{\link[stats:family]{stats::family()}}.}
 
 \item{link}{(character, default 'logit') Link function to use, typically related to the
 GLM \code{family}.}
+
+\item{fixed_effects_pc_prior}{A named list specifying the penalized complexity prior
+for all fixed effects except for the intercept. The two named items are "threshold",
+the test threshold for the size of each fixed effect, and "prob_above", the prior
+probability that the beta for each covariate will EXCEED that threshold.}
 }
 \value{
 A fitted INLA model object created by \code{\link[INLA:inla]{INLA::inla()}}

@@ -16,6 +16,10 @@
 #'   see [stats::family()].
 #' @param link (character, default 'logit') Link function to use, typically related to the
 #'   GLM `family`.
+#' @param fixed_effects_pc_prior A named list specifying the penalized complexity prior
+#'   for all fixed effects except for the intercept. The two named items are "threshold",
+#'   the test threshold for the size of each fixed effect, and "prob_above", the prior
+#'   probability that the beta for each covariate will EXCEED that threshold.
 #' 
 #' @return A fitted INLA model object created by [INLA::inla()]
 #' 
@@ -23,23 +27,30 @@
 #' @importFrom tictoc tic toc
 #' @importFrom stats as.formula
 #' @export
-fit_inla_model <- function(formula, data_stack, spde, family = 'binomial', link = 'logit'){
+fit_inla_model <- function(
+  formula, data_stack, spde, family = 'binomial', link = 'logit',
+  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05)
+){
   spde <- spde
   tictoc::tic("MBG model fitting")
   inla_model <- INLA::inla(
     formula = stats::as.formula(formula),
     family = family,
-    Ntrials = samplesize,
     control.family = list(link = link),
+    Ntrials = samplesize,
     data = INLA::inla.stack.data(data_stack),
+    control.compute = list(config = TRUE),
+    control.fixed = list(
+      prec = list(
+        prior = 'pc.prec',
+        param = c(fixed_effects_pc_prior$threshold, fixed_effects_pc_prior$prob_above)
+      )
+    ),
     control.predictor = list(
       compute = FALSE,
       link = 1,
       A = INLA::inla.stack.A(data_stack)
     ),
-    control.compute = list(
-      config = TRUE
-    )
   )
   tictoc::toc()
   return(inla_model)
