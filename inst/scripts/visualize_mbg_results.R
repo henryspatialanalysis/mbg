@@ -20,7 +20,7 @@ REPOS_PATH_DEFAULT <- '~/repos'
 #  - `repos_path`: the path to the directory that contains the `versioning` custom package
 
 if(interactive()){
-  config_path <- '~/temp_data/geostats/mbg_results/20230927/config.yaml'
+  config_path <- '~/temp_data/geostats/mbg_results/20231003_midsigma/config.yaml'
   repos_path <- REPOS_PATH_DEFAULT
 } else {
   library(argparse)
@@ -63,6 +63,7 @@ summary_table <- config$read('results', glue::glue('adm{modeling_level}_summary_
 mean_raster <- config$read('results', 'cell_pred_mean')
 lower_raster <- config$read('results', 'cell_pred_lower')
 upper_raster <- config$read('results', 'cell_pred_upper')
+pop_raster <- config$read('results', 'pop_raster')
 input_data <- config$read('results', 'formatted_input_data')
 mesh <- config$read('results', 'inla_data_stack')$mesh
 
@@ -178,6 +179,9 @@ data_point_fig <- ggplot() +
 pdf(file.path(viz_dir, 'input_data_map.pdf'), height = 8, width = 8)
 plot(data_point_fig)
 dev.off()
+png(file.path(viz_dir, 'input_data_map.png'), height = 1600, width = 1600, res = 200)
+plot(data_point_fig)
+dev.off()
 
 ## 04) Plot mean vs. uncertainty bivariate maps ----------------------------------------->
 
@@ -230,4 +234,27 @@ full_fig <- bv_fig +
 
 pdf(file.path(viz_dir, 'bivariate_uncertainty_plot.pdf'), height = 8, width = 8)
 plot(full_fig)
+dev.off()
+
+# Plot gridded population density across the country ------------------------------------>
+
+pop_table <- raster_to_table(pop_raster, type = 'Population')
+# Get reasonably-spaced breaks on a log scale
+max_val <- max(pop_table$value, na.rm = T)
+pow_10 <- floor(log(max_val) / log(10))
+max_val_mult <- round(max_val / 10^pow_10) 
+pop_breaks <- c(0, max_val_mult * 10^unique(seq(0, pow_10, length.out = 3)))
+
+pop_fig <- ggplot() +
+  geom_raster(data = pop_table, aes(x=x, y=y, fill=value)) +
+  geom_sf(data = adm_boundaries, fill = NA, linewidth = 0.25, color = "black") + 
+  scale_fill_gradientn(
+    colors = viridisLite::viridis(10)[2:10], labels = scales::comma, breaks = pop_breaks,
+    limits = range(pop_breaks), oob = scales::squish, trans = 'log1p'
+  ) + 
+  labs(title = "Population density", x = '', y = '', fill = "Population\n(log scaled)") +
+  map_theme
+
+pdf(file.path(viz_dir, 'population_density.pdf'), height = 8, width = 8)
+plot(pop_fig)
 dev.off()
