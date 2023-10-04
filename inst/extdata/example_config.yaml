@@ -17,11 +17,15 @@ covariate_settings:
   file_format: 'tif'
   add_intercept: TRUE
 covariates:
-  tt_hcf:
-    annual: FALSE
-    transform: 'identity'
-    normalize: TRUE
+  # tt_hcf:
+  #   annual: FALSE
+  #   transform: 'identity'
+  #   normalize: TRUE
   worldpop_total:
+    annual: TRUE
+    transform: 'log1p'
+    normalize: TRUE
+  ntl:
     annual: TRUE
     transform: 'log1p'
     normalize: TRUE
@@ -34,6 +38,16 @@ inla_settings:
   family: 'binomial'
   link: 'logit'
   sample_size_field: 'samplesize'
+  priors:
+    range:
+      threshold: 0.05 # As a fraction of the maxmimum mesh dimension
+      prob_below: 0.05
+    sigma:
+      threshold: 6
+      prob_above: 0.05
+    fixed_effects:
+      threshold: 1
+      prob_above: 0.05
 versions:
   results: 'v1'
 directories:
@@ -72,3 +86,4 @@ directories:
       adm1_summary_table: 'adm1_summary_table.csv'
       adm0_draws: 'adm0_draws.csv'
       adm0_summary_table: 'adm0_summary_table.csv'
+      pop_raster: 'pop_raster.tif'

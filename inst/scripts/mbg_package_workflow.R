@@ -48,7 +48,7 @@ if(interactive()){
     iso3 = 'TZA',
     country = 'Tanzania',
     year = 2022,
-    results_version = '20230927'
+    results_version = '20231003_covs_f'
   )
 } else {
   library(argparse)
@@ -127,7 +127,11 @@ shp_query <- glue::glue(
   'FROM {tools::file_path_sans_ext(config$get("directories", "shps", "files", adm_level))} ',
   'WHERE ADM0_NAME = \'{config$get("country")}\''
 )
-adm_boundaries <- config$read(dir_name = "shps", file_name = adm_level, query = shp_query)
+if(!'adm_boundaries' %in% ls()){
+  adm_boundaries <- config$read(
+    dir_name = "shps", file_name = adm_level, query = shp_query
+  )
+}
 adm_boundaries$polygon_id <- seq_len(nrow(adm_boundaries))
 
 # Create the ID raster from the admin2 spatial object
@@ -175,7 +179,9 @@ if(nrow(input_data) == 0) stop(
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = covariates_list
+  covariates = covariates_list,
+  spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
+  spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma')
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
@@ -183,7 +189,8 @@ inla_fitted_model <- mbg::fit_inla_model(
   data_stack = inla_inputs_list$inla_data_stack,
   spde = inla_inputs_list$spde,
   family = config$get('inla_settings', 'family'),
-  link = config$get('inla_settings', 'link')
+  link = config$get('inla_settings', 'link'),
+  fixed_effects_pc_prior = config$get('inla_settings', 'priors', 'fixed_effects')
 )
 
 
@@ -210,7 +217,7 @@ draw_fields <- paste0('draw_', seq_len(config$get('n_samples')))
 
 # Aggregate to the most detailed admin units
 message("Aggregating draws at the ", max_adm_level_label, " level.")
-aggregation_table <- pixel2poly::build_aggregation_table(
+if(!"aggregation_table" %in% ls()) aggregation_table <- pixel2poly::build_aggregation_table(
   polygons = terra::vect(adm_boundaries),
   id_raster = id_raster,
   polygon_id_field = 'polygon_id'
@@ -274,6 +281,7 @@ config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws')
 config$write(grid_cell_predictions$cell_pred_mean, 'results', 'cell_pred_mean')
 config$write(grid_cell_predictions$cell_pred_lower, 'results', 'cell_pred_lower')
 config$write(grid_cell_predictions$cell_pred_upper, 'results', 'cell_pred_upper')
+config$write(population_raster, 'results', 'pop_raster')
 for(adm_level in names(adm_draws_list)){
   config$write(adm_draws_list[[adm_level]], 'results', paste0(adm_level, '_draws'))
   config$write(adm_summaries_list[[adm_level]], 'results', paste0(adm_level, '_summary_table'))
