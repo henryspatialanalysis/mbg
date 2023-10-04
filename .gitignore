@@ -82,3 +82,6 @@ rsconnect/
 *.exe
 *.out
 *.app
+
+# User-specific code folder
+user_specific/
