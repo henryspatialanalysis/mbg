@@ -1,7 +1,7 @@
 indicator: 'wasted_test'
 country: 'Madagascar' # Should match the ADM0_NAME in the shapefile
 iso3: 'MDG' # Capitalized ISO3 code
-year: 2022
+year: 2021
 modeling_crs: 'EPSG:4326'
 draws_link_function: 'plogis'
 n_samples: 250
