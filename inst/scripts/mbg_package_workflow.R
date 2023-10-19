@@ -44,11 +44,11 @@ if(interactive()){
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'stunted',
-    iso3 = 'TZA',
-    country = 'Tanzania',
+    indicator = 'wasted_test',
+    iso3 = 'MDG',
+    country = 'Madagascar',
     year = 2022,
-    results_version = '20231003_covs_f'
+    results_version = '20231019'
   )
 } else {
   library(argparse)
@@ -70,7 +70,7 @@ if(interactive()){
 
 # Load standard packages
 load_packages <- c(
-  'assertthat', 'data.table', 'glue', 'INLA', 'rgeoboundaries', 'sf', 'terra', 'tictoc'
+  'assertthat', 'data.table', 'glue', 'INLA', 'sf', 'terra', 'tictoc'
 )
 invisible(lapply(load_packages, library, character.only = TRUE))
 tictoc::tic("Full script execution")
