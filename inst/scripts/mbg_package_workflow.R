@@ -47,7 +47,7 @@ if(interactive()){
     indicator = 'wasted_test',
     iso3 = 'MDG',
     country = 'Madagascar',
-    year = 2022,
+    year = 2021,
     results_version = '20231019'
   )
 } else {
