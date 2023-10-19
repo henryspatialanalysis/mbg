@@ -17,10 +17,10 @@ covariate_settings:
   file_format: 'tif'
   add_intercept: TRUE
 covariates:
-  # tt_hcf:
-  #   annual: FALSE
-  #   transform: 'identity'
-  #   normalize: TRUE
+  tt_hcf:
+    annual: FALSE
+    transform: 'identity'
+    normalize: TRUE
   worldpop_total:
     annual: TRUE
     transform: 'log1p'
