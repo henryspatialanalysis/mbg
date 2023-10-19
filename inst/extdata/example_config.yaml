@@ -34,6 +34,19 @@ pop_covariate:
     annual: TRUE
     transform: 'identity'
     normalize: FALSE
+run_stacking: TRUE
+stacking_settings:
+  gbm:
+    verbose: FALSE
+  enet:
+    fraction: 0.75
+    lambda: 0.1
+  lm:
+    intercept: 0  
+stacking_cv_settings:
+  method: 'repeatedcv'
+  number: 5
+  repeats: 5
 inla_settings:
   family: 'binomial'
   link: 'logit'

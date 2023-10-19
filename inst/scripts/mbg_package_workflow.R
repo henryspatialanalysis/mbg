@@ -176,12 +176,27 @@ if(nrow(input_data) == 0) stop(
 
 ## 03) PREPARE AND RUN INLA MODEL ------------------------------------------------------->
 
+# Optional stacking
+if(config$get("run_stacking")){
+  stackers_list <- mbg::run_regression_submodels(
+    input_data = copy(input_data),
+    id_raster = id_raster,
+    covariates = covariates_list,
+    cv_settings = config$get('stacking_cv_settings'),
+    model_settings = config$get('stacking_settings')
+  )
+  stacked_covariates <- stackers_list$predictions
+} else {
+  stacked_covariates <- list()
+}
+
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = covariates_list,
+  covariates = if(config$get('run_stacking')) covariates_list else stacked_covariates,
   spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
-  spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma')
+  spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma'),
+  sum_to_one = config$get('run_stacking')
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
