@@ -1,0 +1,4 @@
+covariate,include,annual,transform,normalize
+tt_hcf,TRUE,FALSE,identity,TRUE
+worldpop_total,TRUE,TRUE,log1p,TRUE
+ntl,TRUE,TRUE,log1p,TRUE

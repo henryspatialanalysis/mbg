@@ -1,7 +1,7 @@
 indicator: 'wasted_test'
 country: 'Madagascar' # Should match the ADM0_NAME in the shapefile
 iso3: 'MDG' # Capitalized ISO3 code
-year: 2022
+year: 2021
 modeling_crs: 'EPSG:4326'
 draws_link_function: 'plogis'
 n_samples: 250
@@ -16,24 +16,11 @@ shapefile_settings:
 covariate_settings:
   file_format: 'tif'
   add_intercept: TRUE
-covariates:
-  # tt_hcf:
-  #   annual: FALSE
-  #   transform: 'identity'
-  #   normalize: TRUE
-  worldpop_total:
-    annual: TRUE
-    transform: 'log1p'
-    normalize: TRUE
-  ntl:
-    annual: TRUE
-    transform: 'log1p'
-    normalize: TRUE
-pop_covariate: 
-  worldpop_u5:
-    annual: TRUE
-    transform: 'identity'
-    normalize: FALSE
+pop_covariate_settings:
+  covariate: 'worldpop_u5'
+  annual: TRUE
+  transform: 'identity'
+  normalize: FALSE
 run_stacking: TRUE
 stacking_settings:
   gbm:
@@ -74,7 +61,8 @@ directories:
   raw_data:
     versioned: FALSE
     path: '~/temp_data/dhs_mbg/model_code/Geosp_Code/input_data'
-    files: NULL
+    files:
+      covariates_table: 'covariates_table.csv'
   covariates:
     versioned: FALSE
     path: '~/temp_data/rr'

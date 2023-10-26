@@ -47,7 +47,7 @@ if(interactive()){
     indicator = 'wasted_test',
     iso3 = 'MDG',
     country = 'Madagascar',
-    year = 2022,
+    year = 2021,
     results_version = '20231019'
   )
 } else {
@@ -135,10 +135,24 @@ adm_boundaries$polygon_id <- seq_len(nrow(adm_boundaries))
 # Create the ID raster from the admin2 spatial object
 id_raster <- pixel2poly::build_id_raster(polygons = terra::vect(adm_boundaries))
 
+# Load table of covariates
+covariates_table <- config$read(
+  "raw_data", "covariates_table",
+  header = TRUE,
+  colClasses = list(
+    character = c('covariate', 'transform'),
+    logical = c('include', 'annual', 'normalize')
+  )
+)
+# Drop covariates where "include" is FALSE
+if('include' %in% colnames(covariates_table)){
+  covariates_table <- covariates_table[include == TRUE, ]
+}
+
 # Load a list of covariates
 covariates_list <- mbg::load_covariates(
   directory = config$get_dir_path('covariates'),
-  settings = config$get('covariates'),
+  covariates_table = covariates_table,
   id_raster = id_raster,
   year = config$get('year'),
   file_format = config$get('covariate_settings', 'file_format'),
@@ -146,9 +160,10 @@ covariates_list <- mbg::load_covariates(
 )
 # Load the population raster
 # Used for population-weighted aggregation from grid cell to admin
+pop_covariate_table <- data.table::as.data.table(config$get('pop_covariate_settings'))
 population_raster <- mbg::load_covariates(
   directory = config$get_dir_path('covariates'),
-  settings = config$get('pop_covariate'),
+  covariates_table = pop_covariate_table,
   id_raster = id_raster,
   year = config$get('year'),
   file_format = config$get('covariate_settings', 'file_format'),

@@ -20,7 +20,7 @@ REPOS_PATH_DEFAULT <- '~/repos'
 #  - `repos_path`: the path to the directory that contains the `versioning` custom package
 
 if(interactive()){
-  config_path <- '~/temp_data/geostats/mbg_results/20231003_midsigma/config.yaml'
+  config_path <- '~/temp_data/geostats/mbg_results/20231019/config.yaml'
   repos_path <- REPOS_PATH_DEFAULT
 } else {
   library(argparse)
