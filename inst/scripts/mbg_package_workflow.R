@@ -236,6 +236,8 @@ grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   inverse_link_function = config$get('draws_link_function'),
   ui_width = config$get('ui_width')
 )
+# Summarize count of people *without* the indicator
+counts_without_mean <- (-1 * grid_cell_predictions$cell_pred_mean + 1) * population_raster
 
 # Prepare objects to store admin draws and summaries
 max_adm_level <- config$get('shapefile_settings', 'modeling_level')
@@ -314,6 +316,7 @@ config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws')
 config$write(grid_cell_predictions$cell_pred_mean, 'results', 'cell_pred_mean')
 config$write(grid_cell_predictions$cell_pred_lower, 'results', 'cell_pred_lower')
 config$write(grid_cell_predictions$cell_pred_upper, 'results', 'cell_pred_upper')
+config$write(counts_without_mean, 'results', 'counts_without_mean')
 config$write(population_raster, 'results', 'pop_raster')
 for(adm_level in names(adm_draws_list)){
   config$write(adm_draws_list[[adm_level]], 'results', paste0(adm_level, '_draws'))
