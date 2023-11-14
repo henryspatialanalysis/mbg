@@ -48,7 +48,7 @@ if(interactive()){
     iso3 = 'MDG',
     country = 'Madagascar',
     year = 2021,
-    results_version = '20231019'
+    results_version = '20231113'
   )
 } else {
   library(argparse)
@@ -69,13 +69,15 @@ if(interactive()){
 ## 01) SETUP ---------------------------------------------------------------------------->
 
 # Load standard packages
-load_packages <- c('assertthat', 'data.table', 'glue', 'INLA', 'sf', 'terra', 'tictoc')
+load_packages <- c(
+  'assertthat', 'data.table', 'glue', 'sf', 'terra', 'tictoc', 'versioning'
+)
 invisible(lapply(load_packages, library, character.only = TRUE))
 tictoc::tic("Full script execution")
 
 # Load custom packages from subfolders within the `repos_path` directory
 assertthat::assert_that(dir.exists(run_specific_settings$repos_path))
-for(custom_package in c('versioning', 'pixel2poly', 'mbg')){
+for(custom_package in c('pixel2poly', 'mbg')){
   custom_package_dir <- file.path(run_specific_settings$repos_path, custom_package)
   assertthat::assert_that(dir.exists(custom_package_dir))
   devtools::load_all(custom_package_dir)
@@ -102,8 +104,8 @@ for(setting_name in c('indicator', 'iso3', 'country', 'year')){
   }
 }
 # The name of the input file is "<raw_data directory>/<indicator>.csv"
-config$config_list$directories$raw_data$files <- list(
-  input_data = paste0(config$get('indicator'), '.csv')
+config$config_list$directories$raw_data$files$input_data <- paste0(
+  paste0(config$get('indicator'), '.csv')
 )
 
 # Create the results directory
@@ -206,7 +208,7 @@ if(config$get("run_stacking")){
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = if(config$get('run_stacking')) covariates_list else stacked_covariates,
+  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
   spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
   spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma'),
   sum_to_one = config$get('run_stacking')
@@ -230,7 +232,7 @@ grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   inla_mesh = inla_inputs_list$mesh,
   n_samples = config$get("n_samples"),
   id_raster = id_raster,
-  covariates = covariates_list,
+  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
   inverse_link_function = config$get('draws_link_function'),
   ui_width = config$get('ui_width')
 )
@@ -301,6 +303,9 @@ for(adm_level in names(adm_summaries_list)){
 config$write(adm_boundaries, 'results', 'adm_boundaries')
 config$write(id_raster, 'results', 'id_raster')
 config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
+if(config$get('run_stacking')){
+  config$write(terra::rast(stacked_covariates), 'results', 'stacked_covariates')
+}
 config$write(input_data, 'results', 'formatted_input_data')
 config$write(inla_inputs_list, 'results', 'inla_data_stack')
 if(config$get('save_full_model')) config$write(inla_fitted_model, 'results', 'inla_model')

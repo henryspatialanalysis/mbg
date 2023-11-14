@@ -24,6 +24,9 @@
 #'   prior for sigma (standard deviation) of the SPDE object. The two named items are
 #'   "threshold", the test threshold for the standard deviation, and "prob_above",
 #'   the prior probability that sigma will EXCEED that threshold.
+#' @param sum_to_one (logical, default FALSE) Should the input covariates be constrained
+#'   to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
+#'   if running an ensemble ('stacking') model.
 #' 
 #' @return List containing the following items:
 #'   - "mesh": The mesh used to approximate the latent Gaussian process
@@ -38,7 +41,8 @@
 prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
-  spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05)
+  spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
+  sum_to_one = FALSE
 ){
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
 
@@ -83,13 +87,21 @@ prepare_inla_data_stack <- function(
   inla_data_stack <- INLA::inla.stack(
     tag = 'est',
     data = list(y = input_data$indicator, samplesize = input_data$samplesize),
-    A = list(1, A_proj_data),
-    effects = list(input_data[, ..cov_names], s = index_space)
+    A = list(covariates = as.matrix(input_data[, ..cov_names]), s = A_proj_data),
+    effects = list(covariates = seq_along(cov_names), s = index_space)
   )
 
   # INLA model formula
-  formula_string <- paste(
-    'y ~ 0 +', paste(cov_names, collapse = ' + '), '+ f(space, model = spde)'
+  if(sum_to_one){
+    constraint_suffix <- glue::glue(
+      ", extraconstr = list(A = matrix(1, ncol = {length(cov_names)}), e = 1)"
+    )
+  } else {
+    constraint_suffix <- ""
+  }
+  formula_string <- glue::glue(
+    "y ~ 0 + f(covariates, model = 'iid', fixed = TRUE {constraint_suffix}) + ",
+    "f(space, model = spde)"
   )
 
   data_list <- list(

@@ -9,7 +9,8 @@ prepare_inla_data_stack(
   id_raster,
   covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
-  spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05)
+  spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
+  sum_to_one = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,10 @@ converts "threshold" from a proportion of the overall mesh extent into a distanc
 prior for sigma (standard deviation) of the SPDE object. The two named items are
 "threshold", the test threshold for the standard deviation, and "prob_above",
 the prior probability that sigma will EXCEED that threshold.}
+
+\item{sum_to_one}{(logical, default FALSE) Should the input covariates be constrained
+to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
+if running an ensemble ('stacking') model.}
 }
 \value{
 List containing the following items:

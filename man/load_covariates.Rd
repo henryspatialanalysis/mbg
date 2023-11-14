@@ -6,7 +6,7 @@
 \usage{
 load_covariates(
   directory,
-  settings,
+  covariates_table,
   id_raster,
   year = NULL,
   file_format = "tif",
@@ -16,10 +16,9 @@ load_covariates(
 \arguments{
 \item{directory}{Directory containing all covariate sub-directories}
 
-\item{settings}{Nested named list, where names of the top-level list correspond to the
-names of each covariate. Each sub-list corresponds to the settings for that
-covariate. Settings include:
+\item{covariates_table}{\code{data.frame} containing at least the following fields:
 \itemize{
+\item 'covariate': (character): Name of the covariate
 \item 'annual': (logical) Does the covariate vary by year? If so, look for the \code{year} in
 the name of the file.
 \item 'transform': (character) Name of a function to use to transform the covariate.
@@ -35,9 +34,12 @@ study area}
 \item{year}{(numeric, default NULL) Year of data to for time-varying covariates.
 If NULL, the default, uses the current year.}
 
-\item{file_format}{(character, default 'tif')}
+\item{file_format}{(character, default 'tif') File format for the raster covariate
+data. Used to search for the input file within the proper containing folder.}
 
-\item{add_intercept}{(logical, default FALSE)}
+\item{add_intercept}{(logical, default FALSE) Should a covariate called "intercept",
+a raster object with 1s in all required cells, be placed at the start of the returned
+covariates list?}
 }
 \value{
 A named list of formatted covariates. Each list item is a terra SpatRaster with

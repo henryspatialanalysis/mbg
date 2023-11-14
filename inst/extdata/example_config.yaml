@@ -29,7 +29,7 @@ stacking_settings:
     fraction: 0.75
     lambda: 0.1
   lm:
-    intercept: 0  
+    model: TRUE
 stacking_cv_settings:
   method: 'repeatedcv'
   number: 5
@@ -88,3 +88,4 @@ directories:
       adm0_draws: 'adm0_draws.csv'
       adm0_summary_table: 'adm0_summary_table.csv'
       pop_raster: 'pop_raster.tif'
+      stacked_covariates: 'stacked_covariates.tif'
