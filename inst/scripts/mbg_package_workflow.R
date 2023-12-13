@@ -175,7 +175,6 @@ population_raster <- mbg::load_covariates(
 
 # Load input data from the `raw_data` directory
 # This file path was set based on the indicator on line 105
-indicator <- config$get('indicator')
 input_data <- config$read("raw_data", "input_data")[
   (year == config$get("year")) & (country == config$get("iso3")),
   .(
