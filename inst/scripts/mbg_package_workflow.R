@@ -44,11 +44,11 @@ if(interactive()){
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'wasted_test',
+    indicator = 'basic_water',
     iso3 = 'MDG',
     country = 'Madagascar',
     year = 2021,
-    results_version = '20231019'
+    results_version = '20231213'
   )
 } else {
   library(argparse)
@@ -104,8 +104,9 @@ for(setting_name in c('indicator', 'iso3', 'country', 'year')){
   }
 }
 # The name of the input file is "<raw_data directory>/<indicator>.csv"
-config$config_list$directories$raw_data$files <- list(
-  input_data = paste0(config$get('indicator'), '.csv')
+config$config_list$directories$raw_data$files <- c(
+  config$config_list$directories$raw_data$files,
+  list(input_data = paste0(config$get('indicator'), '.csv'))
 )
 
 # Create the results directory
@@ -174,15 +175,14 @@ population_raster <- mbg::load_covariates(
 
 # Load input data from the `raw_data` directory
 # This file path was set based on the indicator on line 105
-input_data <- (
-  config$read("raw_data", "input_data")
-  [(year == config$get("year")) & (country == config$get("iso3")), ] |>
-  setnames(
-    old = c('longitude', 'latitude', 'N', config$get('indicator')),
-    new = c('x', 'y', 'samplesize', 'indicator'),
-    skip_absent = TRUE
+indicator <- config$get('indicator')
+input_data <- config$read("raw_data", "input_data")[
+  (year == config$get("year")) & (country == config$get("iso3")),
+  .(
+    year, country, y = as.numeric(latitude), x = as.numeric(longitude),
+    samplesize = N, indicator = get(config$get('indicator')), weight, cluster_id
   )
-)
+] |> na.omit()
 if(nrow(input_data) == 0) stop(
   "After subsetting to data from ", config$get("country"), " in ", config$get("year"),
   ", no rows of data remain."
