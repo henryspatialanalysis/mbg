@@ -44,11 +44,11 @@ if(interactive()){
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'basic_water',
+    indicator = 'anc_visit_test',
     iso3 = 'MDG',
     country = 'Madagascar',
     year = 2021,
-    results_version = '20231213'
+    results_version = '20231218'
   )
 } else {
   library(argparse)
