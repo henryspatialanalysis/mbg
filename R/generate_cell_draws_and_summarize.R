@@ -47,7 +47,6 @@ generate_cell_draws_and_summarize <- function(
   ui_width = 0.95
 ){
   tictoc::tic("Posterior cell draw generation")
-  # TODO add validation
 
   # Generate INLA posterior samples
   posterior_samples <- INLA::inla.posterior.sample(
@@ -78,12 +77,7 @@ generate_cell_draws_and_summarize <- function(
 
   ## Split parameter matrix into fixed effect coeffients and spatial mesh effects
   # Fixed effect coefficients
-  fe_rows <- sapply(cov_names, function(fe){
-    which_row <- which(rownames(latent_matrix) == fe)
-    # There should be exactly one row per covariate effect
-    assertthat::assert_that(length(which_row) == 1)
-    return(which_row)
-  })
+  fe_rows <- which(rownames(latent_matrix) == 'covariates')
   fe_coefficients <- latent_matrix[fe_rows, ]
   # Spatial mesh effects
   spatial_mesh_effects <- latent_matrix[rownames(latent_matrix) == 'space', ]

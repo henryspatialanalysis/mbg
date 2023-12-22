@@ -21,6 +21,19 @@ pop_covariate_settings:
   annual: TRUE
   transform: 'identity'
   normalize: FALSE
+run_stacking: TRUE
+stacking_settings:
+  gbm:
+    verbose: FALSE
+  enet:
+    fraction: 0.75
+    lambda: 0.1
+  lm:
+    model: TRUE
+stacking_cv_settings:
+  method: 'repeatedcv'
+  number: 5
+  repeats: 5
 inla_settings:
   family: 'binomial'
   link: 'logit'
@@ -76,3 +89,4 @@ directories:
       adm0_draws: 'adm0_draws.csv'
       adm0_summary_table: 'adm0_summary_table.csv'
       pop_raster: 'pop_raster.tif'
+      stacked_covariates: 'stacked_covariates.tif'

@@ -70,14 +70,14 @@ if(interactive()){
 
 # Load standard packages
 load_packages <- c(
-  'assertthat', 'data.table', 'glue', 'INLA', 'sf', 'terra', 'tictoc'
+  'assertthat', 'data.table', 'glue', 'sf', 'terra', 'tictoc', 'versioning'
 )
 invisible(lapply(load_packages, library, character.only = TRUE))
 tictoc::tic("Full script execution")
 
 # Load custom packages from subfolders within the `repos_path` directory
 assertthat::assert_that(dir.exists(run_specific_settings$repos_path))
-for(custom_package in c('versioning', 'pixel2poly', 'mbg')){
+for(custom_package in c('pixel2poly', 'mbg')){
   custom_package_dir <- file.path(run_specific_settings$repos_path, custom_package)
   assertthat::assert_that(dir.exists(custom_package_dir))
   devtools::load_all(custom_package_dir)
@@ -190,12 +190,27 @@ if(nrow(input_data) == 0) stop(
 
 ## 03) PREPARE AND RUN INLA MODEL ------------------------------------------------------->
 
+# Optional stacking
+if(config$get("run_stacking")){
+  stackers_list <- mbg::run_regression_submodels(
+    input_data = copy(input_data),
+    id_raster = id_raster,
+    covariates = covariates_list,
+    cv_settings = config$get('stacking_cv_settings'),
+    model_settings = config$get('stacking_settings')
+  )
+  stacked_covariates <- stackers_list$predictions
+} else {
+  stacked_covariates <- list()
+}
+
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = covariates_list,
+  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
   spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
-  spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma')
+  spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma'),
+  sum_to_one = config$get('run_stacking')
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
@@ -216,7 +231,7 @@ grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   inla_mesh = inla_inputs_list$mesh,
   n_samples = config$get("n_samples"),
   id_raster = id_raster,
-  covariates = covariates_list,
+  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
   inverse_link_function = config$get('draws_link_function'),
   ui_width = config$get('ui_width')
 )
@@ -289,6 +304,9 @@ for(adm_level in names(adm_summaries_list)){
 config$write(adm_boundaries, 'results', 'adm_boundaries')
 config$write(id_raster, 'results', 'id_raster')
 config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
+if(config$get('run_stacking')){
+  config$write(terra::rast(stacked_covariates), 'results', 'stacked_covariates')
+}
 config$write(input_data, 'results', 'formatted_input_data')
 config$write(inla_inputs_list, 'results', 'inla_data_stack')
 if(config$get('save_full_model')) config$write(inla_fitted_model, 'results', 'inla_model')

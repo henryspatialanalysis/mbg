@@ -20,7 +20,7 @@ REPOS_PATH_DEFAULT <- '~/repos'
 #  - `repos_path`: the path to the directory that contains the `versioning` custom package
 
 if(interactive()){
-  config_path <- '~/temp_data/geostats/mbg_results/20231019/config.yaml'
+  config_path <- '~/temp_data/geostats/mbg_results/20231113/config.yaml'
   repos_path <- REPOS_PATH_DEFAULT
 } else {
   library(argparse)
@@ -36,16 +36,12 @@ if(interactive()){
 
 ## 01) SETUP ---------------------------------------------------------------------------->
 
-# Load standard packages
+# Load packages
 load_packages <- c(
-  'data.table', 'ggplot2', 'glue', 'patchwork', 'RColorBrewer', 'sf', 'viridisLite', 'INLA'
+  'data.table', 'ggplot2', 'glue', 'patchwork', 'RColorBrewer', 'sf', 'versioning',
+  'viridisLite', 'INLA'
 )
 invisible(lapply(load_packages, library, character.only = TRUE))
-
-# Load the versioning package based on the `repos_path`
-versioning_dir <- file.path(repos_path, 'versioning')
-assertthat::assert_that(dir.exists(versioning_dir))
-devtools::load_all(versioning_dir)
 
 # Load the configuration object
 config <- versioning::Config$new(config_list = config_path)
@@ -120,6 +116,35 @@ raster_fig <- ggplot() +
 pdf(file.path(viz_dir, 'summary_rasters.pdf'), height = 6, width = 10)
 print(raster_fig)
 dev.off()
+
+
+## 03b) OPTIONAL: Plot stacked covariate predictions ------------------------------------>
+
+if(tryCatch(config$get('run_stacking'), error = function(e) FALSE)){
+  # Load stackers and convert to a table
+  stacked_preds <- config$read('results', 'stacked_covariates')
+  stacked_raster_table <- lapply(names(stacked_preds), function(stacker_name){
+    raster_to_table(stacked_preds[[stacker_name]], type = stacker_name)
+  }) |> do.call(what = rbind)
+
+  # Plot stackers
+  raster_fig <- ggplot() + 
+    facet_wrap('type', nrow = 1) +
+    geom_raster(data = stacked_raster_table, aes(x = x, y = y, fill = value)) + 
+    geom_sf(data = adm_boundaries, fill = NA, linewidth = 0.05, color = '#444444') + 
+    scale_fill_gradientn(
+      colors = color_scheme, limits = value_limits, oob = scales::squish,
+      labels = scales::percent
+    ) +
+    labs(
+      title = glue::glue("Component stacker predictions: {indicator} in {country}, {year}"),
+      x = '', y = '', fill = indicator
+    ) +
+    map_theme
+  pdf(file.path(viz_dir, 'stacker_predictions.pdf'), height = 6, width = 10)
+  print(raster_fig)
+  dev.off()
+}
 
 
 ## 03) Plot the summary administrative data --------------------------------------------->
