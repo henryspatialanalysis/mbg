@@ -3,6 +3,7 @@
 export(fit_inla_model)
 export(generate_cell_draws_and_summarize)
 export(load_covariates)
+export(make_time_stamp)
 export(prepare_inla_data_stack)
 export(run_regression_submodels)
 export(summarize_draws)
