@@ -44,11 +44,11 @@ if(interactive()){
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
     config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'anc_visit_test',
+    indicator = 'basic_water',
     iso3 = 'MDG',
     country = 'Madagascar',
     year = 2021,
-    results_version = '20231218'
+    results_version = 'time_stamp'
   )
 } else {
   library(argparse)
@@ -83,10 +83,15 @@ for(custom_package in c('pixel2poly', 'mbg')){
   devtools::load_all(custom_package_dir)
 }
 
-# Set the custom results version, if one was passed 
+# The custom results version may be one of three options:
 if(is.null(run_specific_settings$results_version)){
+  # --> If NULL, use the results version from the config file
   custom_versions <- NULL
+} else if(run_specific_settings$results_version == 'time_stamp'){
+  # --> If the results version is 'time_stamp', create a custom time stamp for this run
+  custom_versions <- list(results = mbg::make_time_stamp())
 } else {
+  # --> If the results version is not NULL or "time_stamp", use that version directly
   custom_versions <- list(results = run_specific_settings$results_version)
 }
 
