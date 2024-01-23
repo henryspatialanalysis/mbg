@@ -49,9 +49,10 @@ prepare_inla_data_stack <- function(
 
   # Build prediction mesh
   mesh <- INLA::inla.mesh.2d(
+    loc = input_data[, .(x, y)],
     loc.domain = id_raster_table[, .(x, y)],
-    max.edge = c(0.3, 5),
-    cutoff = 0.05
+    max.edge = c(0.2, 5),
+    cutoff = 0.04
   )
   # The maximum mesh dimension will be used to determine the SPDE range prior
   max_d <- apply(X = mesh$loc, MARGIN = 2, FUN = function(x) diff(range(x))) |>
