@@ -7,7 +7,7 @@
 #' @param milliseconds (`logical(1)`, default TRUE) Should milliseconds be appended to
 #'   the timestamp? Useful when launching many models in quick succession.
 #' 
-#' @return A string formatted as 'YYYYMMDD_HH_MM_SS[_optional MS][_optional suffix]'
+#' @return A string formatted as 'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'
 #' 
 #' @export
 make_time_stamp <- function(suffix = NULL, milliseconds = T){
