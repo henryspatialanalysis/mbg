@@ -24,37 +24,71 @@
 #' @param model_settings Named list where the name of each header corresponds to a model
 #'   run in [caret::train], and the arguments correspond to the model-specific settings
 #'   for that model type.
+#' @param clamping (`logical(1)`, default TRUE) Should the predictions of individual ML
+#'   models be limited to the range observed in the data?
+#' @param use_admin_bounds (`logical(1)`, default FALSE) Use one-hot encoding of
+#'   administrative boundaries as a candidate feature?
+#' @param admin_bounds ([sf][sf::sf], default NULL) Administrative boundaries to use.
+#'   Only considered if `use_admin_bounds` is TRUE.
+#' @param admin_bounds_id (`character`, default 'polygon_id') Field to use for
+#'   administrative boundary one-hot encoding. Only considered if `use_admin_bounds` is
+#'   TRUE.
 #' 
 #' @return List with two items:
 #'   - "models": A list containing summary objects for each regression model
 #'   - "predictions": Model predictions covering the entire id_raster
 #'
 #' @importFrom caret trainControl train
-#' @importFrom terra extract values
+#' @importFrom stats model.matrix
+#' @importFrom terra extract values rasterize
 #' @import data.table
 #' @export 
 run_regression_submodels <- function(
-  input_data, id_raster, covariates, cv_settings, model_settings
+  input_data, id_raster, covariates, cv_settings, model_settings, clamping = TRUE,
+  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id'
 ){
   # Prepare training data and eventual prediction space
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
   colnames(id_raster_table)[3] <- 'pixel_id'
   cov_names <- names(covariates)
+  xy_train <- as.matrix(input_data[, .(x, y)])
+  xy_pred <- as.matrix(id_raster_table[, .(x, y)])
   for(cov_name in setdiff(cov_names, 'intercept')){
-    input_data[[cov_name]] <- terra::extract(
-      x = covariates[[cov_name]],
-      y = as.matrix(input_data[, .(x, y)])
-    )[, 1]
-    id_raster_table[[cov_name]] <- terra::extract(
-      x = covariates[[cov_name]],
-      y = as.matrix(id_raster_table[, .(x, y)])
-    )[, 1]    
+    input_data[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_train)[, 1]
+    id_raster_table[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_pred)[, 1]    
+  }
+
+  # Optionally add administrative identifiers as features
+  if(use_admin_bounds){
+    if(is.null(admin_bounds)) stop("Administrative polygons not included")
+    admin_bounds$ADM_ <- factor(gsub(' ', '_', admin_bounds[[admin_bounds_id]]))
+    admin_raster <- terra::vect(admin_bounds)[, c('ADM_')] |>
+      terra::rasterize(y = id_raster, field = 'ADM_')
+    options(na.action = 'na.pass')
+    bounds_training <- stats::model.matrix(
+      ~ 0 + ADM_,
+      data = terra::extract(x = admin_raster, y = xy_train)
+    ) |> as.data.frame()
+    bounds_prediction <- stats::model.matrix(
+      ~ 0 + ADM_, 
+      data = terra::extract(x = admin_raster, y = xy_pred)
+    ) |> as.data.frame()
+    for(adm_unit in colnames(bounds_training)){
+      if(sum(bounds_training[[adm_unit]], na.rm = T) < 3){
+        bounds_training[[adm_unit]] <- NULL
+        bounds_prediction[[adm_unit]] <- NULL
+      }
+    }
+    # Add to the training and prediction data.frames
+    input_data <- cbind(input_data, bounds_training)
+    id_raster_table <- cbind(id_raster_table, bounds_prediction)
+    cov_names <- c(cov_names, colnames(bounds_training))    
   }
 
   # Subset only to data outcome (indicator / samplesize), covariates, and x/y
   cov_cols <- c(setdiff(cov_names, 'intercept'), 'x', 'y')
   input_data$data_rate <- input_data$indicator / input_data$samplesize
-  training_data <- copy(input_data[, c('data_rate', cov_cols), with = F ])
+  training_data <- copy(na.omit(input_data[, c('data_rate', cov_cols), with = F ]))
   prediction_grid <- copy(na.omit(id_raster_table))
 
   # Set internal out-of-sample tuning
@@ -63,6 +97,9 @@ run_regression_submodels <- function(
   # Make a fully NA raster to add predictions to
   template_raster <- id_raster
   terra::values(template_raster) <- NA_real_
+
+  min_observed <- min(input_data$data_rate, na.rm = T)
+  max_observed <- max(input_data$data_rate, na.rm = T)
 
   # Run each stacker, then predict to a raster
   model_names <- names(model_settings)
@@ -82,6 +119,10 @@ run_regression_submodels <- function(
     )
     pred_raster <- template_raster
     terra::values(pred_raster)[prediction_grid$pixel_id] <- prediction_grid$new_vals
+    if(clamping){
+      pred_raster[pred_raster < min_observed] <- min_observed
+      pred_raster[pred_raster > max_observed] <- max_observed
+    }
     preds_list[[model_name]] <- pred_raster
   }
   return(list(models = models_list, predictions = preds_list))
