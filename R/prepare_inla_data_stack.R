@@ -37,6 +37,7 @@
 #' @importFrom INLA inla.mesh.2d inla.spde2.pcmatern inla.spde.make.A inla.stack
 #' @importFrom data.table as.data.table
 #' @importFrom terra extract
+#' @importFrom glue glue
 #' @export
 prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
