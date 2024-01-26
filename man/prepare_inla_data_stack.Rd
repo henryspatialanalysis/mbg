@@ -10,7 +10,9 @@ prepare_inla_data_stack(
   covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
-  sum_to_one = FALSE
+  sum_to_one = FALSE,
+  mesh_max_edge = c(0.2, 5),
+  mesh_cutoff = 0.04
 )
 }
 \arguments{
@@ -42,6 +44,12 @@ the prior probability that sigma will EXCEED that threshold.}
 \item{sum_to_one}{(logical, default FALSE) Should the input covariates be constrained
 to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
 if running an ensemble ('stacking') model.}
+
+\item{mesh_max_edge}{(\code{numeric(2)}, default c(0.2, 5)) Maximum size of the INLA mesh
+inside (1) and outside (2) of the region.}
+
+\item{mesh_cutoff}{(\code{numeric(1)}, default 0.04) Minimum size of the INLA mesh, usually
+reached in data-dense areas.}
 }
 \value{
 List containing the following items:

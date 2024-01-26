@@ -27,6 +27,10 @@
 #' @param sum_to_one (logical, default FALSE) Should the input covariates be constrained
 #'   to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
 #'   if running an ensemble ('stacking') model.
+#' @param mesh_max_edge (`numeric(2)`, default c(0.2, 5)) Maximum size of the INLA mesh
+#'   inside (1) and outside (2) of the region.
+#' @param mesh_cutoff (`numeric(1)`, default 0.04) Minimum size of the INLA mesh, usually
+#'   reached in data-dense areas.
 #' 
 #' @return List containing the following items:
 #'   - "mesh": The mesh used to approximate the latent Gaussian process
@@ -43,7 +47,9 @@ prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
-  sum_to_one = FALSE
+  sum_to_one = FALSE,
+  mesh_max_edge = c(0.2, 5),
+  mesh_cutoff = 0.04
 ){
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
 
@@ -51,8 +57,8 @@ prepare_inla_data_stack <- function(
   mesh <- INLA::inla.mesh.2d(
     loc = input_data[, .(x, y)],
     loc.domain = id_raster_table[, .(x, y)],
-    max.edge = c(0.2, 5),
-    cutoff = 0.04
+    max.edge = mesh_max_edge,
+    cutoff = mesh_cutoff
   )
   # The maximum mesh dimension will be used to determine the SPDE range prior
   max_d <- apply(X = mesh$loc, MARGIN = 2, FUN = function(x) diff(range(x))) |>
