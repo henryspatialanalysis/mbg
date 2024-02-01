@@ -10,7 +10,8 @@ load_covariates(
   id_raster,
   year = NULL,
   file_format = "tif",
-  add_intercept = FALSE
+  add_intercept = FALSE,
+  check_previous_years = 10
 )
 }
 \arguments{
@@ -40,6 +41,10 @@ data. Used to search for the input file within the proper containing folder.}
 \item{add_intercept}{(logical, default FALSE) Should a covariate called "intercept",
 a raster object with 1s in all required cells, be placed at the start of the returned
 covariates list?}
+
+\item{check_previous_years}{(integer > 0, default 10) If annual data is not found in
+this year, how many previous years should be checked? If 0, will not check any
+previous years.}
 }
 \value{
 A named list of formatted covariates. Each list item is a terra SpatRaster with

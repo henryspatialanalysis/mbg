@@ -26,6 +26,9 @@ get_current_year <- function(){
 #' @param add_intercept (logical, default FALSE) Should a covariate called "intercept",
 #'   a raster object with 1s in all required cells, be placed at the start of the returned
 #'   covariates list?
+#' @param check_previous_years (integer > 0, default 10) If annual data is not found in
+#'   this year, how many previous years should be checked? If 0, will not check any
+#'   previous years.
 #' 
 #' @return A named list of formatted covariates. Each list item is a terra SpatRaster with
 #'   one layer and the same dimensions as the `id_raster`
@@ -35,7 +38,7 @@ get_current_year <- function(){
 #' @export
 load_covariates <- function(
   directory, covariates_table, id_raster, year = NULL, file_format = 'tif',
-  add_intercept = FALSE
+  add_intercept = FALSE, check_previous_years = 10
 ){
   # Input data checks
   assertthat::assert_that(dir.exists(directory))
@@ -76,7 +79,18 @@ load_covariates <- function(
     )
     # For annual covariates, the year must also be in the filename
     if(cov_settings$annual){
-      paths <- grep(pattern = paste0('_', year, '_'), x = paths, value = TRUE)
+      test_year <- year
+      annual_paths <- character(0)
+      # Check this year (or previous years, if specified) for annual data
+      while((length(annual_paths) == 0) & (test_year >= (year - check_previous_years))){
+        annual_paths <- grep(pattern = paste0('_', test_year, '_'), x = paths, value = TRUE)
+        test_year <- test_year - 1
+      }
+      if((length(annual_paths) > 0) & (test_year != year)) warning(paste(
+        "Could not find", year, "data for covariate", cov_name, "-- using", test_year,
+        "data instead."
+      ))
+      paths <- annual_paths
     }
     # The search must match exactly one file
     if(length(paths) == 0) stop("File search for covariate ", cov_name, " matched no files.")
