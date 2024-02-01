@@ -61,7 +61,7 @@ run_regression_submodels <- function(
   # Optionally add administrative identifiers as features
   if(use_admin_bounds){
     if(is.null(admin_bounds)) stop("Administrative polygons not included")
-    admin_bounds$ADM_ <- factor(gsub(' ', '_', admin_bounds[[admin_bounds_id]]))
+    admin_bounds$ADM_ <- factor(make.names(admin_bounds[[admin_bounds_id]]))
     admin_raster <- terra::vect(admin_bounds)[, c('ADM_')] |>
       terra::rasterize(y = id_raster, field = 'ADM_')
     options(na.action = 'na.pass')
