@@ -80,11 +80,11 @@ load_covariates <- function(
     # For annual covariates, the year must also be in the filename
     if(cov_settings$annual){
       test_year <- year
-      annual_paths <- character(0)
+      annual_paths <- grep(pattern = paste0('_', test_year, '_'), x = paths, value = TRUE)
       # Check this year (or previous years, if specified) for annual data
-      while((length(annual_paths) == 0) & (test_year >= (year - check_previous_years))){
-        annual_paths <- grep(pattern = paste0('_', test_year, '_'), x = paths, value = TRUE)
+      while((length(annual_paths) == 0) & (test_year > (year - check_previous_years))){
         test_year <- test_year - 1
+        annual_paths <- grep(pattern = paste0('_', test_year, '_'), x = paths, value = TRUE)
       }
       if((length(annual_paths) > 0) & (test_year != year)) warning(paste(
         "Could not find", year, "data for covariate", cov_name, "-- using", test_year,
