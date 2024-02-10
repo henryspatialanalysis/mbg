@@ -1,11 +1,8 @@
-indicator: 'wasted_test'
-country: 'Madagascar' # Should match the ADM0_NAME in the shapefile
-iso3: 'MDG' # Capitalized ISO3 code
-year: 2021
+indicator: 'basic_sanitation'
+country: 'Zambia' # Should match the ADM0_NAME in the shapefile
+iso3: 'ZMB' # Capitalized ISO3 code
+year: 2018
 modeling_crs: 'EPSG:4326'
-draws_link_function: 'plogis'
-n_samples: 250
-ui_width: 0.95
 save_full_model: FALSE # Should the full INLA model be saved? Memory-intensive
 shapefile_settings:
   modeling_level: 2
@@ -17,58 +14,67 @@ covariate_settings:
   file_format: 'tif'
   add_intercept: TRUE
 pop_covariate_settings:
-  covariate: 'worldpop_u5'
+  covariate: 'worldpop_total'
   annual: TRUE
   transform: 'identity'
   normalize: FALSE
-run_stacking: TRUE
 stacking_settings:
-  gbm:
-    verbose: FALSE
-  enet:
-    fraction: 0.75
-    lambda: 0.1
-  lm:
-    model: TRUE
-stacking_cv_settings:
-  method: 'repeatedcv'
-  number: 5
-  repeats: 5
+  run_stacking: TRUE
+  adm1_fixed_effects: TRUE
+  submodels:
+    enet:
+    svmRadial:
+    gam:
+    gbm:
+      verbose: FALSE
+  cv:
+    method: 'repeatedcv'
+    number: 5
+    repeats: 5
 inla_settings:
   family: 'binomial'
   link: 'logit'
   sample_size_field: 'samplesize'
+  mesh_integrate_to_zero: TRUE
   priors:
     range:
-      threshold: 0.05 # As a fraction of the maxmimum mesh dimension
+      threshold: 0.05
       prob_below: 0.05
     sigma:
-      threshold: 6
+      threshold: 3.0
       prob_above: 0.05
     fixed_effects:
-      threshold: 1
+      threshold: 3.0
       prob_above: 0.05
+    nugget:
+      threshold: 3.0
+      prob_above: 0.05
+prediction_settings:
+  n_samples: 250
+  ui_width: 0.95
+  nugget_in_predict: TRUE
+  draws_link_function: 'plogis'
 versions:
   results: 'v1'
 directories:
   shps:
     versioned: FALSE
-    path: '/mnt/c/Users/Lenovo/OneDrive - Henry Spatial Analysis LLC/Henry Spatial Analysis/DHS/Sharing/Updated GAUL shapefile/updated_gaul_v2'
+    path: '~/EXAMPLE/FOLDER/'
     files:
       adm0: 'g2015_2014_0.shp'
       adm1: 'g2015_2014_1.shp'
       adm2: 'g2015_2014_2.shp'
   raw_data:
     versioned: FALSE
-    path: '~/temp_data/dhs_mbg/model_code/Geosp_Code/input_data'
+    path: '~/EXAMPLE/FOLDER/'
     files:
       covariates_table: 'covariates_table.csv'
   covariates:
     versioned: FALSE
-    path: '~/temp_data/rr'
+    path: '~/EXAMPLE/FOLDER/'
   results:
     versioned: TRUE
-    path: '~/temp_data/geostats/mbg_results'
+    path: '~/EXAMPLE/FOLDER/'
     files:
       adm_boundaries: 'adm_boundaries.shp'
       id_raster: 'id_raster.tif'

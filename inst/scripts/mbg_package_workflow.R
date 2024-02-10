@@ -43,11 +43,11 @@ if(interactive()){
   # If running the script interactively, you can optionally update settings
   run_specific_settings <- list(
     repos_path = DEFAULT_REPOS_PATH,
-    config_path = DEFAULT_CONFIG_PATH,
-    indicator = 'basic_water',
-    iso3 = 'MDG',
-    country = 'Madagascar',
-    year = 2021,
+    config_path = file.path(DEFAULT_REPOS_PATH, 'mbg_scripts/nat_defaults/config.yaml'),
+    indicator = 'basic_sanitation',
+    iso3 = 'ZMB',
+    country = 'Zambia',
+    year = 2018,
     results_version = 'time_stamp'
   )
 } else {
@@ -196,13 +196,17 @@ if(nrow(input_data) == 0) stop(
 ## 03) PREPARE AND RUN INLA MODEL ------------------------------------------------------->
 
 # Optional stacking
-if(config$get("run_stacking")){
+run_stacking <- config$get("stacking_settings", "run_stacking")
+if(run_stacking){
   stackers_list <- mbg::run_regression_submodels(
     input_data = copy(input_data),
     id_raster = id_raster,
     covariates = covariates_list,
-    cv_settings = config$get('stacking_cv_settings'),
-    model_settings = config$get('stacking_settings')
+    cv_settings = config$get("stacking_settings", "cv"),
+    model_settings = config$get("stacking_settings", "submodels"),
+    use_admin_bounds = config$get("stacking_settings", "adm1_fixed_effects"),
+    admin_bounds = adm_boundaries,
+    admin_bounds_id = ifelse('ADM1_NAME' %in% names(adm_boundaries), 'ADM1_NAME', 'polygon_id')
   )
   stacked_covariates <- stackers_list$predictions
 } else {
@@ -212,10 +216,12 @@ if(config$get("run_stacking")){
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
+  covariates = if(run_stacking) stacked_covariates else covariates_list,
   spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
   spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma'),
-  sum_to_one = config$get('run_stacking')
+  nugget_pc_prior = config$get('inla_settings', 'priors', 'nugget'),
+  mesh_integrate_to_zero = config$get('inla_settings', 'mesh_integrate_to_zero'),
+  sum_to_one = run_stacking
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
@@ -234,11 +240,12 @@ inla_fitted_model <- mbg::fit_inla_model(
 grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   inla_model = inla_fitted_model,
   inla_mesh = inla_inputs_list$mesh,
-  n_samples = config$get("n_samples"),
+  n_samples = config$get('prediction_settings', 'n_samples'),
   id_raster = id_raster,
-  covariates = if(config$get('run_stacking')) stacked_covariates else covariates_list,
-  inverse_link_function = config$get('draws_link_function'),
-  ui_width = config$get('ui_width')
+  covariates = if(run_stacking) stacked_covariates else covariates_list,
+  inverse_link_function = config$get('prediction_settings', 'draws_link_function'),
+  nugget_in_predict = config$get('prediction_settings', 'nugget_in_predict'),
+  ui_width = config$get('prediction_settings', 'ui_width')
 )
 # Summarize count of people *without* the indicator
 counts_without_mean <- (-1 * grid_cell_predictions$cell_pred_mean + 1) * population_raster
@@ -249,7 +256,7 @@ max_adm_level_label <- paste0('adm', max_adm_level)
 all_adm_levels <- seq(0, max_adm_level)
 adm_draws_list <- adm_summaries_list <- vector('list', length = length(all_adm_levels))
 names(adm_draws_list) <- names(adm_summaries_list) <- paste0('adm', all_adm_levels)
-draw_fields <- paste0('draw_', seq_len(config$get('n_samples')))
+draw_fields <- paste0('draw_', seq_len(config$get('prediction_settings', 'n_samples')))
 
 # Aggregate to the most detailed admin units
 message("Aggregating draws at the ", max_adm_level_label, " level.")
@@ -297,7 +304,7 @@ for(adm_level in names(adm_summaries_list)){
     draws = adm_draws_list[[adm_level]],
     id_fields = id_fields,
     draw_fields = draw_fields,
-    ui_width = config$get("ui_width")
+    ui_width = config$get("prediction_settings", "ui_width")
   )
   adm_summary[adm_draws_list[[adm_level]], population := i.population, on = id_fields]
   adm_summaries_list[[adm_level]] <- adm_summary
@@ -309,7 +316,7 @@ for(adm_level in names(adm_summaries_list)){
 config$write(adm_boundaries, 'results', 'adm_boundaries')
 config$write(id_raster, 'results', 'id_raster')
 config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
-if(config$get('run_stacking')){
+if(run_stacking){
   config$write(terra::rast(stacked_covariates), 'results', 'stacked_covariates')
 }
 config$write(input_data, 'results', 'formatted_input_data')
