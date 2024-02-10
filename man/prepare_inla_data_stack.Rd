@@ -10,6 +10,8 @@ prepare_inla_data_stack(
   covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
+  nugget_pc_prior = list(threshold = 3, prob_above = 0.05),
+  mesh_integrate_to_zero = FALSE,
   sum_to_one = FALSE,
   mesh_max_edge = c(0.2, 5),
   mesh_cutoff = 0.04
@@ -40,6 +42,11 @@ converts "threshold" from a proportion of the overall mesh extent into a distanc
 prior for sigma (standard deviation) of the SPDE object. The two named items are
 "threshold", the test threshold for the standard deviation, and "prob_above",
 the prior probability that sigma will EXCEED that threshold.}
+
+\item{nugget_pc_prior}{A named list specifying the penalized complexity prior for the
+nugget (IID observation-level error) term. The two named items are "threshold", the
+test threshold for the nugget standard deviation, and "prob_above", the prior
+probability that the standard deviation will EXCEED that threshold.}
 
 \item{sum_to_one}{(logical, default FALSE) Should the input covariates be constrained
 to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE

@@ -24,6 +24,10 @@
 #'   prior for sigma (standard deviation) of the SPDE object. The two named items are
 #'   "threshold", the test threshold for the standard deviation, and "prob_above",
 #'   the prior probability that sigma will EXCEED that threshold.
+#' @param nugget_pc_prior A named list specifying the penalized complexity prior for the
+#'   nugget (IID observation-level error) term. The two named items are "threshold", the
+#'   test threshold for the nugget standard deviation, and "prob_above", the prior
+#'   probability that the standard deviation will EXCEED that threshold.
 #' @param sum_to_one (logical, default FALSE) Should the input covariates be constrained
 #'   to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
 #'   if running an ensemble ('stacking') model.
@@ -47,6 +51,8 @@ prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
+  nugget_pc_prior = list(threshold = 3, prob_above = 0.05),
+  mesh_integrate_to_zero = FALSE,
   sum_to_one = FALSE,
   mesh_max_edge = c(0.2, 5),
   mesh_cutoff = 0.04
@@ -68,7 +74,7 @@ prepare_inla_data_stack <- function(
   spde <- INLA::inla.spde2.pcmatern(
     mesh = mesh,
     alpha = 2,
-    constr = TRUE,
+    constr = !mesh_integrate_to_zero,
     prior.range = c(max_d * spde_range_pc_prior$threshold, spde_range_pc_prior$prob_below),
     prior.sigma = c(spde_sigma_pc_prior$threshold, spde_sigma_pc_prior$prob_above)
   )
@@ -95,8 +101,16 @@ prepare_inla_data_stack <- function(
   inla_data_stack <- INLA::inla.stack(
     tag = 'est',
     data = list(y = input_data$indicator, samplesize = input_data$samplesize),
-    A = list(covariates = as.matrix(input_data[, ..cov_names]), s = A_proj_data),
-    effects = list(covariates = seq_along(cov_names), s = index_space)
+    A = list(
+      covariates = as.matrix(input_data[, ..cov_names]),
+      s = A_proj_data,
+      nugget = 1
+    ),
+    effects = list(
+      covariates = seq_along(cov_names),
+      s = index_space,
+      nugget = as.matrix(input_data[, .(cluster_id)])
+    )
   )
 
   # INLA model formula
@@ -107,9 +121,13 @@ prepare_inla_data_stack <- function(
   } else {
     constraint_suffix <- ""
   }
+  npcp <- nugget_pc_prior
   formula_string <- glue::glue(
-    "y ~ 0 + f(covariates, model = 'iid', fixed = TRUE {constraint_suffix}) + ",
-    "f(space, model = spde)"
+    "y ~ 0 + f(covariates, model = 'iid', fixed = TRUE {constraint_suffix}) + 
+      f(space, model = spde) + 
+      f(nugget, model = 'iid', hyper = list(
+        prec = list(prior = 'pc.prec', param = c({npcp$threshold}, {npcp$prob_above}))
+      ))"
   )
 
   data_list <- list(
