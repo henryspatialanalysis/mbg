@@ -307,6 +307,11 @@ for(adm_level in names(adm_summaries_list)){
     ui_width = config$get("prediction_settings", "ui_width")
   )
   adm_summary[adm_draws_list[[adm_level]], population := i.population, on = id_fields]
+  adm_summary[, `:=` (
+    count_mean = mean * population,
+    count_lower = lower * population,
+    count_upper = upper * population
+  )]
   adm_summaries_list[[adm_level]] <- adm_summary
 }
 
