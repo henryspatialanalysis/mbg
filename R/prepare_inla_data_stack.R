@@ -96,6 +96,16 @@ prepare_inla_data_stack <- function(
       y = as.matrix(input_data[, .(x, y)])
     )[, 1]
   }
+  # If sum to one, ensure cutoffs before converting to logit space
+  if(sum_to_one){
+    min_cutoff <- 1e-4
+    max_cutoff <- 1 - 1e-4
+    for(cov_name in cov_names){
+      input_data[ get(cov_name) > max_cutoff, (cov_name) := max_cutoff ]
+      input_data[ get(cov_name) < min_cutoff, (cov_name) := min_cutoff ]
+      input_data[, (cov_name) := qlogis(get(cov_name)) ]
+    }
+  }
 
   # Data stack for estimation
   inla_data_stack <- INLA::inla.stack(

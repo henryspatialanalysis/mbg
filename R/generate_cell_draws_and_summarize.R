@@ -71,6 +71,17 @@ generate_cell_draws_and_summarize <- function(
       y = as.matrix(id_raster_table[, .(x, y)])
     )[, 1]
   }
+  # If stacking was used, set cutoffs before transforming to logit space
+  sum_to_one_constraint <- inla_model$.args$formula |> as.character() |> grepl(pattern='extraconstr') |> any()
+  if(sum_to_one_constraint){
+    min_cutoff <- 1e-4
+    max_cutoff <- 1 - 1e-4
+    for(cov_name in cov_names){
+      id_raster_table[ get(cov_name) > max_cutoff, (cov_name) := max_cutoff ]
+      id_raster_table[ get(cov_name) < min_cutoff, (cov_name) := min_cutoff ]
+      id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
+    }
+  }
   # B) Projection matrix: mesh to all prediction locations
   A_proj_predictions <- INLA::inla.spde.make.A(
     mesh = inla_mesh,
