@@ -20,7 +20,7 @@ REPOS_PATH_DEFAULT <- '~/repos'
 #  - `repos_path`: the path to the directory that contains the `versioning` custom package
 
 if(interactive()){
-  config_path <- '~/temp_data/geostats/mbg_results/20231113/config.yaml'
+  config_path <- '~/temp_data/geostats/mbg_results/20240216_13_08_23_549/config.yaml'
   repos_path <- REPOS_PATH_DEFAULT
 } else {
   library(argparse)
@@ -65,11 +65,12 @@ mesh <- config$read('results', 'inla_data_stack')$mesh
 
 # Set some global variables that will be used in labels several times
 indicator <- config$get('indicator')
+i_title <- gsub('_', ' ', indicator)
 country <- config$get('country')
 year <- config$get('year')
 
 # Set the color scheme for mean/lower/upper values
-low_is_better <- TRUE
+low_is_better <- FALSE
 color_scheme <- RColorBrewer::brewer.pal(n = 9, name = 'Spectral')
 if(low_is_better) color_scheme <- rev(color_scheme)
 
@@ -78,10 +79,12 @@ eb <- ggplot2::element_blank()
 map_theme <- ggplot2::theme_minimal() + 
   ggplot2::theme(axis.ticks = eb, axis.text = eb, panel.grid = eb)
 
-## 02) Plot the mesh -------------------------------------------------------------------->
+
+## 02) Plot the mesh with overlapping data points --------------------------------------->
 
 pdf(file.path(viz_dir, 'inla_mesh.pdf'), height = 10, width = 10)
 plot(mesh)
+points(input_data[, .(x, y)], col = rgb(1, 0, 0, alpha = 0.7))
 dev.off()
 
 
@@ -98,19 +101,20 @@ raster_table_full <- rbind(
   raster_to_table(lower_raster, type = '2. Lower'),
   raster_to_table(upper_raster, type = '3. Upper')
 )
-value_limits <- quantile(na.omit(raster_table_full$value), probs = c(0.05, 0.95))
+value_limits_raster <- quantile(na.omit(raster_table_full$value), probs = c(0.01, 0.9))
+if(value_limits_raster[1] < 0.05) value_limits_raster[1] <- 0
 
 raster_fig <- ggplot() + 
   facet_wrap('type', nrow = 1) +
   geom_raster(data = raster_table_full, aes(x = x, y = y, fill = value)) + 
   geom_sf(data = adm_boundaries, fill = NA, linewidth = 0.05, color = '#444444') + 
   scale_fill_gradientn(
-    colors = color_scheme, limits = value_limits, oob = scales::squish,
+    colors = color_scheme, limits = value_limits_raster, oob = scales::squish,
     labels = scales::percent
   ) +
   labs(
-    title = glue::glue("Summary rasters: {indicator} in {country}, {year}"),
-    x = '', y = '', fill = indicator
+    title = glue::glue("Summary rasters: {i_title} in {country}, {year}"),
+    x = '', y = '', fill = stringr::str_to_title(i_title)
   ) +
   map_theme
 pdf(file.path(viz_dir, 'summary_rasters.pdf'), height = 6, width = 10)
@@ -120,7 +124,7 @@ dev.off()
 
 ## 03b) OPTIONAL: Plot stacked covariate predictions ------------------------------------>
 
-if(tryCatch(config$get('run_stacking'), error = function(e) FALSE)){
+if(tryCatch(config$get('stacking_settings', 'run_stacking'), error = function(e) FALSE)){
   # Load stackers and convert to a table
   stacked_preds <- config$read('results', 'stacked_covariates')
   stacked_raster_table <- lapply(names(stacked_preds), function(stacker_name){
@@ -133,12 +137,12 @@ if(tryCatch(config$get('run_stacking'), error = function(e) FALSE)){
     geom_raster(data = stacked_raster_table, aes(x = x, y = y, fill = value)) + 
     geom_sf(data = adm_boundaries, fill = NA, linewidth = 0.05, color = '#444444') + 
     scale_fill_gradientn(
-      colors = color_scheme, limits = value_limits, oob = scales::squish,
+      colors = color_scheme, limits = value_limits_raster, oob = scales::squish,
       labels = scales::percent
     ) +
     labs(
-      title = glue::glue("Component stacker predictions: {indicator} in {country}, {year}"),
-      x = '', y = '', fill = indicator
+      title = glue::glue("Component stacker predictions: {i_title} in {country}, {year}"),
+      x = '', y = '', fill = stringr::str_to_title(i_title)
     ) +
     map_theme
   pdf(file.path(viz_dir, 'stacker_predictions.pdf'), height = 6, width = 10)
@@ -162,16 +166,28 @@ adm_data_for_plotting <- merge(
   by = 'variable'
 )
 
+value_limits_adm <- quantile(adm_data_for_plotting$value, c(0.05, 0.95))
+if(min(value_limits_adm) < .05) value_limits_adm[1] <- 0
+
+percent_truncated <- function(...){
+  labels <- scales::percent(...)
+  labels[length(labels)] <- paste0(labels[length(labels)], '+')
+  return(labels)
+}
+
 adm_fig <- ggplot() + 
   facet_wrap('type', nrow = 1) +
   geom_sf(
     data = adm_data_for_plotting,
-    aes(fill = value), linewidth = 0.25, color = '#444444'
+    aes(fill = value), linewidth = 0.15, color = '#444444'
   ) + 
-  scale_fill_gradientn(colors = color_scheme, labels = scales::percent) +
+  scale_fill_gradientn(
+    colors = color_scheme, labels = percent_truncated, limits = value_limits_adm,
+    oob = scales::squish
+  ) +
   labs(
-    title = glue::glue("Summary estimates: {indicator} in {country}, {year}"),
-    x = '', y = '', fill = indicator
+    title = glue::glue("Summary estimates: {i_title} in {country}, {year}"),
+    x = '', y = '', fill = stringr::str_to_title(i_title)
   ) +
   map_theme
 pdf(file.path(viz_dir, 'summary_admin_estimates.pdf'), height = 6, width = 10)
@@ -196,8 +212,8 @@ data_point_fig <- ggplot() +
     oob = scales::squish
   ) + 
   labs(
-    title = glue::glue("Raw data: {indicator} in {country}, {year}"),
-    x = '', y = '', fill = stringr::str_to_title(indicator), size = 'Number\nsampled'
+    title = glue::glue("Raw data: {i_title} in {country}, {year}"),
+    x = '', y = '', fill = stringr::str_to_title(i_title), size = 'Number\nsampled'
   ) +
   map_theme
 
@@ -207,6 +223,7 @@ dev.off()
 png(file.path(viz_dir, 'input_data_map.png'), height = 1600, width = 1600, res = 200)
 plot(data_point_fig)
 dev.off()
+
 
 ## 04) Plot mean vs. uncertainty bivariate maps ----------------------------------------->
 
