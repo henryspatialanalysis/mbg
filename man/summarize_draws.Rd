@@ -37,6 +37,7 @@ A data.table containing at least the following fields:
 \item "mean": Mean across predictive draws
 \item "lower": Lower bound of the (X\%) uncertainty interval
 \item "upper": Upper bound of the (X\%) uncertainty interval
+\item "ui_width": "upper" - "lower"
 }
 }
 \description{

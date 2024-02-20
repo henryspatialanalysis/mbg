@@ -20,6 +20,7 @@
 #'   - "mean": Mean across predictive draws
 #'   - "lower": Lower bound of the (X%) uncertainty interval
 #'   - "upper": Upper bound of the (X%) uncertainty interval
+#'   - "ui_width": "upper" - "lower"
 #' 
 #' @import data.table
 #' @importFrom Matrix rowMeans
@@ -47,6 +48,7 @@ summarize_draws <- function(
     lower = matrixStats::rowQuantiles(draws_mat, probs = (1 - ui_width)/2, na.rm = na.rm),
     upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - (1 - ui_width)/2, na.rm = na.rm)
   )
+  summary_table[, ui_width := upper - lower ]
   if(!is.null(ids_table)) summary_table <- cbind(ids_table, summary_table)
   return(summary_table)
 }
