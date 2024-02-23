@@ -13,7 +13,8 @@ run_regression_submodels(
   clamping = TRUE,
   use_admin_bounds = FALSE,
   admin_bounds = NULL,
-  admin_bounds_id = "polygon_id"
+  admin_bounds_id = "polygon_id",
+  prediction_range = c(-Inf, Inf)
 )
 }
 \arguments{
@@ -50,6 +51,10 @@ Only considered if \code{use_admin_bounds} is TRUE.}
 \item{admin_bounds_id}{(\code{character}, default 'polygon_id') Field to use for
 administrative boundary one-hot encoding. Only considered if \code{use_admin_bounds} is
 TRUE.}
+
+\item{prediction_range}{(\code{numeric(2)}, default c(-Inf, Inf)) Prediction limits for the
+outcome range. Used when the predictions are in a limited range, for example, 0 to 1
+or -1 to 1.}
 }
 \value{
 List with two items:
