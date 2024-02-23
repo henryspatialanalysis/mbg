@@ -154,12 +154,12 @@ prepare_inla_data_stack <- function(
   if(use_admin_effect){
     # Merge on unique admin ID for each observation
     admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
-    input_data_merged <- sf::st_sf(input_data, coords = xy_fields, crs = 'EPSG:4326') |>
+    input_data_merged <- sf::st_as_sf(input_data, coords = xy_fields, crs = 'EPSG:4326') |>
       sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature) |>
       data.table::as.data.table()
     # Add the effect to the observations list, effects list, and model formula  
     obs_list$adm_effect <- 1
-    effects_list$adm_effect <- as.matrix(input_data_merged[, 'adm_effect', with = F])
+    effects_list$adm_effect <- as.matrix(input_data_merged[, 'admin_id', with = F])
     a_pcp <- admin_pc_prior
     formula_string <- glue::glue(
       "{formula_string} + 
