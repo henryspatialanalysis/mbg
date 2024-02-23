@@ -21,6 +21,9 @@
 #'   fine) to invert-logit the predictive draws.
 #' @param nugget_in_predict (`logical(1)`, default TRUE) Should the nugget term be used as
 #'   an IID noise term applied to each pixel-draw?
+#' @param admin_boundaries ([sf][sf::sf] object, default NULL) The same admin boundaries
+#'   used to create the admin-level effect, if one was defined in the model. Only used if
+#'   an admin-level effect was defined in the model.
 #' @param ui_width (numeric, default 0.95) Size of the uncertainty interval width when
 #'   calculating the upper and lower summary rasters
 #' 
@@ -47,7 +50,7 @@
 #' @export
 generate_cell_draws_and_summarize <- function(
   inla_model, inla_mesh, n_samples, id_raster, covariates, inverse_link_function,
-  nugget_in_predict = TRUE, ui_width = 0.95
+  nugget_in_predict = TRUE, adm_boundaries = NULL, ui_width = 0.95
 ){
   tictoc::tic("Posterior cell draw generation")
 
@@ -71,16 +74,11 @@ generate_cell_draws_and_summarize <- function(
       y = as.matrix(id_raster_table[, .(x, y)])
     )[, 1]
   }
-  # If stacking was used, set cutoffs before transforming to logit space
-  sum_to_one_constraint <- inla_model$.args$formula |> as.character() |> grepl(pattern='extraconstr') |> any()
+  # If stacking was used, transform to logit space
+  sum_to_one_constraint <- inla_model$.args$formula |> as.character() |>
+    grepl(pattern='extraconstr') |> any()
   if(sum_to_one_constraint){
-    min_cutoff <- 1e-4
-    max_cutoff <- 1 - 1e-4
-    for(cov_name in cov_names){
-      id_raster_table[ get(cov_name) > max_cutoff, (cov_name) := max_cutoff ]
-      id_raster_table[ get(cov_name) < min_cutoff, (cov_name) := min_cutoff ]
-      id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
-    }
+    for(cov_name in cov_names) id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
   }
   # B) Projection matrix: mesh to all prediction locations
   A_proj_predictions <- INLA::inla.spde.make.A(
@@ -100,6 +98,8 @@ generate_cell_draws_and_summarize <- function(
   fe_draws <- as.matrix(id_raster_table[, ..cov_names]) %*% fe_coefficients
   re_draws <- as.matrix(A_proj_predictions %*% spatial_mesh_effects)
   assertthat::assert_that(all.equal(dim(fe_draws), dim(re_draws)))
+  ## Create the grid cell draws object (still in transform space)
+  transformed_cell_draws <- fe_draws + re_draws
 
   # Optionally add nugget effect
   if(nugget_in_predict){
@@ -108,14 +108,32 @@ generate_cell_draws_and_summarize <- function(
       purrr::map_dbl("Precision for nugget")
     nugget_sigma <- 1 / sqrt(nugget_precision)
     # Generate IID noise for each draw
-    nugget_draws <- rnorm(length(fe_draws), mean = 0, sd = nugget_sigma) |>
+    nugget_draws <- rnorm(length(transformed_cell_draws), mean = 0, sd = nugget_sigma) |>
       matrix(ncol = n_samples, byrow = TRUE)
-  } else {
-    nugget_draws <- 0
+    # Add to the draws
+    transformed_cell_draws <- transformed_cell_draws + nugget_draws
+  }
+
+  # Add an admin-level effect, if one was defined
+  admin_effects <- latent_matrix[rownames(latent_matrix) == 'adm_effect', ]
+  if(nrow(admin_effects) > 0){
+    if(is.null(admin_boundaries)){
+      stop("Admin effects were defined but admin boundaries were not passed for prediction")
+    }
+    if(nrow(admin_boundaries) != nrow(admin_effects)) stop("Admin effects dimension mismatch")
+    # Translate from grid cells to admin units
+    admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
+    grid_cells_to_admin_ids <- id_raster |>
+      as.data.frame(xy = TRUE) |>
+      sf::st_as_sf(coords = c('x','y'), crs = 'EPSG:4326') |>
+      sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature)
+    admin_effects_by_cell <- admin_effects[grid_cells_to_admin_ids$admin_id, ]
+    # Add admin-level effect to the draws
+    transformed_cell_draws <- transformed_cell_draws + admin_effects_by_cell
   }
   
-  # Combine and apply the inverse link function to get predictive draws by grid cell
-  predictive_draws <- get(inverse_link_function)(fe_draws + re_draws + nugget_draws)
+  # Apply the inverse link function to get predictive draws by grid cell
+  predictive_draws <- get(inverse_link_function)(transformed_cell_draws)
 
   ## Summarize as rasters
   to_fill <- which(!is.na(terra::values(id_raster)))

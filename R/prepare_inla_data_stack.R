@@ -24,17 +24,28 @@
 #'   prior for sigma (standard deviation) of the SPDE object. The two named items are
 #'   "threshold", the test threshold for the standard deviation, and "prob_above",
 #'   the prior probability that sigma will EXCEED that threshold.
-#' @param nugget_pc_prior A named list specifying the penalized complexity prior for the
-#'   nugget (IID observation-level error) term. The two named items are "threshold", the
-#'   test threshold for the nugget standard deviation, and "prob_above", the prior
-#'   probability that the standard deviation will EXCEED that threshold.
-#' @param sum_to_one (logical, default FALSE) Should the input covariates be constrained
-#'   to sum to one? Usually FALSE when raw covariates are passed to the model, and TRUE
-#'   if running an ensemble ('stacking') model.
+#' @param covariates_sum_to_one (logical, default FALSE) Should the input covariates be
+#'   constrained to sum to one? Usually FALSE when raw covariates are passed to the model,
+#'   and TRUE if running an ensemble (stacking) model.
 #' @param mesh_max_edge (`numeric(2)`, default c(0.2, 5)) Maximum size of the INLA mesh
 #'   inside (1) and outside (2) of the region.
 #' @param mesh_cutoff (`numeric(1)`, default 0.04) Minimum size of the INLA mesh, usually
 #'   reached in data-dense areas.
+#' @parma use_nugget (`boolean(1)`, default TRUE) Should a nugget (IID observation-level 
+#'   error or noise) term be included?
+#' @param nugget_pc_prior A named list specifying the penalized complexity prior for the
+#'   nugget term. The two named items are "threshold", the test threshold for the nugget
+#'   standard deviation, and "prob_above", the prior probability that the standard
+#'   deviation will EXCEED that threshold. Only used if `use_nugget` is TRUE
+#' @param use_admin_effect (`boolean(1)`, default FALSE) Should an IID random effect by
+#'   administrative unit be included?
+#' @param admin_boundaries ([sf][sf::sf] object, default NULL) admin boundaries spatial
+#'   object. Only used if `use_admin_effect` is TRUE
+#' @param admin_pc_prior (list) A named list specifying the penalized complexity prior
+#'   for the admin-level IID term. The two named items are "threshold", the test threshold
+#'   for the standard deviation of admin-level effects, and "prob_above", the prior
+#'   probability that the standard deviation with EXCEED that threshold. Only used if 
+#'   `use_admin_effect` is TRUE.
 #' 
 #' @return List containing the following items:
 #'   - "mesh": The mesh used to approximate the latent Gaussian process
@@ -44,18 +55,23 @@
 #' 
 #' @importFrom INLA inla.mesh.2d inla.spde2.pcmatern inla.spde.make.A inla.stack
 #' @importFrom data.table as.data.table
+#' @importFrom sf st_sf st_join st_nearest_feature
 #' @importFrom terra extract
 #' @importFrom glue glue
 #' @export
 prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
+  covariates_sum_to_one = FALSE,
+  mesh_integrate_to_zero = FALSE,
+  mesh_max_edge = c(0.2, 5),
+  mesh_cutoff = 0.04,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
+  use_nugget = TRUE,
   nugget_pc_prior = list(threshold = 3, prob_above = 0.05),
-  mesh_integrate_to_zero = FALSE,
-  sum_to_one = FALSE,
-  mesh_max_edge = c(0.2, 5),
-  mesh_cutoff = 0.04
+  use_admin_effect = FALSE,
+  admin_boundaries = NULL,
+  admin_pc_prior = list(threshold = 3, prob_above = 0.05)
 ){
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
 
@@ -96,56 +112,73 @@ prepare_inla_data_stack <- function(
       y = as.matrix(input_data[, .(x, y)])
     )[, 1]
   }
-  # If sum to one, ensure cutoffs before converting to logit space
-  if(sum_to_one){
-    min_cutoff <- 1e-4
-    max_cutoff <- 1 - 1e-4
-    for(cov_name in cov_names){
-      input_data[ get(cov_name) > max_cutoff, (cov_name) := max_cutoff ]
-      input_data[ get(cov_name) < min_cutoff, (cov_name) := min_cutoff ]
-      input_data[, (cov_name) := qlogis(get(cov_name)) ]
-    }
-  }
 
-  # Data stack for estimation
-  inla_data_stack <- INLA::inla.stack(
-    tag = 'est',
-    data = list(y = input_data$indicator, samplesize = input_data$samplesize),
-    A = list(
-      covariates = as.matrix(input_data[, ..cov_names]),
-      s = A_proj_data,
-      nugget = 1
-    ),
-    effects = list(
-      covariates = seq_along(cov_names),
-      s = index_space,
-      nugget = as.matrix(input_data[, .(cluster_id)])
-    )
-  )
-
-  # INLA model formula
-  if(sum_to_one){
+  # If sum to one, add a model constraint and convert to logit space
+  if(covariates_sum_to_one){
+    for(cov_name in cov_names) input_data[, (cov_name) := qlogis(get(cov_name)) ]
     constraint_suffix <- glue::glue(
       ", extraconstr = list(A = matrix(1, ncol = {length(cov_names)}), e = 1)"
     )
   } else {
     constraint_suffix <- ""
   }
-  npcp <- nugget_pc_prior
+
+  # Iteratively define observation matrices, model effects list, and model formula
+  # These always include the covariate and spatially-correlated effects
+  obs_list <- list(covariates = as.matrix(input_data[, ..cov_names]), s = A_proj_data)
+  effects_list <- list(covariates = seq_along(cov_names), s = index_space)
   formula_string <- glue::glue(
-    "y ~ 0 + f(covariates, model = 'iid', fixed = TRUE {constraint_suffix}) + 
-      f(space, model = spde) + 
-      f(nugget, model = 'iid', hyper = list(
-        prec = list(prior = 'pc.prec', param = c({npcp$threshold}, {npcp$prob_above}))
-      ))"
+    "y ~ 0 +
+      f(covariates, model = 'iid', fixed = TRUE{constraint_suffix}) + 
+      f(space, model = spde)"
+  )
+  # Optionally add nugget
+  if(use_nugget){
+    obs_list$nugget <- 1
+    effects_list$nugget <- as.matrix(input_data[, .(cluster_id)])
+    n_pcp <- nugget_pc_prior
+    formula_string <- glue::glue(
+      "{formula_string} + 
+       f(nugget, model = 'iid', hyper = list(
+         prec = list(prior = 'pc.prec', param = c({n_pcp$threshold}, {n_pcp$prob_above}))
+       ))
+      "
+    )
+  }
+  # Optionally add admin-level effects
+  if(use_admin_effect){
+    # Merge on unique admin ID for each observation
+    admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
+    input_data_merged <- sf::st_sf(input_data, coords = c('x','y'), crs = 'EPSG:4326') |>
+      sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature) |>
+      data.table::as.data.table()
+    # Add the effect to the observations list, effects list, and model formula  
+    obs_list$adm_effect <- 1
+    effects_list$adm_effect <- as.matrix(input_data_merged[, .(adm_effect)])
+    a_pcp <- admin_pc_prior
+    formula_string <- glue::glue(
+      "{formula_string} + 
+       f(adm_effect, model = 'iid', hyper = list(
+         prec = list(prior = 'pc.prec', param = c({a_pcp$threshold}, {a_pcp$prob_above}))
+       ))
+      "
+    )
+  }
+
+  # Data stack for estimation
+  inla_data_stack <- INLA::inla.stack(
+    tag = 'est',
+    data = list(y = input_data$indicator, samplesize = input_data$samplesize),
+    A = obs_list,
+    effects = effects_list
   )
 
+  # Return a list containing the mesh, SPDE object, INLA data stack, and INLA formula
   data_list <- list(
     mesh = mesh,
     spde = spde,
     inla_data_stack = inla_data_stack,
     formula_string = formula_string
   )
-
   return(data_list)
 }
