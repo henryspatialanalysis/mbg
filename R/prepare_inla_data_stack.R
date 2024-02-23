@@ -31,7 +31,7 @@
 #'   inside (1) and outside (2) of the region.
 #' @param mesh_cutoff (`numeric(1)`, default 0.04) Minimum size of the INLA mesh, usually
 #'   reached in data-dense areas.
-#' @parma use_nugget (`boolean(1)`, default TRUE) Should a nugget (IID observation-level 
+#' @param use_nugget (`boolean(1)`, default TRUE) Should a nugget (IID observation-level 
 #'   error or noise) term be included?
 #' @param nugget_pc_prior A named list specifying the penalized complexity prior for the
 #'   nugget term. The two named items are "threshold", the test threshold for the nugget
@@ -56,6 +56,7 @@
 #' @importFrom INLA inla.mesh.2d inla.spde2.pcmatern inla.spde.make.A inla.stack
 #' @importFrom data.table as.data.table
 #' @importFrom sf st_sf st_join st_nearest_feature
+#' @importFrom stats qlogis
 #' @importFrom terra extract
 #' @importFrom glue glue
 #' @export
@@ -76,9 +77,10 @@ prepare_inla_data_stack <- function(
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
 
   # Build prediction mesh
+  xy_fields <- c('x','y')
   mesh <- INLA::inla.mesh.2d(
-    loc = input_data[, .(x, y)],
-    loc.domain = id_raster_table[, .(x, y)],
+    loc = input_data[, xy_fields, with = F],
+    loc.domain = id_raster_table[, xy_fields, with = F],
     max.edge = mesh_max_edge,
     cutoff = mesh_cutoff
   )
@@ -101,7 +103,7 @@ prepare_inla_data_stack <- function(
   # Projection matrix: mesh to data
   A_proj_data <- INLA::inla.spde.make.A(
     mesh = mesh,
-    loc = as.matrix(input_data[, .(x, y)])
+    loc = as.matrix(input_data[, xy_fields, with = F])
   )
 
   # Extract all covariates
@@ -109,13 +111,13 @@ prepare_inla_data_stack <- function(
   for(cov_name in cov_names){
     input_data[[cov_name]] <- terra::extract(
       x = covariates[[cov_name]],
-      y = as.matrix(input_data[, .(x, y)])
+      y = as.matrix(input_data[, xy_fields, with = F])
     )[, 1]
   }
 
   # If sum to one, add a model constraint and convert to logit space
   if(covariates_sum_to_one){
-    for(cov_name in cov_names) input_data[, (cov_name) := qlogis(get(cov_name)) ]
+    for(cov_name in cov_names) input_data[[cov_name]] <- qlogis(input_data[[cov_name]])
     constraint_suffix <- glue::glue(
       ", extraconstr = list(A = matrix(1, ncol = {length(cov_names)}), e = 1)"
     )
@@ -125,7 +127,10 @@ prepare_inla_data_stack <- function(
 
   # Iteratively define observation matrices, model effects list, and model formula
   # These always include the covariate and spatially-correlated effects
-  obs_list <- list(covariates = as.matrix(input_data[, ..cov_names]), s = A_proj_data)
+  obs_list <- list(
+    covariates = as.matrix(input_data[, cov_names, with = F]),
+    s = A_proj_data
+  )
   effects_list <- list(covariates = seq_along(cov_names), s = index_space)
   formula_string <- glue::glue(
     "y ~ 0 +
@@ -135,7 +140,7 @@ prepare_inla_data_stack <- function(
   # Optionally add nugget
   if(use_nugget){
     obs_list$nugget <- 1
-    effects_list$nugget <- as.matrix(input_data[, .(cluster_id)])
+    effects_list$nugget <- as.matrix(input_data[, 'cluster_id', with = F])
     n_pcp <- nugget_pc_prior
     formula_string <- glue::glue(
       "{formula_string} + 
@@ -149,12 +154,12 @@ prepare_inla_data_stack <- function(
   if(use_admin_effect){
     # Merge on unique admin ID for each observation
     admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
-    input_data_merged <- sf::st_sf(input_data, coords = c('x','y'), crs = 'EPSG:4326') |>
+    input_data_merged <- sf::st_sf(input_data, coords = xy_fields, crs = 'EPSG:4326') |>
       sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature) |>
       data.table::as.data.table()
     # Add the effect to the observations list, effects list, and model formula  
     obs_list$adm_effect <- 1
-    effects_list$adm_effect <- as.matrix(input_data_merged[, .(adm_effect)])
+    effects_list$adm_effect <- as.matrix(input_data_merged[, 'adm_effect', with = F])
     a_pcp <- admin_pc_prior
     formula_string <- glue::glue(
       "{formula_string} + 

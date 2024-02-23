@@ -42,7 +42,7 @@
 #'   - "predictions": Model predictions covering the entire id_raster
 #'
 #' @importFrom caret trainControl train
-#' @importFrom stats model.matrix
+#' @importFrom stats model.matrix predict
 #' @importFrom terra extract values rasterize
 #' @import data.table
 #' @export 
@@ -52,11 +52,12 @@ run_regression_submodels <- function(
   prediction_range = c(-Inf, Inf)
 ){
   # Prepare training data and eventual prediction space
+  xy_fields <- c('x','y')
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
   colnames(id_raster_table)[3] <- 'pixel_id'
   cov_names <- names(covariates)
-  xy_train <- as.matrix(input_data[, .(x, y)])
-  xy_pred <- as.matrix(id_raster_table[, .(x, y)])
+  xy_train <- as.matrix(input_data[, xy_fields, with = F])
+  xy_pred <- as.matrix(id_raster_table[, xy_fields, with = F])
   for(cov_name in setdiff(cov_names, 'intercept')){
     input_data[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_train)[, 1]
     id_raster_table[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_pred)[, 1]    

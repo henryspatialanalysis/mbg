@@ -33,11 +33,11 @@ summarize_draws <- function(
     draws <- as.data.table(draws)
     if(is.null(draw_fields)) draw_fields <- setdiff(colnames(draws), id_fields)
     if(!is.null(id_fields)){
-      ids_table <- draws[, ..id_fields]
+      ids_table <- draws[, id_fields, with = F]
     } else {
       ids_table <- NULL
     }
-    draws_mat <- as.matrix(draws[, ..draw_fields])
+    draws_mat <- as.matrix(draws[, draw_fields, with = F])
   } else {
     draws_mat <- draws
     ids_table <- NULL
@@ -48,7 +48,7 @@ summarize_draws <- function(
     lower = matrixStats::rowQuantiles(draws_mat, probs = (1 - ui_width)/2, na.rm = na.rm),
     upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - (1 - ui_width)/2, na.rm = na.rm)
   )
-  summary_table[, ui_width := upper - lower ]
+  summary_table$ui_width <- summary_table$upper - summary_table$lower
   if(!is.null(ids_table)) summary_table <- cbind(ids_table, summary_table)
   return(summary_table)
 }

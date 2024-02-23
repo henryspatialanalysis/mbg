@@ -45,12 +45,13 @@
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles
 #' @importFrom purrr map map_dbl
+#' @importFrom stats na.omit qlogis rnorm
 #' @importFrom terra extract values
 #' @importFrom tictoc tic toc
 #' @export
 generate_cell_draws_and_summarize <- function(
   inla_model, inla_mesh, n_samples, id_raster, covariates, inverse_link_function,
-  nugget_in_predict = TRUE, adm_boundaries = NULL, ui_width = 0.95
+  nugget_in_predict = TRUE, admin_boundaries = NULL, ui_width = 0.95
 ){
   tictoc::tic("Posterior cell draw generation")
 
@@ -66,12 +67,13 @@ generate_cell_draws_and_summarize <- function(
   
   ## Generate data objects needed to project from the posterior draws to prediction points
   # A) Table containing all fixed effects
+  xy_fields <- c('x','y')
   id_raster_table <- data.table::as.data.table(id_raster, xy = T) |> na.omit()
   cov_names <- names(covariates)
   for(cov_name in cov_names){
     id_raster_table[[cov_name]] <- terra::extract(
       x = covariates[[cov_name]],
-      y = as.matrix(id_raster_table[, .(x, y)])
+      y = as.matrix(id_raster_table[, xy_fields, with = F])
     )[, 1]
   }
   # If stacking was used, transform to logit space
@@ -83,7 +85,7 @@ generate_cell_draws_and_summarize <- function(
   # B) Projection matrix: mesh to all prediction locations
   A_proj_predictions <- INLA::inla.spde.make.A(
     mesh = inla_mesh,
-    loc = as.matrix(id_raster_table[, .(x, y)])
+    loc = as.matrix(id_raster_table[, xy_fields, with = F])
   )
 
   ## Split parameter matrix into fixed effect coeffients and spatial mesh effects
@@ -95,14 +97,14 @@ generate_cell_draws_and_summarize <- function(
   assertthat::assert_that(nrow(spatial_mesh_effects) == ncol(A_proj_predictions))
 
   # Project to all grid locations
-  fe_draws <- as.matrix(id_raster_table[, ..cov_names]) %*% fe_coefficients
+  fe_draws <- as.matrix(id_raster_table[, cov_names, with = F]) %*% fe_coefficients
   re_draws <- as.matrix(A_proj_predictions %*% spatial_mesh_effects)
   assertthat::assert_that(all.equal(dim(fe_draws), dim(re_draws)))
   ## Create the grid cell draws object (still in transform space)
   transformed_cell_draws <- fe_draws + re_draws
 
   # Optionally add nugget effect
-  if(nugget_in_predict){
+  if(('nugget' %in% rownames(latent_matrix)) & nugget_in_predict){
     # Get draws of nugget precision -> draws of nugget standard deviation
     nugget_precision <- purrr::map(posterior_samples, 'hyperpar') |>
       purrr::map_dbl("Precision for nugget")
@@ -125,7 +127,7 @@ generate_cell_draws_and_summarize <- function(
     admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
     grid_cells_to_admin_ids <- id_raster |>
       as.data.frame(xy = TRUE) |>
-      sf::st_as_sf(coords = c('x','y'), crs = 'EPSG:4326') |>
+      sf::st_as_sf(coords = xy_fields, crs = 'EPSG:4326') |>
       sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature)
     admin_effects_by_cell <- admin_effects[grid_cells_to_admin_ids$admin_id, ]
     # Add admin-level effect to the draws

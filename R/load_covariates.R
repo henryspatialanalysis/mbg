@@ -34,6 +34,7 @@ get_current_year <- function(){
 #'   one layer and the same dimensions as the `id_raster`
 #' 
 #' @importFrom assertthat assert_that
+#' @importFrom stats sd
 #' @importFrom terra rast crop mask global
 #' @export
 load_covariates <- function(
