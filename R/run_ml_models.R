@@ -33,6 +33,9 @@
 #' @param admin_bounds_id (`character`, default 'polygon_id') Field to use for
 #'   administrative boundary one-hot encoding. Only considered if `use_admin_bounds` is
 #'   TRUE.
+#' @param prediction_range (`numeric(2)`, default c(-Inf, Inf)) Prediction limits for the
+#'   outcome range. Used when the predictions are in a limited range, for example, 0 to 1
+#'   or -1 to 1.
 #' 
 #' @return List with two items:
 #'   - "models": A list containing summary objects for each regression model
@@ -45,7 +48,8 @@
 #' @export 
 run_regression_submodels <- function(
   input_data, id_raster, covariates, cv_settings, model_settings, clamping = TRUE,
-  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id'
+  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id',
+  prediction_range = c(-Inf, Inf)
 ){
   # Prepare training data and eventual prediction space
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
@@ -119,6 +123,10 @@ run_regression_submodels <- function(
     )
     pred_raster <- template_raster
     terra::values(pred_raster)[prediction_grid$pixel_id] <- prediction_grid$new_vals
+    # Restrict to to plausible range
+    pred_raster[pred_raster < min(prediction_range)] <- min(prediction_range)
+    pred_raster[pred_raster > max(prediction_range)] <- max(prediction_range)
+    # If clamping, restrict to observed range
     if(clamping){
       pred_raster[pred_raster < min_observed] <- min_observed
       pred_raster[pred_raster > max_observed] <- max_observed
