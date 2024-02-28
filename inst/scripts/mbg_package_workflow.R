@@ -356,6 +356,10 @@ config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws') |> suppr
 config$write(grid_cell_predictions$cell_pred_mean, 'results', 'cell_pred_mean')
 config$write(grid_cell_predictions$cell_pred_lower, 'results', 'cell_pred_lower')
 config$write(grid_cell_predictions$cell_pred_upper, 'results', 'cell_pred_upper')
+config$write(
+  grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower,
+  'results', 'cell_pred_ui'
+)
 config$write(counts_mean, 'results', 'counts_mean')
 config$write(counts_without_mean, 'results', 'counts_without_mean')
 config$write(population_raster, 'results', 'pop_raster')

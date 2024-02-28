@@ -97,6 +97,7 @@ directories:
       cell_pred_mean: 'cell_pred_mean.tif'
       cell_pred_lower: 'cell_pred_lower.tif'
       cell_pred_upper: 'cell_pred_upper.tif'
+      cell_pred_ui: 'cell_pred_ui.tif'
       counts_mean: 'counts_mean.tif'
       counts_without_mean: 'counts_without_mean.tif'
       adm2_draws: 'adm2_draws.csv'
