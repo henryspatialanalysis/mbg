@@ -36,9 +36,9 @@ inla_settings:
   sample_size_field: 'samplesize'
   effects:
     covariates: TRUE
-    spde: FALSE
+    spde: TRUE
     nugget: TRUE
-    admin1: TRUE
+    admin1: FALSE
   mesh:
     integrate_to_zero: FALSE
     cutoff: 0.04
