@@ -21,6 +21,9 @@
 #'   fine) to invert-logit the predictive draws.
 #' @param nugget_in_predict (`logical(1)`, default TRUE) Should the nugget term be used as
 #'   an IID noise term applied to each pixel-draw?
+#' @param admin_boundaries ([sf][sf::sf] object, default NULL) The same admin boundaries
+#'   used to create the admin-level effect, if one was defined in the model. Only used if
+#'   an admin-level effect was defined in the model.
 #' @param ui_width (numeric, default 0.95) Size of the uncertainty interval width when
 #'   calculating the upper and lower summary rasters
 #' 
@@ -42,12 +45,13 @@
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles
 #' @importFrom purrr map map_dbl
+#' @importFrom stats na.omit qlogis rnorm
 #' @importFrom terra extract values
 #' @importFrom tictoc tic toc
 #' @export
 generate_cell_draws_and_summarize <- function(
   inla_model, inla_mesh, n_samples, id_raster, covariates, inverse_link_function,
-  nugget_in_predict = TRUE, ui_width = 0.95
+  nugget_in_predict = TRUE, admin_boundaries = NULL, ui_width = 0.95
 ){
   tictoc::tic("Posterior cell draw generation")
 
@@ -57,65 +61,85 @@ generate_cell_draws_and_summarize <- function(
   )
   # Reorder as a matrix with rows named after the coresponding model terms
   latent_matrix <- purrr::map(posterior_samples, 'latent') |> do.call(what = cbind)
-  rownames(latent_matrix) <- rownames(posterior_samples[[1]]$latent) |>
+  param_names <- rownames(posterior_samples[[1]]$latent) |>
     strsplit(split = ':') |>
     vapply(`[`, 1, FUN.VALUE = character(1))
-  
-  ## Generate data objects needed to project from the posterior draws to prediction points
-  # A) Table containing all fixed effects
+  rownames(latent_matrix) <- param_names
+
+  # Create the template for predictions, dimensions = N grid cells (by) N samples
+  xy_fields <- c('x','y')
   id_raster_table <- data.table::as.data.table(id_raster, xy = T) |> na.omit()
-  cov_names <- names(covariates)
-  for(cov_name in cov_names){
-    id_raster_table[[cov_name]] <- terra::extract(
-      x = covariates[[cov_name]],
-      y = as.matrix(id_raster_table[, .(x, y)])
-    )[, 1]
-  }
-  # If stacking was used, set cutoffs before transforming to logit space
-  sum_to_one_constraint <- inla_model$.args$formula |> as.character() |> grepl(pattern='extraconstr') |> any()
-  if(sum_to_one_constraint){
-    min_cutoff <- 1e-4
-    max_cutoff <- 1 - 1e-4
+  transformed_cell_draws <- matrix(0, nrow = nrow(id_raster_table), ncol = n_samples)
+  
+  ## Optionally add covariate effects
+  if('covariates' %in% param_names){
+    cov_names <- names(covariates)
     for(cov_name in cov_names){
-      id_raster_table[ get(cov_name) > max_cutoff, (cov_name) := max_cutoff ]
-      id_raster_table[ get(cov_name) < min_cutoff, (cov_name) := min_cutoff ]
-      id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
+      id_raster_table[[cov_name]] <- terra::extract(
+        x = covariates[[cov_name]],
+        y = as.matrix(id_raster_table[, xy_fields, with = F])
+      )[, 1]
     }
+    # If stacking was used, transform to logit space
+    sum_to_one_constraint <- inla_model$.args$formula |> as.character() |>
+      grepl(pattern='extraconstr') |> any()
+    if(sum_to_one_constraint){
+      for(cov_name in cov_names) id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
+    }
+    fe_coefficients <- latent_matrix[param_names == 'covariates', ]
+    fe_draws <- as.matrix(id_raster_table[, cov_names, with = F]) %*% fe_coefficients
+  } else {
+    fe_draws <- latent_matrix[param_names == '(Intercept)', ] |>
+      matrix(ncol = n_samples, nrow = nrow(transformed_cell_draws), byrow = T)
   }
-  # B) Projection matrix: mesh to all prediction locations
-  A_proj_predictions <- INLA::inla.spde.make.A(
-    mesh = inla_mesh,
-    loc = as.matrix(id_raster_table[, .(x, y)])
-  )
+  transformed_cell_draws <- transformed_cell_draws + fe_draws
 
-  ## Split parameter matrix into fixed effect coeffients and spatial mesh effects
-  # Fixed effect coefficients
-  fe_rows <- which(rownames(latent_matrix) == 'covariates')
-  fe_coefficients <- latent_matrix[fe_rows, ]
-  # Spatial mesh effects
-  spatial_mesh_effects <- latent_matrix[rownames(latent_matrix) == 'space', ]
-  assertthat::assert_that(nrow(spatial_mesh_effects) == ncol(A_proj_predictions))
-
-  # Project to all grid locations
-  fe_draws <- as.matrix(id_raster_table[, ..cov_names]) %*% fe_coefficients
-  re_draws <- as.matrix(A_proj_predictions %*% spatial_mesh_effects)
-  assertthat::assert_that(all.equal(dim(fe_draws), dim(re_draws)))
+  ## Optionally add spatial GP effect
+  if('space' %in% param_names){
+    A_proj_predictions <- INLA::inla.spde.make.A(
+      mesh = inla_mesh,
+      loc = as.matrix(id_raster_table[, xy_fields, with = F])
+    )
+    spatial_mesh_effects <- latent_matrix[param_names == 'space', ]
+    assertthat::assert_that(nrow(spatial_mesh_effects) == ncol(A_proj_predictions))
+    space_draws <- as.matrix(A_proj_predictions %*% spatial_mesh_effects)
+    assertthat::assert_that(all.equal(dim(transformed_cell_draws), dim(space_draws)))
+    transformed_cell_draws <- transformed_cell_draws + space_draws
+  }
 
   # Optionally add nugget effect
-  if(nugget_in_predict){
+  if(('nugget' %in% param_names) & nugget_in_predict){
     # Get draws of nugget precision -> draws of nugget standard deviation
     nugget_precision <- purrr::map(posterior_samples, 'hyperpar') |>
       purrr::map_dbl("Precision for nugget")
     nugget_sigma <- 1 / sqrt(nugget_precision)
     # Generate IID noise for each draw
-    nugget_draws <- rnorm(length(fe_draws), mean = 0, sd = nugget_sigma) |>
+    nugget_draws <- rnorm(length(transformed_cell_draws), mean = 0, sd = nugget_sigma) |>
       matrix(ncol = n_samples, byrow = TRUE)
-  } else {
-    nugget_draws <- 0
+    # Add to the draws
+    transformed_cell_draws <- transformed_cell_draws + nugget_draws
+  }
+
+  # Add an admin-level effect, if one was defined
+  if('adm_effect' %in% param_names){
+    if(is.null(admin_boundaries)){
+      stop("Admin effects were defined but admin boundaries were not passed for prediction")
+    }
+    admin_effects <- latent_matrix[param_names == 'adm_effect', ]
+    if(nrow(admin_boundaries) != nrow(admin_effects)) stop("Admin effects dimension mismatch")
+    # Translate from grid cells to admin units
+    admin_boundaries$admin_id <- seq_len(nrow(admin_boundaries))
+    grid_cells_to_admin_ids <- id_raster |>
+      as.data.frame(xy = TRUE) |>
+      sf::st_as_sf(coords = xy_fields, crs = 'EPSG:4326') |>
+      sf::st_join(y = admin_boundaries[, c('admin_id')], join = sf::st_nearest_feature)
+    admin_effects_by_cell <- admin_effects[grid_cells_to_admin_ids$admin_id, ]
+    # Add admin-level effect to the draws
+    transformed_cell_draws <- transformed_cell_draws + admin_effects_by_cell
   }
   
-  # Combine and apply the inverse link function to get predictive draws by grid cell
-  predictive_draws <- get(inverse_link_function)(fe_draws + re_draws + nugget_draws)
+  # Apply the inverse link function to get predictive draws by grid cell
+  predictive_draws <- get(inverse_link_function)(transformed_cell_draws)
 
   ## Summarize as rasters
   to_fill <- which(!is.na(terra::values(id_raster)))

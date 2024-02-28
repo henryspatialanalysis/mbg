@@ -24,3 +24,37 @@ make_time_stamp <- function(suffix = NULL, milliseconds = T){
 
   return(time_stamp)
 }
+
+
+#' Dissolve sf object by attribute
+#' 
+#' @description Dissolve an SF object by attribute
+#' 
+#' @details Inspired by "sf_dissolve" from the 
+#'   \url{https://cran.r-project.org/web/packages/spatialEco/index.html}{spatialEco}
+#'   package.
+#' 
+#' @param x ([sf][sf::sf] object) SF object to dissolve
+#' @param by (`character(N)`, default character(0)) Attributes to dissolve by
+#' 
+#' @return Dissolved [sf][sf::sf] object
+#' 
+#' @importFrom sf st_drop_geometry
+#' @export
+dissolve_sf_by_attribute <- function(x, by = character(0)){
+  if(length(by) == 0){
+    # Dissolve all
+    dissolved <- x |> sf::st_union() |> sf::st_as_sf()
+  } else {
+    # Dissolve by attributes
+    dissolved_groups <- sf::st_drop_geometry(x)[, by] |> unique()
+    dissolved <- lapply(seq_len(nrow(dissolved_groups)), function(row_id){
+      dissolved_row <- dissolved_groups[row_id, ]
+      sf::st_geometry(dissolved_row) <- merge(x = x, y = dissolved_row, by = by) |>
+        sf::st_make_valid() |>
+        sf::st_union()
+      return(dissolved_row)
+    }) |> do.call(what = 'rbind')
+  }
+  return(dissolved)
+}

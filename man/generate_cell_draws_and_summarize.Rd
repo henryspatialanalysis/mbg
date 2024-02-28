@@ -12,6 +12,7 @@ generate_cell_draws_and_summarize(
   covariates,
   inverse_link_function,
   nugget_in_predict = TRUE,
+  admin_boundaries = NULL,
   ui_width = 0.95
 )
 }
@@ -37,6 +38,10 @@ fine) to invert-logit the predictive draws.}
 
 \item{nugget_in_predict}{(\code{logical(1)}, default TRUE) Should the nugget term be used as
 an IID noise term applied to each pixel-draw?}
+
+\item{admin_boundaries}{(\link[sf:sf]{sf} object, default NULL) The same admin boundaries
+used to create the admin-level effect, if one was defined in the model. Only used if
+an admin-level effect was defined in the model.}
 
 \item{ui_width}{(numeric, default 0.95) Size of the uncertainty interval width when
 calculating the upper and lower summary rasters}

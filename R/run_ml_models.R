@@ -33,26 +33,31 @@
 #' @param admin_bounds_id (`character`, default 'polygon_id') Field to use for
 #'   administrative boundary one-hot encoding. Only considered if `use_admin_bounds` is
 #'   TRUE.
+#' @param prediction_range (`numeric(2)`, default c(-Inf, Inf)) Prediction limits for the
+#'   outcome range. Used when the predictions are in a limited range, for example, 0 to 1
+#'   or -1 to 1.
 #' 
 #' @return List with two items:
 #'   - "models": A list containing summary objects for each regression model
 #'   - "predictions": Model predictions covering the entire id_raster
 #'
 #' @importFrom caret trainControl train
-#' @importFrom stats model.matrix
+#' @importFrom stats model.matrix predict
 #' @importFrom terra extract values rasterize
 #' @import data.table
 #' @export 
 run_regression_submodels <- function(
   input_data, id_raster, covariates, cv_settings, model_settings, clamping = TRUE,
-  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id'
+  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id',
+  prediction_range = c(-Inf, Inf)
 ){
   # Prepare training data and eventual prediction space
+  xy_fields <- c('x','y')
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
   colnames(id_raster_table)[3] <- 'pixel_id'
   cov_names <- names(covariates)
-  xy_train <- as.matrix(input_data[, .(x, y)])
-  xy_pred <- as.matrix(id_raster_table[, .(x, y)])
+  xy_train <- as.matrix(input_data[, xy_fields, with = F])
+  xy_pred <- as.matrix(id_raster_table[, xy_fields, with = F])
   for(cov_name in setdiff(cov_names, 'intercept')){
     input_data[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_train)[, 1]
     id_raster_table[[cov_name]] <- terra::extract(x = covariates[[cov_name]], y = xy_pred)[, 1]    
@@ -119,6 +124,10 @@ run_regression_submodels <- function(
     )
     pred_raster <- template_raster
     terra::values(pred_raster)[prediction_grid$pixel_id] <- prediction_grid$new_vals
+    # Restrict to to plausible range
+    pred_raster[pred_raster < min(prediction_range)] <- min(prediction_range)
+    pred_raster[pred_raster > max(prediction_range)] <- max(prediction_range)
+    # If clamping, restrict to observed range
     if(clamping){
       pred_raster[pred_raster < min_observed] <- min_observed
       pred_raster[pred_raster > max_observed] <- max_observed
