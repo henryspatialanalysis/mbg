@@ -45,9 +45,9 @@ if(interactive()){
     repos_path = DEFAULT_REPOS_PATH,
     config_path = file.path(DEFAULT_REPOS_PATH, 'mbg_scripts/nat_defaults/config.yaml'),
     indicator = 'basic_sanitation',
-    iso3 = 'ZMB',
-    country = 'Zambia',
-    year = 2018,
+    iso3 = 'LBR',
+    country = 'Liberia',
+    year = 2019,
     results_version = 'time_stamp'
   )
 } else {
@@ -139,6 +139,11 @@ if(!'adm_boundaries' %in% ls()){
   )
 }
 adm_boundaries$polygon_id <- seq_len(nrow(adm_boundaries))
+# Aggregate by admin1 unit
+adm1_boundaries <- mbg::dissolve_sf_by_attribute(
+  x = adm_boundaries,
+  by = config$get('shapefile_settings', 'ids', 'adm1')
+)
 
 # Create the ID raster from the admin2 spatial object
 id_raster <- pixel2poly::build_id_raster(polygons = terra::vect(adm_boundaries))
@@ -196,8 +201,10 @@ if(nrow(input_data) == 0) stop(
 ## 03) PREPARE AND RUN INLA MODEL ------------------------------------------------------->
 
 # Optional stacking
+use_covariates <- config$get("inla_settings", "effects", "covariates")
 run_stacking <- config$get("stacking_settings", "run_stacking")
-if(run_stacking){
+
+if(run_stacking & use_covariates){
   stackers_list <- mbg::run_regression_submodels(
     input_data = copy(input_data),
     id_raster = id_raster,
@@ -206,22 +213,36 @@ if(run_stacking){
     model_settings = config$get("stacking_settings", "submodels"),
     use_admin_bounds = config$get("stacking_settings", "adm1_fixed_effects"),
     admin_bounds = adm_boundaries,
-    admin_bounds_id = ifelse('ADM1_NAME' %in% names(adm_boundaries), 'ADM1_NAME', 'polygon_id')
+    admin_bounds_id = ifelse('ADM1_NAME' %in% names(adm_boundaries), 'ADM1_NAME', 'polygon_id'),
+    prediction_range = c(1e-4, 1-1e-4)
   )
   stacked_covariates <- stackers_list$predictions
+  model_covariates <- stacked_covariates
+} else if(use_covariates){
+  stacked_covariates <- list()
+  model_covariates <- covariates_list
 } else {
   stacked_covariates <- list()
+  model_covariates <- NULL
 }
 
 inla_inputs_list <- mbg::prepare_inla_data_stack(
   input_data = input_data,
   id_raster = id_raster,
-  covariates = if(run_stacking) stacked_covariates else covariates_list,
+  covariates = model_covariates,
+  use_covariates = config$get('inla_settings', 'effects', 'covariates'),
+  covariates_sum_to_one = run_stacking,
+  use_spde = config$get('inla_settings', 'effects', 'spde'),
   spde_range_pc_prior = config$get('inla_settings', 'priors', 'range'),
   spde_sigma_pc_prior = config$get('inla_settings', 'priors', 'sigma'),
+  spde_integrate_to_zero = config$get('inla_settings', 'mesh', 'integrate_to_zero'),
+  mesh_max_edge = config$get('inla_settings', 'mesh', 'max_edge'),
+  mesh_cutoff = config$get('inla_settings', 'mesh', 'cutoff'),
+  use_nugget = config$get('inla_settings', 'effects', 'nugget'),
   nugget_pc_prior = config$get('inla_settings', 'priors', 'nugget'),
-  mesh_integrate_to_zero = config$get('inla_settings', 'mesh_integrate_to_zero'),
-  sum_to_one = run_stacking
+  use_admin_effect = config$get('inla_settings', 'effects', 'admin1'),
+  admin_boundaries = adm1_boundaries,
+  admin_pc_prior = config$get('inla_settings', 'priors', 'admin1')
 )
 
 inla_fitted_model <- mbg::fit_inla_model(
@@ -242,11 +263,14 @@ grid_cell_predictions <- mbg::generate_cell_draws_and_summarize(
   inla_mesh = inla_inputs_list$mesh,
   n_samples = config$get('prediction_settings', 'n_samples'),
   id_raster = id_raster,
-  covariates = if(run_stacking) stacked_covariates else covariates_list,
+  covariates = model_covariates,
   inverse_link_function = config$get('prediction_settings', 'draws_link_function'),
   nugget_in_predict = config$get('prediction_settings', 'nugget_in_predict'),
+  admin_boundaries = adm1_boundaries,
   ui_width = config$get('prediction_settings', 'ui_width')
 )
+# Summarize the count of people *with* the indicator
+counts_mean <- grid_cell_predictions$cell_pred_mean * population_raster
 # Summarize count of people *without* the indicator
 counts_without_mean <- (-1 * grid_cell_predictions$cell_pred_mean + 1) * population_raster
 
@@ -318,20 +342,21 @@ for(adm_level in names(adm_summaries_list)){
 
 ## 06) SAVE RESULTS --------------------------------------------------------------------->
 
-config$write(adm_boundaries, 'results', 'adm_boundaries')
+config$write(adm_boundaries, 'results', 'adm_boundaries', quiet = T)
 config$write(id_raster, 'results', 'id_raster')
-config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
-if(run_stacking){
+if(use_covariates) config$write(terra::rast(covariates_list), 'results', 'covariate_rasters')
+if(use_covariates & run_stacking){
   config$write(terra::rast(stacked_covariates), 'results', 'stacked_covariates')
 }
 config$write(input_data, 'results', 'formatted_input_data')
 config$write(inla_inputs_list, 'results', 'inla_data_stack')
 if(config$get('save_full_model')) config$write(inla_fitted_model, 'results', 'inla_model')
 config$write(grid_cell_predictions$parameter_draws, 'results', 'parameter_draws')
-config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws')
+config$write(grid_cell_predictions$cell_draws, 'results', 'cell_draws') |> suppressMessages()
 config$write(grid_cell_predictions$cell_pred_mean, 'results', 'cell_pred_mean')
 config$write(grid_cell_predictions$cell_pred_lower, 'results', 'cell_pred_lower')
 config$write(grid_cell_predictions$cell_pred_upper, 'results', 'cell_pred_upper')
+config$write(counts_mean, 'results', 'counts_mean')
 config$write(counts_without_mean, 'results', 'counts_without_mean')
 config$write(population_raster, 'results', 'pop_raster')
 for(adm_level in names(adm_draws_list)){
