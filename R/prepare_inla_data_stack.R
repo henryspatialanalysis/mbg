@@ -51,7 +51,7 @@
 #' @param admin_pc_prior (list) A named list specifying the penalized complexity prior
 #'   for the admin-level IID term. The two named items are "threshold", the test threshold
 #'   for the standard deviation of admin-level effects, and "prob_above", the prior
-#'   probability that the standard deviation with EXCEED that threshold. Only used if 
+#'   probability that the standard deviation will EXCEED that threshold. Only used if 
 #'   `use_admin_effect` is TRUE.
 #' 
 #' @return List containing the following items:
