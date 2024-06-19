@@ -45,7 +45,7 @@
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles
 #' @importFrom purrr map map_dbl
-#' @importFrom stats na.omit qlogis rnorm
+#' @importFrom stats na.omit rnorm
 #' @importFrom terra extract values
 #' @importFrom tictoc tic toc
 #' @export
@@ -54,6 +54,10 @@ generate_cell_draws_and_summarize <- function(
   nugget_in_predict = TRUE, admin_boundaries = NULL, ui_width = 0.95
 ){
   tictoc::tic("Posterior cell draw generation")
+  # Get original link function and inverse link function
+  inverse_link <- get(inverse_link_function)
+  links <- list(plogis = stats::qlogis, identity = identity, logit = stats::plogis)
+  link_fun <- links[[inverse_link_function]]
 
   # Generate INLA posterior samples
   posterior_samples <- INLA::inla.posterior.sample(
@@ -84,7 +88,7 @@ generate_cell_draws_and_summarize <- function(
     sum_to_one_constraint <- inla_model$.args$formula |> as.character() |>
       grepl(pattern='extraconstr') |> any()
     if(sum_to_one_constraint){
-      for(cov_name in cov_names) id_raster_table[, (cov_name) := qlogis(get(cov_name)) ]
+      for(cov_name in cov_names) id_raster_table[, (cov_name) := link_fun(get(cov_name)) ]
     }
     fe_coefficients <- latent_matrix[param_names == 'covariates', ]
     fe_draws <- as.matrix(id_raster_table[, cov_names, with = F]) %*% fe_coefficients
@@ -139,7 +143,7 @@ generate_cell_draws_and_summarize <- function(
   }
   
   # Apply the inverse link function to get predictive draws by grid cell
-  predictive_draws <- get(inverse_link_function)(transformed_cell_draws)
+  predictive_draws <- inverse_link(transformed_cell_draws)
 
   ## Summarize as rasters
   to_fill <- which(!is.na(terra::values(id_raster)))

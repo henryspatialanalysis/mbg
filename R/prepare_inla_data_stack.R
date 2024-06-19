@@ -21,6 +21,8 @@
 #' @param covariates_sum_to_one (logical, default FALSE) Should the input covariates be
 #'   constrained to sum to one? Usually FALSE when raw covariates are passed to the model,
 #'   and TRUE if running an ensemble (stacking) model.
+#' @param family (`character(1)`, default 'binomial') Statistical family; used to
+#'   link stacked covariates with outcomes
 #' @param use_spde (`boolean(1)`, default TRUE) Should an SPDE approximation of a Gaussian
 #'   process be included in the model?
 #' @param spde_range_pc_prior (list) A named list specifying the penalized complexity
@@ -71,6 +73,7 @@ prepare_inla_data_stack <- function(
   input_data, id_raster, covariates,
   use_covariates = TRUE,
   covariates_sum_to_one = FALSE,
+  family = 'binomial',
   use_spde = TRUE,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
@@ -104,7 +107,9 @@ prepare_inla_data_stack <- function(
       constraint_suffix <- glue::glue(
         ", extraconstr = list(A = matrix(1, ncol = {length(cov_names)}), e = 1)"
       )
-      for(cov_name in cov_names) input_data[[cov_name]] <- qlogis(input_data[[cov_name]])
+      if(family == 'binomial'){
+        for(cov_name in cov_names) input_data[[cov_name]] <- qlogis(input_data[[cov_name]])
+      }
     } else {
       constraint_suffix <- ""
     }
@@ -188,7 +193,7 @@ prepare_inla_data_stack <- function(
   ## Combine observation and effects lists into an INLA estimation data stack
   inla_data_stack <- INLA::inla.stack(
     tag = 'est',
-    data = list(y = input_data$indicator, samplesize = input_data$samplesize),
+    data = list(y = input_data$indicator),
     A = obs_list,
     effects = effects_list
   )

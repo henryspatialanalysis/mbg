@@ -24,6 +24,10 @@
 #' @param model_settings Named list where the name of each header corresponds to a model
 #'   run in [caret::train], and the arguments correspond to the model-specific settings
 #'   for that model type.
+#' @param family (`character(1)`, default 'binomial') Statistical model family being
+#'   evaluated. For Gaussian models, this function trains against the 'mean' field; for
+#'   all other families, this function trains against the ratio of
+#'  'indicator':'samplesize'.
 #' @param clamping (`logical(1)`, default TRUE) Should the predictions of individual ML
 #'   models be limited to the range observed in the data?
 #' @param use_admin_bounds (`logical(1)`, default FALSE) Use one-hot encoding of
@@ -47,8 +51,8 @@
 #' @import data.table
 #' @export 
 run_regression_submodels <- function(
-  input_data, id_raster, covariates, cv_settings, model_settings, clamping = TRUE,
-  use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id',
+  input_data, id_raster, covariates, cv_settings, model_settings, family = 'binomial',
+  clamping = TRUE, use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id',
   prediction_range = c(-Inf, Inf)
 ){
   # Prepare training data and eventual prediction space
@@ -92,7 +96,11 @@ run_regression_submodels <- function(
 
   # Subset only to data outcome (indicator / samplesize), covariates, and x/y
   cov_cols <- c(setdiff(cov_names, 'intercept'), 'x', 'y')
-  input_data$data_rate <- input_data$indicator / input_data$samplesize
+  if((family == 'gaussian') & ('mean' %in% colnames(input_data))){
+    input_data$data_rate <- input_data$mean
+  } else {
+    input_data$data_rate <- input_data$indicator / input_data$samplesize
+  }
   training_data <- copy(na.omit(input_data[, c('data_rate', cov_cols), with = F ]))
   prediction_grid <- copy(na.omit(id_raster_table))
 

@@ -3,8 +3,7 @@
 #' @description Fit an INLA model based on a constructed data stack and formula
 #' 
 #' @details Using [INLA::inla()] with reasonable defaults and settings tuned to predict
-#'   across a grid. NOTE: The sample size field in the `data_stack` MUST be named
-#'   "samplesize".
+#'   across a grid.
 #' 
 #' @param formula (character) INLA formula to fit. Generated in
 #'   [prepare_inla_data_stack()], then interpreted using [stats::as.formula()] within the
@@ -28,7 +27,8 @@
 #' @importFrom stats as.formula
 #' @export
 fit_inla_model <- function(
-  formula, data_stack, spde, family = 'binomial', link = 'logit',
+  formula, data_stack, spde, samplesize_vec = 1, precision_vec = 1, 
+  family = 'binomial', link = 'logit',
   fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05)
 ){
   spde <- spde
@@ -37,7 +37,8 @@ fit_inla_model <- function(
     formula = stats::as.formula(formula),
     family = family,
     control.family = list(link = link),
-    Ntrials = samplesize,
+    Ntrials = if(family == 'binomial') samplesize_vec else NULL,
+    scale = if(family == 'gaussian') precision_vec else NULL,
     data = INLA::inla.stack.data(data_stack),
     control.compute = list(config = TRUE),
     control.fixed = list(
@@ -50,7 +51,7 @@ fit_inla_model <- function(
       compute = FALSE,
       link = 1,
       A = INLA::inla.stack.A(data_stack)
-    ),
+    )
   )
   tictoc::toc()
   return(inla_model)
