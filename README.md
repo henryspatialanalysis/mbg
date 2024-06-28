@@ -35,5 +35,3 @@ Or clone the package to your computer and load it dynamically (this is the prefe
 ```devtools::load_all("/local/path/to/mbg/")```
 
 After loading the package, you can access package documentation by running `help(mbg)`, or get documentation for a specific function by running e.g. `help(fit_inla_model)`.
-
-Example model execution scripts are available under `inst/scripts`, with `inst/scripts/mbg_package_workflow.R` being a template for the main script. Example config files are also available under `/inst/extdata`. More details about example scripts and config files are located in the README documents for those folders.
