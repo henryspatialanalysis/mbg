@@ -10,6 +10,7 @@ prepare_inla_data_stack(
   covariates,
   use_covariates = TRUE,
   covariates_sum_to_one = FALSE,
+  family = "binomial",
   use_spde = TRUE,
   spde_range_pc_prior = list(threshold = 0.1, prob_below = 0.05),
   spde_sigma_pc_prior = list(threshold = 3, prob_above = 0.05),
@@ -45,6 +46,9 @@ included in the model? If TRUE, includes fixed effects for all covariates in the
 \item{covariates_sum_to_one}{(logical, default FALSE) Should the input covariates be
 constrained to sum to one? Usually FALSE when raw covariates are passed to the model,
 and TRUE if running an ensemble (stacking) model.}
+
+\item{family}{(\code{character(1)}, default 'binomial') Statistical family; used to
+link stacked covariates with outcomes}
 
 \item{use_spde}{(\code{boolean(1)}, default TRUE) Should an SPDE approximation of a Gaussian
 process be included in the model?}

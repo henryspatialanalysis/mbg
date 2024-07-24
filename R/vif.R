@@ -12,6 +12,9 @@
 #' @importFrom stats lm
 #' @export
 vif_covariate_select <- function(dataset, vif_cutoff = 5){
+  # Set dummy variables to avoid R CMD CHECK issues
+  keep <- vif <- NULL
+  
   # Check inputs
   if(!is.data.frame(dataset)) stop("VIF input dataset must be data.frame-like")
   if(max(table(colnames(dataset))) > 1) stop("VIF input dataset must have unique column names")

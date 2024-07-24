@@ -15,6 +15,7 @@ Imports:
     Matrix,
     matrixStats,
     purrr,
+    R6,
     sf,
     terra,
     tictoc
