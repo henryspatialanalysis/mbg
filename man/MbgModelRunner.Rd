@@ -147,6 +147,8 @@ List of model inputs yielded by \link{prepare_inla_data_stack}}
 List of model outputs yielded by \link{fit_inla_model}}
 
 \item{\code{grid_cell_predictions}}{List of predictive surfaces yielded by \link{generate_cell_draws_and_summarize}}
+
+\item{\code{verbose}}{Should model progress be timed?}
 }
 \if{html}{\out{</div>}}
 }
