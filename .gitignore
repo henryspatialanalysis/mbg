@@ -86,3 +86,8 @@ rsconnect/
 # User-specific code folder
 user_specific/
 inst/doc
+
+
+## MISCELLANEOUS GITIGNORE FILES -------------------------------------------------------->
+
+.vscode/
