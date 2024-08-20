@@ -2,7 +2,7 @@
 title: "Getting started with MBG"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{mbg}
+  %\VignetteIndexEntry{Getting started with MBG}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,6 +13,8 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+This is a placeholder vignette---the full vignette will be uploaded shortly. 
 
 ```{r setup}
 library(mbg)
