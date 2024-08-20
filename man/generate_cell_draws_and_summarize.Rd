@@ -13,7 +13,8 @@ generate_cell_draws_and_summarize(
   inverse_link_function,
   nugget_in_predict = TRUE,
   admin_boundaries = NULL,
-  ui_width = 0.95
+  ui_width = 0.95,
+  verbose = TRUE
 )
 }
 \arguments{
@@ -45,6 +46,8 @@ an admin-level effect was defined in the model.}
 
 \item{ui_width}{(numeric, default 0.95) Size of the uncertainty interval width when
 calculating the upper and lower summary rasters}
+
+\item{verbose}{(\code{logical(1)}, default TRUE) Log progress for draw generation?}
 }
 \value{
 Named list containing at least the following items:

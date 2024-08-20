@@ -175,6 +175,9 @@ MbgModelRunner <- R6::R6Class(
     #' List of predictive surfaces yielded by [generate_cell_draws_and_summarize]
     grid_cell_predictions = NULL,
 
+    #' @field verbose
+    #' Should model progress be timed?
+    verbose = TRUE,
 
     ## Public methods ------------------------------------------------------------------->
 
@@ -264,6 +267,7 @@ MbgModelRunner <- R6::R6Class(
     #' @param nugget_in_predict (`logical(1)`, default TRUE) If the nugget is used in
     #'   model fitting, should it also be included as an IID effect by pixel in the
     #'   model prediction step?
+    #' @param verbose (`logical(1)`, default TRUE) Should model progress be timed?
     #' 
     initialize = function(
       input_data,
@@ -300,11 +304,9 @@ MbgModelRunner <- R6::R6Class(
       inla_link = 'logit',
       inverse_link = 'plogis',
       inla_family = 'binomial',
-      nugget_in_predict = TRUE
+      nugget_in_predict = TRUE,
+      verbose = TRUE
     ){
-      # Check internal consistency of inputs
-      # TODO
-
       # Set values
       self$input_data <- input_data
       self$id_raster <- id_raster
@@ -332,6 +334,7 @@ MbgModelRunner <- R6::R6Class(
       self$inverse_link <- inverse_link
       self$inla_family <- inla_family
       self$nugget_in_predict <- nugget_in_predict
+      self$verbose <- verbose
       return(self)
     },
 
@@ -351,7 +354,8 @@ MbgModelRunner <- R6::R6Class(
           use_admin_bounds = self$stacking_use_admin_bounds,
           admin_bounds = self$admin_bounds,
           admin_bounds_id = self$admin_bounds_id,
-          prediction_range = self$stacking_prediction_range
+          prediction_range = self$stacking_prediction_range,
+          verbose = self$verbose
         )
         self$model_covariates <- stackers_list$predictions
       } else if(self$use_covariates){
@@ -395,7 +399,8 @@ MbgModelRunner <- R6::R6Class(
         precision_vec = (self$input_data$sd)**(-2),
         family = self$inla_family,
         link = self$inla_link,
-        fixed_effects_pc_prior = self$prior_covariate_effect
+        fixed_effects_pc_prior = self$prior_covariate_effect,
+        verbose = self$verbose
       )
       invisible(NULL)
     },
@@ -420,7 +425,8 @@ MbgModelRunner <- R6::R6Class(
         inverse_link_function = self$inverse_link,
         nugget_in_predict = self$nugget_in_predict,
         admin_boundaries = self$admin_bounds,
-        ui_width = ui_width
+        ui_width = ui_width,
+        verbose = self$verbose
       )
       invisible(self$grid_cell_predictions)
     },

@@ -12,7 +12,8 @@ fit_inla_model(
   precision_vec = 1,
   family = "binomial",
   link = "logit",
-  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05)
+  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -41,6 +42,8 @@ GLM \code{family}.}
 for all fixed effects except for the intercept. The two named items are "threshold",
 the test threshold for the size of each fixed effect, and "prob_above", the prior
 probability that the beta for each covariate will EXCEED that threshold.}
+
+\item{verbose}{(\code{logical(1)}, default TRUE) Log progress for INLA model fitting?}
 }
 \value{
 A fitted INLA model object created by \code{\link[INLA:inla]{INLA::inla()}}

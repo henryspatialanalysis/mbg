@@ -26,6 +26,7 @@
 #'   an admin-level effect was defined in the model.
 #' @param ui_width (numeric, default 0.95) Size of the uncertainty interval width when
 #'   calculating the upper and lower summary rasters
+#' @param verbose (`logical(1)`, default TRUE) Log progress for draw generation?
 #' 
 #' @return Named list containing at least the following items:
 #'   - "parameter_draws": posterior samples generated from [INLA::inla.posterior.sample()]
@@ -47,23 +48,26 @@
 #' @importFrom purrr map map_dbl
 #' @importFrom stats na.omit rnorm
 #' @importFrom terra extract values
-#' @importFrom tictoc tic toc
 #' @export
 generate_cell_draws_and_summarize <- function(
   inla_model, inla_mesh, n_samples, id_raster, covariates, inverse_link_function,
-  nugget_in_predict = TRUE, admin_boundaries = NULL, ui_width = 0.95
+  nugget_in_predict = TRUE, admin_boundaries = NULL, ui_width = 0.95, verbose = TRUE
 ){
-  tictoc::tic("Posterior cell draw generation")
+  if(verbose) logging_start_timer("Generating model predictions")
   # Get original link function and inverse link function
   inverse_link <- get(inverse_link_function)
   links <- list(plogis = stats::qlogis, identity = identity, logit = stats::plogis)
   link_fun <- links[[inverse_link_function]]
 
   # Generate INLA posterior samples
+  if(verbose) logging_start_timer("Parameter posterior samples")
   posterior_samples <- INLA::inla.posterior.sample(
     n = n_samples, result = inla_model, add.names = FALSE
   )
+  if(verbose) logging_stop_timer()
+
   # Reorder as a matrix with rows named after the coresponding model terms
+  if(verbose) logging_start_timer("Cell draws")
   latent_matrix <- purrr::map(posterior_samples, 'latent') |> do.call(what = cbind)
   param_names <- rownames(posterior_samples[[1]]$latent) |>
     strsplit(split = ':') |>
@@ -144,8 +148,10 @@ generate_cell_draws_and_summarize <- function(
   
   # Apply the inverse link function to get predictive draws by grid cell
   predictive_draws <- inverse_link(transformed_cell_draws)
+  if(verbose) logging_stop_timer()
 
   ## Summarize as rasters
+  if(verbose) logging_start_timer("Summarize draws")
   to_fill <- which(!is.na(terra::values(id_raster)))
   r_mean <- r_lower <- r_upper <- id_raster
   terra::values(r_mean)[to_fill] <- Matrix::rowMeans(predictive_draws)
@@ -155,9 +161,7 @@ generate_cell_draws_and_summarize <- function(
   terra::values(r_upper)[to_fill] <- (
     matrixStats::rowQuantiles(predictive_draws, probs = 1 - (1 - ui_width)/2)
   )
-
-  # Stop timer
-  tictoc::toc()
+  if(verbose) logging_stop_timer() # End summarization
 
   # Return list of predictions
   predictions_list <- list(
@@ -167,5 +171,6 @@ generate_cell_draws_and_summarize <- function(
     cell_pred_lower = r_lower,
     cell_pred_upper = r_upper
   )
+  if(verbose) logging_stop_timer() # End prediction
   return(predictions_list)
 }

@@ -40,6 +40,7 @@
 #' @param prediction_range (`numeric(2)`, default c(-Inf, Inf)) Prediction limits for the
 #'   outcome range. Used when the predictions are in a limited range, for example, 0 to 1
 #'   or -1 to 1.
+#' @param verbose (`logical(1)`, default TRUE) Log progress for ML model fitting?
 #' 
 #' @return List with two items:
 #'   - "models": A list containing summary objects for each regression model
@@ -53,8 +54,10 @@
 run_regression_submodels <- function(
   input_data, id_raster, covariates, cv_settings, model_settings, family = 'binomial',
   clamping = TRUE, use_admin_bounds = FALSE, admin_bounds = NULL, admin_bounds_id = 'polygon_id',
-  prediction_range = c(-Inf, Inf)
+  prediction_range = c(-Inf, Inf), verbose = TRUE
 ){
+  if(verbose) logging_start_timer("Fitting candidate models for stacked ensemble")
+
   # Prepare training data and eventual prediction space
   xy_fields <- c('x','y')
   id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |> na.omit()
@@ -119,6 +122,7 @@ run_regression_submodels <- function(
   models_list <- preds_list <- vector('list', length = length(model_names))
   names(models_list) <- names(preds_list) <- model_names
   for(model_name in model_names){
+    if(verbose) logging_start_timer(paste("Candidate model: ", model_name))
     # Fit caret model
     model_args <- c(
       list(data_rate ~ ., data = training_data, method = model_name, trControl = oos_tune),
@@ -141,6 +145,9 @@ run_regression_submodels <- function(
       pred_raster[pred_raster > max_observed] <- max_observed
     }
     preds_list[[model_name]] <- pred_raster
+    if(verbose) logging_stop_timer()
   }
+  # End logging for candidate model fitting
+  if(verbose) logging_stop_timer()
   return(list(models = models_list, predictions = preds_list))
 }

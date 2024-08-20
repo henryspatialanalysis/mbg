@@ -23,20 +23,21 @@
 #'   for all fixed effects except for the intercept. The two named items are "threshold",
 #'   the test threshold for the size of each fixed effect, and "prob_above", the prior
 #'   probability that the beta for each covariate will EXCEED that threshold.
+#' @param verbose (`logical(1)`, default TRUE) Log progress for INLA model fitting?
 #' 
 #' @return A fitted INLA model object created by [INLA::inla()]
 #' 
 #' @importFrom INLA inla inla.stack.data inla.stack.A
-#' @importFrom tictoc tic toc
 #' @importFrom stats as.formula
 #' @export
 fit_inla_model <- function(
   formula, data_stack, spde, samplesize_vec = 1, precision_vec = 1, 
   family = 'binomial', link = 'logit',
-  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05)
+  fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05),
+  verbose = TRUE
 ){
   spde <- spde
-  tictoc::tic("MBG model fitting")
+  if(verbose) logging_start_timer("MBG model fitting")
   inla_model <- INLA::inla(
     formula = stats::as.formula(formula),
     family = family,
@@ -57,6 +58,6 @@ fit_inla_model <- function(
       A = INLA::inla.stack.A(data_stack)
     )
   )
-  tictoc::toc()
+  if(verbose) logging_stop_timer()
   return(inla_model)
 }

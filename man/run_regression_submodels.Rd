@@ -15,7 +15,8 @@ run_regression_submodels(
   use_admin_bounds = FALSE,
   admin_bounds = NULL,
   admin_bounds_id = "polygon_id",
-  prediction_range = c(-Inf, Inf)
+  prediction_range = c(-Inf, Inf),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -61,6 +62,8 @@ TRUE.}
 \item{prediction_range}{(\code{numeric(2)}, default c(-Inf, Inf)) Prediction limits for the
 outcome range. Used when the predictions are in a limited range, for example, 0 to 1
 or -1 to 1.}
+
+\item{verbose}{(\code{logical(1)}, default TRUE) Log progress for ML model fitting?}
 }
 \value{
 List with two items:

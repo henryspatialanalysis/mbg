@@ -193,7 +193,8 @@ Create a new MbgModelRunner object
   inla_link = "logit",
   inverse_link = "plogis",
   inla_family = "binomial",
-  nugget_in_predict = TRUE
+  nugget_in_predict = TRUE,
+  verbose = TRUE
 )}\if{html}{\out{</div>}}
 }
 
@@ -310,6 +311,8 @@ information, see \code{\link[stats:family]{stats::family()}}.}
 \item{\code{nugget_in_predict}}{(\code{logical(1)}, default TRUE) If the nugget is used in
 model fitting, should it also be included as an IID effect by pixel in the
 model prediction step?}
+
+\item{\code{verbose}}{(\code{logical(1)}, default TRUE) Should model progress be timed?}
 }
 \if{html}{\out{</div>}}
 }
