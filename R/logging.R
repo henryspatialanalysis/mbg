@@ -11,7 +11,7 @@
 #' @details Increases the `MbgLoggingIndent` option, with default of one if not set
 #' 
 logging_add_indent <- function(){
-  options(MbgLoggingIndent = getOption('MbgLoggingIndent', default = 0) + 1)
+  options(MbgLoggingIndent = max(getOption('MbgLoggingIndent', default = 0) + 1, 1))
   invisible()
 }
 
@@ -22,7 +22,7 @@ logging_add_indent <- function(){
 #' @details Decreases the `MbgLoggingIndent` option, with default of zero if not set
 #' 
 logging_drop_indent <- function(){
-  options(MbgLoggingIndent = getOption('MbgLoggingIndent', default = 1) - 1)
+  options(MbgLoggingIndent = max(getOption('MbgLoggingIndent', default = 1) - 1, 0))
   invisible()
 }
 
