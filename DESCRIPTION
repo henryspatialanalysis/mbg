@@ -4,7 +4,10 @@ Version: 0.9.1
 Authors@R: 
     person("Nathaniel", "Henry", , "nat@henryspatialanalysis.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-8150-4988"))
-Description: What the package does (one paragraph).
+Description:
+    Modern model-based geostatistics for point-referenced data. This package
+    combines sf, terra, and data.table functions for spatial data processing, caret for
+    spatial ML models, and R-INLA for geostatistical models.
 License: MIT + file LICENSE
 Depends: 
     R (>= 4.1.0)
