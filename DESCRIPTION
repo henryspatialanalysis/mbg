@@ -6,12 +6,13 @@ Authors@R:
            comment = c(ORCID = "0000-0001-8150-4988"))
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
+Depends: 
+    R (>= 4.1.0)
 Imports:
     assertthat,
     caret,
     data.table,
     glue,
-    INLA,
     Matrix,
     matrixStats,
     purrr,
@@ -19,6 +20,9 @@ Imports:
     sf,
     terra,
     tictoc
+Suggests:
+    INLA
+Additional_repositories: https://inla.r-inla-download.org/R/testing/
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, r6 = TRUE)
 RoxygenNote: 7.2.3
