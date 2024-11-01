@@ -24,12 +24,11 @@ Imports:
     terra,
     tictoc
 Suggests:
-    INLA
+    INLA,
+    knitr,
+    rmarkdown
 Additional_repositories: https://inla.r-inla-download.org/R/testing/
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, r6 = TRUE)
 RoxygenNote: 7.2.3
-Suggests: 
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
