@@ -183,13 +183,13 @@ MbgModelRunner <- R6::R6Class(
 
     #' @description
     #' Create a new MbgModelRunner object
-    #' 
+    #'
     #' @param input_data ([data.table][data.table::data.table]) Table containing at least
     #'   the following fields:\cr
-    #'   * x (`numeric`) location longitude in decimal degrees
-    #'   * y (`numeric`) location latitude in decimal degrees
-    #'   * indicator (`integer`) The number of events in the population
-    #'   * samplesize (`integer`) The total population, denominator for `indicator`
+    #'   * x (`numeric`) location longitude in decimal degrees\cr
+    #'   * y (`numeric`) location latitude in decimal degrees\cr
+    #'   * indicator (`integer`) The number of events in the population\cr
+    #'   * samplesize (`integer`) The total population, denominator for `indicator`\cr
     #' @param id_raster ([terra][terra::rast]) raster showing the total area that
     #'   will be predicted using this model
     #' @param covariate_rasters (`list()`) A list containing all predictor covariates.
@@ -204,11 +204,11 @@ MbgModelRunner <- R6::R6Class(
     #'   included in the predictive model?
     #' @param use_gp (`logical(1)`, default TRUE) Should a smoothed spatial surface be
     #'   included in the predictive model?
-    #' @param use_admin_effect (`logical(1)` default TRUE) Should IID administrative-level
-    #'   effects be included in the predictive model?
+    #' @param use_admin_effect (`logical(1)` default FALSE) Should IID
+    #'   administrative-level effects be included in the predictive model?
     #' @param use_nugget (`logical(1)`, default TRUE) Should an IID effect by pixel be
     #'   included in the predictive model?
-    #' @param use_stacking (`logical(1)`, default TRUE) Should machine learning submodels
+    #' @param use_stacking (`logical(1)`, default FALSE) Should machine learning submodels
     #'   be trained to relate the covariate rasters with the outcome data? Only run if
     #'   `use_covariates` is `TRUE`.
     #' @param stacking_model_settings (`list()`) A named list of submodels to be run. For
@@ -217,7 +217,7 @@ MbgModelRunner <- R6::R6Class(
     #' @param stacking_cv_settings (`list()`) How should the stacking submodels be
     #'   cross-validated? For more information about this term, see
     #'  [run_regression_submodels]. Only considered if `use_stacking` is `TRUE`.
-    #' @param stacking_use_admin_bounds (`logical(1)`, default TRUE) Should admin
+    #' @param stacking_use_admin_bounds (`logical(1)`, default FALSE) Should admin
     #'   boundaries be included as features in the stacking submodels? For more
     #'   information about this term, see [run_regression_submodels]. Only considered if
     #'   `use_stacking` is TRUE.
@@ -237,13 +237,13 @@ MbgModelRunner <- R6::R6Class(
     #'   probability that the value is BELOW that range threshold. The function
     #'   automatically converts "threshold" from a proportion of the overall mesh extent
     #'   into a distance. Only considered if `use_gp` is TRUE.
-    #' @param prior_spde_sigma (`list()`) A named list specifying the penalized complexity 
+    #' @param prior_spde_sigma (`list()`) A named list specifying the penalized complexity
     #'   prior for sigma (standard deviation) of the SPDE object. The two named items are
     #'   "threshold", the test threshold for the standard deviation, and "prob_above",
     #'   the prior probability that sigma will EXCEED that threshold. Only considered if
     #'   `use_gp` is TRUE
     #' @param prior_nugget (`list()`) A named list specifying the penalized complexity
-    #'   prior for the nugget term. The two named items are "threshold", the test 
+    #'   prior for the nugget term. The two named items are "threshold", the test
     #'   threshold for the nugget standard deviation, and "prob_above", the prior
     #'   probability that the standard deviation will EXCEED that threshold. Only
     #'   considered if `use_nugget` is TRUE.
@@ -277,9 +277,9 @@ MbgModelRunner <- R6::R6Class(
       admin_bounds_id = NULL,
       use_covariates = TRUE,
       use_gp = TRUE,
-      use_admin_effect = TRUE,
+      use_admin_effect = FALSE,
       use_nugget = TRUE,
-      use_stacking = TRUE,
+      use_stacking = FALSE,
       stacking_cv_settings = list(
         method = 'repeatedcv',
         number = 5,
@@ -339,7 +339,7 @@ MbgModelRunner <- R6::R6Class(
     },
 
     #' @description Prepare covariates for MBG model fitting
-    #' 
+    #'
     #' @seealso [run_regression_submodels]
     prepare_covariates = function(){
       # Optionally run stacking
