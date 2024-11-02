@@ -2,6 +2,10 @@ SHELL := /bin/bash
 PKG := "mbg"
 R_EXEC := /usr/bin/R --no-save --quiet
 
+# Build and install package
+install:
+	@$(R_EXEC) -e "devtools::install()"
+
 # Rebuild man pages
 build-docs:
 	@$(R_EXEC) -e "devtools::document()"
