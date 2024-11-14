@@ -177,9 +177,9 @@ Create a new MbgModelRunner object
   admin_bounds_id = NULL,
   use_covariates = TRUE,
   use_gp = TRUE,
-  use_admin_effect = TRUE,
+  use_admin_effect = FALSE,
   use_nugget = TRUE,
-  use_stacking = TRUE,
+  use_stacking = FALSE,
   stacking_cv_settings = list(method = "repeatedcv", number = 5, repeats = 5),
   stacking_model_settings = list(gam = NULL, gbm = NULL, treebag = NULL, rf = NULL),
   stacking_use_admin_bounds = FALSE,
@@ -206,10 +206,10 @@ Create a new MbgModelRunner object
 \item{\code{input_data}}{(\link[data.table:data.table]{data.table}) Table containing at least
 the following fields:\cr
 \itemize{
-\item x (\code{numeric}) location longitude in decimal degrees
-\item y (\code{numeric}) location latitude in decimal degrees
-\item indicator (\code{integer}) The number of events in the population
-\item samplesize (\code{integer}) The total population, denominator for \code{indicator}
+\item x (\code{numeric}) location longitude in decimal degrees\cr
+\item y (\code{numeric}) location latitude in decimal degrees\cr
+\item indicator (\code{integer}) The number of events in the population\cr
+\item samplesize (\code{integer}) The total population, denominator for \code{indicator}\cr
 }}
 
 \item{\code{id_raster}}{(\link[terra:rast]{terra}) raster showing the total area that
@@ -232,13 +232,13 @@ included in the predictive model?}
 \item{\code{use_gp}}{(\code{logical(1)}, default TRUE) Should a smoothed spatial surface be
 included in the predictive model?}
 
-\item{\code{use_admin_effect}}{(\code{logical(1)} default TRUE) Should IID administrative-level
-effects be included in the predictive model?}
+\item{\code{use_admin_effect}}{(\code{logical(1)} default FALSE) Should IID
+administrative-level effects be included in the predictive model?}
 
 \item{\code{use_nugget}}{(\code{logical(1)}, default TRUE) Should an IID effect by pixel be
 included in the predictive model?}
 
-\item{\code{use_stacking}}{(\code{logical(1)}, default TRUE) Should machine learning submodels
+\item{\code{use_stacking}}{(\code{logical(1)}, default FALSE) Should machine learning submodels
 be trained to relate the covariate rasters with the outcome data? Only run if
 \code{use_covariates} is \code{TRUE}.}
 
@@ -250,7 +250,7 @@ cross-validated? For more information about this term, see
 more information about this term, see \link{run_regression_submodels}. Only considered
 if \code{use_stacking} is TRUE.}
 
-\item{\code{stacking_use_admin_bounds}}{(\code{logical(1)}, default TRUE) Should admin
+\item{\code{stacking_use_admin_bounds}}{(\code{logical(1)}, default FALSE) Should admin
 boundaries be included as features in the stacking submodels? For more
 information about this term, see \link{run_regression_submodels}. Only considered if
 \code{use_stacking} is TRUE.}
