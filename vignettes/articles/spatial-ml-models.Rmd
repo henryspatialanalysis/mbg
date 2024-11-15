@@ -1,0 +1,133 @@
+---
+title: "Running spatial machine learning models"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Setup
+
+```{r setup}
+## Load packages
+#+ message = FALSE, warning = FALSE
+library(data.table)
+library(sf)
+library(terra)
+library(mbg)
+#+
+
+## Load data
+# Outcome: child stunting
+outcomes <- data.table::fread(system.file('extdata/child_stunting.csv', package = 'mbg'))
+# Spatial covariates, including an intercept
+covariates <- list(
+  access = terra::rast(system.file('extdata/access.tif', package = 'mbg')),
+  evi = terra::rast(system.file('extdata/evi.tif', package = 'mbg')),
+  temperature = terra::rast(system.file('extdata/temperature.tif', package = 'mbg'))
+)
+covariates$intercept <- covariates[[1]] * 0 + 1
+# Administrative boundaries
+# Regions (first-level administrative divisions)
+regions <- sf::st_read(
+  system.file('extdata/Tanzania_regions.gpkg', package = 'mbg'),
+  quiet = TRUE
+)
+
+# Create ID raster
+id_raster <- mbg::build_id_raster(
+  polygons = regions,
+  template_raster = covariates[[1]]
+)
+```
+
+# Running ML models with `mbg` and `caret`
+
+```{r run-ml-models}
+## Run ML models using input covariates
+cross_validation_settings <- list(method = 'repeatedcv', number = 5, repeats = 5)
+submodel_settings <- list(
+  enet = NULL,
+  gbm = list(verbose = FALSE),
+  treebag = NULL
+)
+submodels <- run_regression_submodels(
+  input_data = outcomes,
+  id_raster = id_raster,
+  covariates = covariates,
+  cv_settings = cross_validation_settings,
+  model_settings = submodel_settings,
+  prediction_range = c(0, 1)
+)
+plot(
+  terra::rast(submodels$predictions),
+  main = paste('Submodel prediction:', names(submodels$predictions)),
+  range = c(.2, .6),
+  fill_range = TRUE
+)
+```
+
+```{r run-with-region-effects}
+submodels_with_region_effects <- run_regression_submodels(
+  input_data = outcomes,
+  id_raster = id_raster,
+  covariates = covariates,
+  cv_settings = cross_validation_settings,
+  model_settings = submodel_settings,
+  use_admin_bounds = TRUE,
+  admin_bounds = regions,
+  admin_bounds_id = 'region_code',
+  prediction_range = c(0, 1)
+)
+plot(
+  terra::rast(submodels_with_region_effects$predictions),
+  main = paste('Submodel prediction:', names(submodels_with_region_effects$predictions)),
+  range = c(.2, .6),
+  fill_range = TRUE,
+  nr = 1
+)
+```
+
+# Stacking ML models
+
+```{r run-stacked-geostatistical-model}
+# Run stacked generalization MBG model
+model_runner <- MbgModelRunner$new(
+  input_data = outcomes,
+  id_raster = id_raster,
+  covariate_rasters = covariates,
+  use_stacking = TRUE,
+  stacking_cv_settings = cross_validation_settings,
+  stacking_model_settings = submodel_settings,
+  stacking_prediction_range = c(0, 1),
+  stacking_use_admin_bounds = TRUE,
+  admin_bounds = regions,
+  admin_bounds_id = 'region_code',
+  spde_integrate_to_zero = FALSE
+)
+model_runner$run_mbg_pipeline()
+
+# Get predictions from each component submodel
+mbg_component_models <- model_runner$model_covariates
+print(str(mbg_component_models))
+
+# Get predictions from the overall model
+grid_cell_predictions <- model_runner$grid_cell_predictions
+# Plot mean estimates
+plot(
+  grid_cell_predictions$cell_pred_mean,
+  main = 'MBG mean estimates'
+)
+lines(regions)
+
+ui_raster <- grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower
+plot(
+  ui_raster,
+  col = sf::sf.colors(n = 100),
+  main = 'MBG estimates: 95% uncertainty interval width'
+)
+lines(regions)
+```
