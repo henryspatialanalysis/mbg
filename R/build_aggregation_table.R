@@ -18,9 +18,11 @@
 #'
 #' @importFrom assertthat assert_that is.scalar
 #' @importFrom data.table data.table
-#' @importFrom terra same.crs extract
+#' @importFrom terra vect same.crs extract
 #' @export
 calculate_pixel_fractions_single_polygon <- function(polygon, id_raster, polygon_id = NULL){
+  # If polygon inherits sf, convert to SpatVector
+  if(inherits(polygon, 'sf')) polygon <- terra::vect(polygon)
   # Input data checks
   assertthat::assert_that(inherits(polygon, 'SpatVector'))
   assertthat::assert_that(inherits(id_raster, 'SpatRaster'))
@@ -97,8 +99,9 @@ build_aggregation_table_validation <- function(
 #' @param polygons terra SpatVector object. Should contain a unique ID field.
 #' @param id_raster terra SpatRaster object. ID raster created by `build_id_raster()` for
 #'   the polygons object. Should have the same CRS as `polygons` and completely cover it.
-#' @param polygon_id_field (character) Unique identifier field in `polygons`.
-#' @param verbose (logical) Show progress for building aggregation rows for each polygon?
+#' @param polygon_id_field (`character(1)`) Unique identifier field in `polygons`.
+#' @param verbose (`logical(1)`, default FALSE) Show progress for building aggregation
+#'   rows for each polygon?
 #'
 #' @return data.table with fields:
 #'   * polygon_id: Unique polygon identifier
@@ -110,13 +113,16 @@ build_aggregation_table_validation <- function(
 #' @seealso calculate_pixel_fractions_single_polygon()
 #'
 #' @import data.table
+#' @importFrom terra vect crop values
 #' @export
-build_aggregation_table <- function(polygons, id_raster, polygon_id_field, verbose = TRUE){
-
-  polys_dt <- as.data.table(polygons)
-  poly_ids <- polys_dt[[polygon_id_field]]
-
+build_aggregation_table <- function(
+  polygons, id_raster, polygon_id_field, verbose = FALSE
+){
+  # If polygons inherit sf, convert to SpatVector
+  if(inherits(polygons, 'sf')) polygons <- terra::vect(polygons)
   # Input data validation
+  polys_dt <- data.table::as.data.table(polygons)
+  poly_ids <- polys_dt[[polygon_id_field]]
   build_aggregation_table_validation(
     polygons = polygons,
     id_raster = id_raster,
@@ -131,11 +137,12 @@ build_aggregation_table <- function(polygons, id_raster, polygon_id_field, verbo
   # Build the aggregation table by calling zonal statistics for each polygon
   agg_table <- lapply(poly_ids, function(poly_id){
     # Create smaller spatial objects for calculating fractional zonal statistics
-    if(verbose) message('.', appendLF = F)
+    if(verbose) message('.', appendLF = FALSE)
     one_poly <- polygons_cropped[poly_ids == poly_id, ]
     id_raster_sub <- terra::crop(x = id_raster, y = one_poly, ext = TRUE, snap = 'out')
     # Mask missing values with -1
-    terra::values(id_raster_sub)[which(is.na(terra::values(id_raster_sub, mat = F)))] <- -1
+    missing_cells <- which(is.na(terra::values(id_raster_sub, mat = F)))
+    terra::values(id_raster_sub)[missing_cells] <- -1
     # Get fractional pixel areas for the polygon
     pixel_fractions <- calculate_pixel_fractions_single_polygon(
       polygon = one_poly,

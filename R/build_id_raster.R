@@ -36,12 +36,14 @@ make_world_template_raster <- function(){
 #'
 #' @return ID raster. A terra SpatRaster object that minimally encloses the polygons
 #'
-#' @importFrom terra same.crs crop values
+#' @importFrom terra vect same.crs crop values
 #' @importFrom assertthat assert_that
 #' @export
 build_id_raster <- function(polygons, template_raster = NULL){
   # Get default template raster, if needed
   if(is.null(template_raster)) template_raster <- make_world_template_raster()
+  # If polygons inherit sf, convert to SpatVector
+  if(inherits(polygons, 'sf')) polygons <- terra::vect(polygons)
 
   # Input data checks
   assertthat::assert_that(inherits(template_raster, 'SpatRaster'))
