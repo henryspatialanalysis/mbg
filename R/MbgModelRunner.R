@@ -29,6 +29,24 @@ MbgModelRunner <- R6::R6Class(
     #' `id_raster`.
     covariate_rasters = NULL,
 
+    #' @field aggregation_table ([data.table][data.table::data.table])\cr
+    #' A table created by [build_aggregation_table], used to link each grid cell to
+    #' higher-level administrative units.
+    aggregation_table = NULL,
+
+    #' @field aggregation_levels (`list()`)\cr
+    #' A named list: for each named item, the name is the label for that aggregation
+    #' level, and the value is a character vector of all fields in the original polygons
+    #' to be used for aggregation at that level.
+    aggregation_levels = NULL,
+
+    #' @field population_raster ([terra][terra::rast])\cr
+    #' A raster giving population for each grid cell, to be used for population-weighted
+    #' aggregation from grid cells to polygon boundaries. Should have the same dimensions
+    #' as `id_raster`. If no population raster is passed and the results are aggregated,
+    #' aggregation will be by simple mean rather than population-weighted mean
+    population_raster = NULL,
+
     #' @field admin_bounds ([sf][sf::sf])\cr
     #'  Polygons showing the boundaries of administrative divisions within the study
     #'   region. Only required if `use_admin_effect` OR `stacking_use_admin_bounds` is
@@ -155,6 +173,9 @@ MbgModelRunner <- R6::R6Class(
     #'   by pixel in the model prediction step?
     nugget_in_predict = NULL,
 
+    #' @field verbose
+    #' Should model progress be timed?
+    verbose = TRUE,
 
     ## Fields set during model runs ----------------------------------------------------->
 
@@ -175,9 +196,10 @@ MbgModelRunner <- R6::R6Class(
     #' List of predictive surfaces yielded by [generate_cell_draws_and_summarize]
     grid_cell_predictions = NULL,
 
-    #' @field verbose
-    #' Should model progress be timed?
-    verbose = TRUE,
+    #' @field aggregated_predictions
+    #' List of predictions by administrative unit. Only created if `aggregation_table` and
+    #' `aggregation_levels` are both defined.
+    aggregated_predictions = NULL,
 
     ## Public methods ------------------------------------------------------------------->
 
@@ -195,6 +217,16 @@ MbgModelRunner <- R6::R6Class(
     #' @param covariate_rasters (`list()`) A list containing all predictor covariates.
     #'   Each covariate is a [terra][terra::rast] object with the same extent and
     #'   dimensions as `id_raster`.
+    #' @param aggregation_table ([data.table][data.table::data.table]) A table created by
+    #'   [build_aggregation_table], linking each grid cell to one or more polygons
+    #' @param aggregation_levels (`list()`) A named list: for each named item, the name is
+    #' the label for that aggregation level, and the value is a character vector of all
+    #' fields in the original polygons to be used for aggregation at that level.
+    #' @param population_raster ([terra][terra::rast]) A raster giving population for each
+    #' grid cell, to be used for population-weighted aggregation from grid cells to
+    #' polygon boundaries. Should have the same dimensions as `id_raster`. If no
+    #' population raster is passed and the results are aggregated, aggregation will be by
+    #' simple mean rather than population-weighted mean
     #' @param admin_bounds ([sf][sf::sf], default `NULL`) Polygons showing the boundaries
     #'   of administrative divisions within the study region. Only required if
     #'   `use_admin_effect` OR `stacking_use_admin_bounds` is `TRUE`.
@@ -268,11 +300,14 @@ MbgModelRunner <- R6::R6Class(
     #'   model fitting, should it also be included as an IID effect by pixel in the
     #'   model prediction step?
     #' @param verbose (`logical(1)`, default TRUE) Should model progress be timed?
-    #' 
+    #'
     initialize = function(
       input_data,
       id_raster,
       covariate_rasters,
+      aggregation_table = NULL,
+      aggregation_levels = NULL,
+      population_raster = NULL,
       admin_bounds = NULL,
       admin_bounds_id = NULL,
       use_covariates = TRUE,
@@ -295,7 +330,7 @@ MbgModelRunner <- R6::R6Class(
       stacking_prediction_range = NULL,
       mesh_max_edge = c(0.2, 5.0),
       mesh_cutoff = c(0.04),
-      spde_integrate_to_zero = TRUE,
+      spde_integrate_to_zero = FALSE,
       prior_spde_range = list(threshold = 0.1, prob_below = 0.05),
       prior_spde_sigma = list(threshold = 3, prob_above = 0.05),
       prior_nugget = list(threshold = 3, prob_above = 0.05),
@@ -311,6 +346,9 @@ MbgModelRunner <- R6::R6Class(
       self$input_data <- input_data
       self$id_raster <- id_raster
       self$covariate_rasters <- covariate_rasters
+      self$aggregation_table <- aggregation_table
+      self$aggregation_levels <- aggregation_levels
+      self$population_raster <- population_raster
       self$admin_bounds <- admin_bounds
       self$admin_bounds_id <- admin_bounds_id
       self$use_covariates <- use_covariates
@@ -344,6 +382,7 @@ MbgModelRunner <- R6::R6Class(
     prepare_covariates = function(){
       # Optionally run stacking
       if(self$use_covariates & self$use_stacking){
+        if(is.null(stacking_prediction_range)) stop("Must set stacking_prediction_range")
         stackers_list <- run_regression_submodels(
           input_data = copy(self$input_data),
           id_raster = self$id_raster,
@@ -367,7 +406,7 @@ MbgModelRunner <- R6::R6Class(
     },
 
     #' @description Fit MBG model
-    #' 
+    #'
     #' @seealso [prepare_inla_data_stack], [fit_inla_model]
     fit_mbg_model = function(){
       # Prepare data for MBG model run
@@ -405,15 +444,15 @@ MbgModelRunner <- R6::R6Class(
       invisible(NULL)
     },
 
-    
+
     #' @description Generate predictions by grid cell
-    #' 
+    #'
     #' @param n_samples (`integer(1)`, default 1000) Number of posterior predictive
     #'   samples to generate from the fitted model object.
     #' @param ui_width (`numeric(1)`, default 0.95) Uncertainty interval width. This
     #'   method will create summary rasters for quantiles ((1 - ui_width)/2) and
     #'   (1 - (1 - ui_width)/2).
-    #' 
+    #'
     #' @seealso [generate_cell_draws_and_summarize]
     generate_predictions = function(n_samples = 1e3, ui_width = 0.95){
       self$grid_cell_predictions <- generate_cell_draws_and_summarize(
@@ -431,9 +470,69 @@ MbgModelRunner <- R6::R6Class(
       invisible(self$grid_cell_predictions)
     },
 
+    #' @description Aggregate grid cell predictions
+    #'
+    #' @param ui_width (`numeric(1)`, default 0.95) Uncertainty interval width. This
+    #'   method will create summary "upper" and "lower" fields rasters for quantiles
+    #'   ((1 - ui_width)/2) and (1 - (1 - ui_width)/2).
+    #'
+    #' @return List with the same names as `self$aggregation_levels`, aggregating by the
+    #'   columns specified in `self$aggregation_levels`
+    #'
+    #' @seealso Must be run after [generate_predictions]
+    aggregate_predictions = function(ui_width = 0.95){
+      # Validate inputs
+      if(is.null(self$grid_cell_predictions)){
+        stop("Must run generate_predictions() before aggregate_predictions()")
+      }
+      if(is.null(self$aggregation_table) || is.null(self$aggregation_levels)){
+        stop(
+          "Both aggregation_table and aggregation_levels must be set before running ",
+          "aggregate_predictions()"
+        )
+      }
+      # Aggregate by population-weighted mean if population raster is available, or simple
+      #  mean otherwise
+      if(is.null(self$population_raster)){
+        message("Running unweighted aggregation from grid cells to polygons")
+        agg_method <- 'mean'
+      } else {
+        message("Running population-weighted aggregation from grid cells to polygons")
+        agg_method <- 'weighted.mean'
+      }
+      # Run aggregation at all specified levels
+      self$aggregated_predictions <- lapply(self$aggregation_levels, function(cols){
+        aggregated_draws <- mbg::aggregate_draws_to_polygons(
+          draws_matrix = self$grid_cell_predictions$cell_draws,
+          aggregation_table = self$aggregation_table,
+          aggregation_cols = cols,
+          method = agg_method,
+          weighting_raster = self$population_raster
+        )
+        # Summarize using mean and boundaries of the uncertainty interval
+        draw_fields <- setdiff(colnames(aggregated_draws), cols)
+        agg_draws_matrix <- as.matrix(aggregated_draws[, ..draw_fields])
+        alpha <- (1 - ui_width) / 2
+        aggregated_summary <- data.table::copy(aggregated_draws[, ..cols])
+        aggregated_summary$mean <- rowMeans(agg_draws_matrix, na.rm = TRUE)
+        aggregated_summary$lower <- matrixStats::rowQuantiles(
+          agg_draws_matrix,
+          probs = alpha,
+          na.rm = TRUE
+        )
+        aggregated_summary$upper <- matrixStats::rowQuantiles(
+          agg_draws_matrix,
+          probs = 1 - alpha,
+          na.rm = TRUE
+        )
+        return(list(draws = aggregated_draws, summary = aggregated_summary))
+      })
+      names(self$aggregated_predictions) <- names(self$aggregation_levels)
+    },
+
     #' @description
     #' Run a full MBG pipeline, including stacking, MBG model fitting, and prediction
-    #' 
+    #'
     #' @param n_samples (`integer(1)`, default 1000) Number of posterior predictive
     #'   samples to generate from the fitted model object.
     #' @param ui_width (`numeric(1)`, default 0.95)
@@ -441,7 +540,12 @@ MbgModelRunner <- R6::R6Class(
       self$prepare_covariates()
       self$fit_mbg_model()
       self$generate_predictions(n_samples = n_samples, ui_width = ui_width)
-      invisible(self$grid_cell_predictions)
+      if(!is.null(self$aggregation_table) && !is.null(self$aggregation_levels)){
+        self$aggregate_predictions()
+        invisible(self$aggregated_predictions)
+      } else {
+        invisible(self$grid_cell_predictions)
+      }
     }
   )
 )

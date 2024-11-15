@@ -12,6 +12,8 @@ R6 class to run a full MBG model and make predictions.
 \link{prepare_inla_data_stack}, \link{fit_inla_model}
 
 \link{generate_cell_draws_and_summarize}
+
+Must be run after \link{generate_predictions}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -32,6 +34,21 @@ raster showing the total area that will be predicted using this model.}
 A list containing all predictor covariates. Each covariate is a
 \link[terra:rast]{terra} object with the same extent and dimensions as
 \code{id_raster}.}
+
+\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table})\cr
+A table created by \link{build_aggregation_table}, used to link each grid cell to
+higher-level administrative units.}
+
+\item{\code{aggregation_levels}}{(\code{list()})\cr
+A named list: for each named item, the name is the label for that aggregation
+level, and the value is a character vector of all fields in the original polygons
+to be used for aggregation at that level.}
+
+\item{\code{population_raster}}{(\link[terra:rast]{terra})\cr
+A raster giving population for each grid cell, to be used for population-weighted
+aggregation from grid cells to polygon boundaries. Should have the same dimensions
+as \code{id_raster}. If no population raster is passed and the results are aggregated,
+aggregation will be by simple mean rather than population-weighted mean}
 
 \item{\code{admin_bounds}}{(\link[sf:sf]{sf})\cr
 Polygons showing the boundaries of administrative divisions within the study
@@ -136,6 +153,8 @@ GLM family to use. For more information, see \code{\link[stats:family]{stats::fa
 If the nugget is used in model fitting, should it also be included as an IID effect
 by pixel in the model prediction step?}
 
+\item{\code{verbose}}{Should model progress be timed?}
+
 \item{\code{model_covariates}}{(\code{list()})\cr
 A list of covariates to be included in the INLA model. Either equal to
 \code{covariate_rasters}, or ML model predictions for stacked generalization.}
@@ -148,7 +167,8 @@ List of model outputs yielded by \link{fit_inla_model}}
 
 \item{\code{grid_cell_predictions}}{List of predictive surfaces yielded by \link{generate_cell_draws_and_summarize}}
 
-\item{\code{verbose}}{Should model progress be timed?}
+\item{\code{aggregated_predictions}}{List of predictions by administrative unit. Only created if \code{aggregation_table} and
+\code{aggregation_levels} are both defined.}
 }
 \if{html}{\out{</div>}}
 }
@@ -159,6 +179,7 @@ List of model outputs yielded by \link{fit_inla_model}}
 \item \href{#method-MbgModelRunner-prepare_covariates}{\code{MbgModelRunner$prepare_covariates()}}
 \item \href{#method-MbgModelRunner-fit_mbg_model}{\code{MbgModelRunner$fit_mbg_model()}}
 \item \href{#method-MbgModelRunner-generate_predictions}{\code{MbgModelRunner$generate_predictions()}}
+\item \href{#method-MbgModelRunner-aggregate_predictions}{\code{MbgModelRunner$aggregate_predictions()}}
 \item \href{#method-MbgModelRunner-run_mbg_pipeline}{\code{MbgModelRunner$run_mbg_pipeline()}}
 \item \href{#method-MbgModelRunner-clone}{\code{MbgModelRunner$clone()}}
 }
@@ -173,6 +194,9 @@ Create a new MbgModelRunner object
   input_data,
   id_raster,
   covariate_rasters,
+  aggregation_table = NULL,
+  aggregation_levels = NULL,
+  population_raster = NULL,
   admin_bounds = NULL,
   admin_bounds_id = NULL,
   use_covariates = TRUE,
@@ -186,7 +210,7 @@ Create a new MbgModelRunner object
   stacking_prediction_range = NULL,
   mesh_max_edge = c(0.2, 5),
   mesh_cutoff = c(0.04),
-  spde_integrate_to_zero = TRUE,
+  spde_integrate_to_zero = FALSE,
   prior_spde_range = list(threshold = 0.1, prob_below = 0.05),
   prior_spde_sigma = list(threshold = 3, prob_above = 0.05),
   prior_nugget = list(threshold = 3, prob_above = 0.05),
@@ -218,6 +242,19 @@ will be predicted using this model}
 \item{\code{covariate_rasters}}{(\code{list()}) A list containing all predictor covariates.
 Each covariate is a \link[terra:rast]{terra} object with the same extent and
 dimensions as \code{id_raster}.}
+
+\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table}) A table created by
+\link{build_aggregation_table}, linking each grid cell to one or more polygons}
+
+\item{\code{aggregation_levels}}{(\code{list()}) A named list: for each named item, the name is
+the label for that aggregation level, and the value is a character vector of all
+fields in the original polygons to be used for aggregation at that level.}
+
+\item{\code{population_raster}}{(\link[terra:rast]{terra}) A raster giving population for each
+grid cell, to be used for population-weighted aggregation from grid cells to
+polygon boundaries. Should have the same dimensions as \code{id_raster}. If no
+population raster is passed and the results are aggregated, aggregation will be by
+simple mean rather than population-weighted mean}
 
 \item{\code{admin_bounds}}{(\link[sf:sf]{sf}, default \code{NULL}) Polygons showing the boundaries
 of administrative divisions within the study region. Only required if
@@ -359,6 +396,29 @@ method will create summary rasters for quantiles ((1 - ui_width)/2) and
 (1 - (1 - ui_width)/2).}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MbgModelRunner-aggregate_predictions"></a>}}
+\if{latex}{\out{\hypertarget{method-MbgModelRunner-aggregate_predictions}{}}}
+\subsection{Method \code{aggregate_predictions()}}{
+Aggregate grid cell predictions
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MbgModelRunner$aggregate_predictions(ui_width = 0.95)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{ui_width}}{(\code{numeric(1)}, default 0.95) Uncertainty interval width. This
+method will create summary "upper" and "lower" fields rasters for quantiles
+((1 - ui_width)/2) and (1 - (1 - ui_width)/2).}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+List with the same names as \code{self$aggregation_levels}, aggregating by the
+columns specified in \code{self$aggregation_levels}
 }
 }
 \if{html}{\out{<hr>}}
