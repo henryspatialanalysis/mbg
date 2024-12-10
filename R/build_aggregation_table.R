@@ -20,7 +20,9 @@
 #' @importFrom data.table data.table
 #' @importFrom terra vect same.crs extract
 #' @export
-calculate_pixel_fractions_single_polygon <- function(polygon, id_raster, polygon_id = NULL){
+calculate_pixel_fractions_single_polygon <- function(
+  polygon, id_raster, polygon_id = NULL
+){
   # If polygon inherits sf, convert to SpatVector
   if(inherits(polygon, 'sf')) polygon <- terra::vect(polygon)
   # Input data checks
