@@ -91,3 +91,4 @@ inst/doc
 ## MISCELLANEOUS GITIGNORE FILES -------------------------------------------------------->
 
 .vscode/
+docs

@@ -14,6 +14,8 @@ R6 class to run a full MBG model and make predictions.
 \link{generate_cell_draws_and_summarize}
 
 Must be run after \link{generate_predictions}
+
+\link{rmse_raster_to_point} \link{log_posterior_density}
 }
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
@@ -21,9 +23,9 @@ Must be run after \link{generate_predictions}
 \item{\code{input_data}}{(\link[data.table:data.table]{data.table})\cr
 Table containing at least the following fields:\cr
 \itemize{
-\item x (\code{numeric}) location longitude in decimal degrees
-\item y (\code{numeric}) location latitude in decimal degrees
-\item indicator (\code{integer}) The number of events in the population
+\item x (\code{numeric}) location longitude in decimal degrees\cr
+\item y (\code{numeric}) location latitude in decimal degrees\cr
+\item indicator (\code{integer}) The number of events in the population\cr
 \item samplesize (\code{integer}) The total population, denominator for \code{indicator}
 }}
 
@@ -181,6 +183,7 @@ List of model outputs yielded by \link{fit_inla_model}}
 \item \href{#method-MbgModelRunner-generate_predictions}{\code{MbgModelRunner$generate_predictions()}}
 \item \href{#method-MbgModelRunner-aggregate_predictions}{\code{MbgModelRunner$aggregate_predictions()}}
 \item \href{#method-MbgModelRunner-run_mbg_pipeline}{\code{MbgModelRunner$run_mbg_pipeline()}}
+\item \href{#method-MbgModelRunner-get_predictive_validity}{\code{MbgModelRunner$get_predictive_validity()}}
 \item \href{#method-MbgModelRunner-clone}{\code{MbgModelRunner$clone()}}
 }
 }
@@ -193,7 +196,7 @@ Create a new MbgModelRunner object
 \if{html}{\out{<div class="r">}}\preformatted{MbgModelRunner$new(
   input_data,
   id_raster,
-  covariate_rasters,
+  covariate_rasters = NULL,
   aggregation_table = NULL,
   aggregation_levels = NULL,
   population_raster = NULL,
@@ -230,8 +233,8 @@ Create a new MbgModelRunner object
 \item{\code{input_data}}{(\link[data.table:data.table]{data.table}) Table containing at least
 the following fields:\cr
 \itemize{
-\item x (\code{numeric}) location longitude in decimal degrees\cr
-\item y (\code{numeric}) location latitude in decimal degrees\cr
+\item x (\code{numeric}) location x position, in the same projection as the \code{id_raster}\cr
+\item y (\code{numeric}) location y position, in the same projection as the \code{id_raster}\cr
 \item indicator (\code{integer}) The number of events in the population\cr
 \item samplesize (\code{integer}) The total population, denominator for \code{indicator}\cr
 }}
@@ -239,9 +242,9 @@ the following fields:\cr
 \item{\code{id_raster}}{(\link[terra:rast]{terra}) raster showing the total area that
 will be predicted using this model}
 
-\item{\code{covariate_rasters}}{(\code{list()}) A list containing all predictor covariates.
-Each covariate is a \link[terra:rast]{terra} object with the same extent and
-dimensions as \code{id_raster}.}
+\item{\code{covariate_rasters}}{(\code{list()}, default NULL) A list containing all predictor
+covariates. Each covariate is a \link[terra:rast]{terra} object with the same extent
+and dimensions as \code{id_raster}.}
 
 \item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table}) A table created by
 \link{build_aggregation_table}, linking each grid cell to one or more polygons}
@@ -439,6 +442,60 @@ samples to generate from the fitted model object.}
 \item{\code{ui_width}}{(\code{numeric(1)}, default 0.95)}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-MbgModelRunner-get_predictive_validity"></a>}}
+\if{latex}{\out{\hypertarget{method-MbgModelRunner-get_predictive_validity}{}}}
+\subsection{Method \code{get_predictive_validity()}}{
+Get predictive validity metrics for the fitted model
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{MbgModelRunner$get_predictive_validity(
+  in_sample = TRUE,
+  validation_data = NULL,
+  na.rm = FALSE
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{in_sample}}{(\code{logical(1)}, default TRUE) Compare model predictions to
+the data used to generate the model? If FALSE, does not return the WAIC, which
+is only useful for in-sample predictive validity.}
+
+\item{\code{validation_data}}{(\code{data.table}, default NULL) Observed data to compare
+against. Expected for out-of-sample model validation. Table containing at least
+the following fields:\cr
+\itemize{
+\item x (\code{numeric}) location x position, in the same projection as the \code{id_raster}\cr
+\item y (\code{numeric}) location y position, in the same projection as the \code{id_raster}\cr
+\item indicator (\code{integer}) The number of events in the population\cr
+\item samplesize (\code{integer}) The total population, denominator for \code{indicator}
+}}
+
+\item{\code{na.rm}}{(\code{logical(1)}, default FALSE) Should NA values be dropped from the
+RMSE and log predictive density calculations?}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+Returns the point RMSE (compared against the mean estimates by pixel),
+log-posterior density (compared against the predictive draws), and the
+Watanabe-Aikake Information Criterion (WAIC, only returned for in-sample
+predictive validity).
+}
+
+\subsection{Returns}{
+\link{data.table} Containing the following fields:\cr
+\itemize{
+\item 'rmse': Root mean squared error when compared against the mean estimates by
+pixel. Lower RMSE is better.\cr
+\item 'lpd': Log posterior predictive density when compared against pixel-level
+samples from the model. Higher LPD is better.\cr
+\item 'waic' (in-sample only): Watanable-Aikake information criterion estimated by
+INLA. Lower WAIC is better.
+}
 }
 }
 \if{html}{\out{<hr>}}
