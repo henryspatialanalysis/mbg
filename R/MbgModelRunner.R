@@ -591,7 +591,9 @@ MbgModelRunner <- R6::R6Class(
     #'   * 'lpd': Log posterior predictive density when compared against pixel-level
     #'     samples from the model. Higher LPD is better.\cr
     #'   * 'waic' (in-sample only): Watanable-Aikake information criterion estimated by
-    #'     INLA. Lower WAIC is better.
+    #'     INLA. Lower WAIC is better.\cr
+    #' For clarity, these fields will have the suffix "_is" for in-sample models, and
+    #' "_oos" for out-of-sample models.
     get_predictive_validity = function(
       in_sample = TRUE,
       validation_data = NULL,
@@ -626,10 +628,18 @@ MbgModelRunner <- R6::R6Class(
           draws = self$grid_cell_predictions$cell_draws,
           validation_data = validation_data,
           id_raster = self$id_raster,
-          na.rm = FALSE
-        ),
+          na.rm = na.rm
+        )
       )
-      if(in_sample) pv_table$waic <- self$inla_fitted_model$waic$waic
+      if(in_sample){
+        # WAIC is returned only for in-sample predictive validity
+        pv_table$waic <- self$inla_fitted_model$waic$waic
+        # Append "_is" to all metrics
+        colnames(pv_table) <- paste0(colnames(pv_table), "_is")
+      } else {
+        # Append "_oos" to all metrics
+        colnames(pv_table) <- paste0(colnames(pv_table), "_oos")
+      }
       return(pv_table)
     }
   )
