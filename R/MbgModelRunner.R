@@ -3,7 +3,9 @@
 #' @description
 #' R6 class to run a full MBG model and make predictions.
 #'
+#' @import data.table
 #' @importFrom R6 R6Class
+#' @importFrom matrixStats rowQuantiles
 #' @export
 MbgModelRunner <- R6::R6Class(
   "MbgModelRunner",
@@ -13,9 +15,9 @@ MbgModelRunner <- R6::R6Class(
 
     #' @field input_data ([data.table][data.table::data.table])\cr
     #' Table containing at least the following fields:\cr
-    #'   * x (`numeric`) location longitude in decimal degrees
-    #'   * y (`numeric`) location latitude in decimal degrees
-    #'   * indicator (`integer`) The number of events in the population
+    #'   * x (`numeric`) location longitude in decimal degrees\cr
+    #'   * y (`numeric`) location latitude in decimal degrees\cr
+    #'   * indicator (`integer`) The number of events in the population\cr
     #'   * samplesize (`integer`) The total population, denominator for `indicator`
     input_data = NULL,
 
@@ -208,15 +210,15 @@ MbgModelRunner <- R6::R6Class(
     #'
     #' @param input_data ([data.table][data.table::data.table]) Table containing at least
     #'   the following fields:\cr
-    #'   * x (`numeric`) location longitude in decimal degrees\cr
-    #'   * y (`numeric`) location latitude in decimal degrees\cr
+    #'   * x (`numeric`) location x position, in the same projection as the `id_raster`\cr
+    #'   * y (`numeric`) location y position, in the same projection as the `id_raster`\cr
     #'   * indicator (`integer`) The number of events in the population\cr
     #'   * samplesize (`integer`) The total population, denominator for `indicator`\cr
     #' @param id_raster ([terra][terra::rast]) raster showing the total area that
     #'   will be predicted using this model
-    #' @param covariate_rasters (`list()`) A list containing all predictor covariates.
-    #'   Each covariate is a [terra][terra::rast] object with the same extent and
-    #'   dimensions as `id_raster`.
+    #' @param covariate_rasters (`list()`, default NULL) A list containing all predictor
+    #'   covariates. Each covariate is a [terra][terra::rast] object with the same extent
+    #'   and dimensions as `id_raster`.
     #' @param aggregation_table ([data.table][data.table::data.table]) A table created by
     #'   [build_aggregation_table], linking each grid cell to one or more polygons
     #' @param aggregation_levels (`list()`) A named list: for each named item, the name is
@@ -304,7 +306,7 @@ MbgModelRunner <- R6::R6Class(
     initialize = function(
       input_data,
       id_raster,
-      covariate_rasters,
+      covariate_rasters = NULL,
       aggregation_table = NULL,
       aggregation_levels = NULL,
       population_raster = NULL,
@@ -382,7 +384,7 @@ MbgModelRunner <- R6::R6Class(
     prepare_covariates = function(){
       # Optionally run stacking
       if(self$use_covariates & self$use_stacking){
-        if(is.null(stacking_prediction_range)) stop("Must set stacking_prediction_range")
+        if(is.null(self$stacking_prediction_range)) stop("Set stacking_prediction_range")
         stackers_list <- run_regression_submodels(
           input_data = copy(self$input_data),
           id_raster = self$id_raster,
@@ -455,6 +457,9 @@ MbgModelRunner <- R6::R6Class(
     #'
     #' @seealso [generate_cell_draws_and_summarize]
     generate_predictions = function(n_samples = 1e3, ui_width = 0.95){
+      if(is.null(self$inla_fitted_model)){
+        stop("Must fit geostatistical model before generating predictions")
+      }
       self$grid_cell_predictions <- generate_cell_draws_and_summarize(
         inla_model = self$inla_fitted_model,
         inla_mesh = self$inla_inputs_list$mesh,
@@ -502,7 +507,7 @@ MbgModelRunner <- R6::R6Class(
       }
       # Run aggregation at all specified levels
       self$aggregated_predictions <- lapply(self$aggregation_levels, function(cols){
-        aggregated_draws <- mbg::aggregate_draws_to_polygons(
+        aggregated_draws <- aggregate_draws_to_polygons(
           draws_matrix = self$grid_cell_predictions$cell_draws,
           aggregation_table = self$aggregation_table,
           aggregation_cols = cols,
@@ -525,6 +530,15 @@ MbgModelRunner <- R6::R6Class(
           probs = 1 - alpha,
           na.rm = TRUE
         )
+        # Add grid-cell population aggregated by polygon
+        admin_pop <- aggregate_raster_to_polygons(
+          data_raster = self$population_raster,
+          aggregation_table = self$aggregation_table,
+          aggregation_cols = cols,
+          method = 'sum',
+          aggregated_field = 'population'
+        )
+        aggregated_summary[admin_pop, population := i.population, on = cols]
         return(list(draws = aggregated_draws, summary = aggregated_summary))
       })
       names(self$aggregated_predictions) <- names(self$aggregation_levels)
@@ -546,6 +560,77 @@ MbgModelRunner <- R6::R6Class(
       } else {
         invisible(self$grid_cell_predictions)
       }
+    },
+
+    #' @description
+    #' Get predictive validity metrics for the fitted model
+    #'
+    #' @details Returns the point RMSE (compared against the mean estimates by pixel),
+    #'   log-posterior density (compared against the predictive draws), and the
+    #'   Watanabe-Aikake Information Criterion (WAIC, only returned for in-sample
+    #'   predictive validity).
+    #'
+    #' @seealso [rmse_raster_to_point] [log_posterior_density]
+    #'
+    #' @param in_sample (`logical(1)`, default TRUE) Compare model predictions to
+    #'   the data used to generate the model? If FALSE, does not return the WAIC, which
+    #'   is only useful for in-sample predictive validity.
+    #' @param validation_data (`data.table`, default NULL) Observed data to compare
+    #'   against. Expected for out-of-sample model validation. Table containing at least
+    #'   the following fields:\cr
+    #'   * x (`numeric`) location x position, in the same projection as the `id_raster`\cr
+    #'   * y (`numeric`) location y position, in the same projection as the `id_raster`\cr
+    #'   * indicator (`integer`) The number of events in the population\cr
+    #'   * samplesize (`integer`) The total population, denominator for `indicator`
+    #' @param na.rm (`logical(1)`, default FALSE) Should NA values be dropped from the
+    #'   RMSE and log predictive density calculations?
+    #'
+    #' @return [data.table][data.table] Containing the following fields:\cr
+    #'   * 'rmse': Root mean squared error when compared against the mean estimates by
+    #'     pixel. Lower RMSE is better.\cr
+    #'   * 'lpd': Log posterior predictive density when compared against pixel-level
+    #'     samples from the model. Higher LPD is better.\cr
+    #'   * 'waic' (in-sample only): Watanable-Aikake information criterion estimated by
+    #'     INLA. Lower WAIC is better.
+    get_predictive_validity = function(
+      in_sample = TRUE,
+      validation_data = NULL,
+      na.rm = FALSE
+    ){
+      # Check inputs
+      if(is.null(self$grid_cell_predictions)){
+        stop("Must run generate_predictions() before measure_predictive_validity()")
+      }
+      if(in_sample && !is.null(validation_data)){
+        warning(paste(
+          "Measuring in-sample predictive validity, but an external data source was",
+          "provided. Are you sure you are not measuring out-of-sample?"
+        ))
+      }
+      if(!in_sample && is.null(validation_data)){
+        warning(paste(
+          "Measuring out-of-sample predictive validity, but no external data source was",
+          "provided. Model input data will be used."
+        ))
+      }
+      if(is.null(validation_data)) validation_data <- data.table::copy(self$input_data)
+      validation_data[, data_rate := indicator / samplesize]
+      pv_table <- data.table::data.table(
+        rmse = rmse_raster_to_point(
+          estimates = self$grid_cell_predictions$cell_pred_mean,
+          validation_data = validation_data,
+          outcome_field = 'data_rate',
+          na.rm = na.rm
+        ),
+        lpd = log_posterior_density(
+          draws = self$grid_cell_predictions$cell_draws,
+          validation_data = validation_data,
+          id_raster = self$id_raster,
+          na.rm = FALSE
+        ),
+      )
+      if(in_sample) pv_table$waic <- self$inla_fitted_model$waic$waic
+      return(pv_table)
     }
   )
 )
