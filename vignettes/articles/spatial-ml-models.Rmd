@@ -1,5 +1,6 @@
 ---
 title: "Running spatial machine learning models"
+output: rmarkdown::html_vignette
 ---
 
 ```{r, include = FALSE}
@@ -16,7 +17,7 @@ The default MBG setup models a uniform linear relationship between each covariat
 
 In this tutorial, we will run multiple machine learning models using point-georeferenced outcome data and raster covariate data, then apply the ML model predictions to generate raster predictions across the prediction space. To begin, load the `mbg` package and helper packages for data manipulation, then load the example data. Generate a raster of the full prediction space using the `build_id_raster()` function.
 
-```{r setup}
+```{r setup, message = FALSE, warning = FALSE}
 ## Load packages
 library(data.table)
 library(sf)
@@ -25,7 +26,9 @@ library(mbg)
 
 ## Load data
 # Outcome: child stunting
-outcomes <- data.table::fread(system.file('extdata/child_stunting.csv', package = 'mbg'))
+outcomes <- data.table::fread(
+  system.file('extdata/child_stunting.csv', package = 'mbg')
+)
 # Spatial covariates, including an intercept
 covariates <- list(
   access = terra::rast(system.file('extdata/access.tif', package = 'mbg')),
@@ -134,8 +137,7 @@ model_runner <- MbgModelRunner$new(
   stacking_prediction_range = c(0, 1),
   stacking_use_admin_bounds = TRUE,
   admin_bounds = departments,
-  admin_bounds_id = 'department_code',
-  spde_integrate_to_zero = FALSE
+  admin_bounds_id = 'department_code'
 )
 model_runner$run_mbg_pipeline()
 ```
