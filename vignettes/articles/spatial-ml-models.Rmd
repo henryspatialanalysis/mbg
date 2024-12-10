@@ -9,7 +9,12 @@ knitr::opts_chunk$set(
 )
 ```
 
+The default MBG setup models a uniform linear relationship between each covariate and the outcome in modeling space. This assumption may not always hold: there may be nonlinear relationships, spatially-varying relationships, and covariate interactions that affect the outcome. If we want to capture the nuances of these predictor relationships without over-fitting our model, we can turn to machine learning (ML) algorithms that are intended to fit over a high-dimensional feature space.
+
+
 # Setup
+
+In this tutorial, we will run multiple machine learning models using point-georeferenced outcome data and raster covariate data, then apply the ML model predictions to generate raster predictions across the prediction space. To begin, load the `mbg` package and helper packages for data manipulation, then load the example data. Generate a raster of the full prediction space using the `build_id_raster()` function.
 
 ```{r setup}
 ## Load packages
@@ -46,6 +51,19 @@ id_raster <- mbg::build_id_raster(
 
 # Running ML models with `mbg` and `caret`
 
+The `mbg` package wraps `[caret](https://topepo.github.io/caret/)` package to run predictive models over space. The caret (Classification And REgression Training) package contains 137 different model specifications for regression: these include linear regression and generalized linear models, generalized additive models, penalized regression (LASSO, ridge, elastic net), support vector machines, regression trees, gradient boosting, neural nets, and more.
+
+You can search the full list of available regression models in the [`caret` documentation](https://topepo.github.io/caret/available-models.html). Note that some models have tuning parameters that can be set beforehand. We will create a named list of `submodel_settings`, where each name corresponds to the name of the model we will be using, and each value is an optional named list containing any tuning parameters we want to pass to that model.
+
+Each ML model will be tuned using cross-validation. We can control model tuning by editing `cross_validation_settings`, a named list of arguments that will be passed to the `caret::trainControl` function.
+
+These models are fit and predictions generated across the study area using the `run_regression_submodels()` function. This function returns a named list with two items:
+
+- `"models"`: The fitted caret models, which can be used to closely inspect the model results and generate new predictions
+- `"predictions"`: Rasters containing the predictions of the outcome generated from each model.
+
+In the code block below, we run three regression models, using child stunting in Tanzania as the outcome and three covariate predictors: elastic net (a penalized regression method), gradient boosted machines, and bagged regression trees. We then plot the results across Tanzania:
+
 ```{r run-ml-models}
 ## Run ML models using input covariates
 cross_validation_settings <- list(method = 'repeatedcv', number = 5, repeats = 5)
@@ -54,7 +72,7 @@ submodel_settings <- list(
   gbm = list(verbose = FALSE),
   treebag = NULL
 )
-submodels <- run_regression_submodels(
+submodels <- mbg::run_regression_submodels(
   input_data = outcomes,
   id_raster = id_raster,
   covariates = covariates,
@@ -70,8 +88,10 @@ plot(
 )
 ```
 
+Many machine learning models are robust to handling a large feature space, meaning that we can add more candidate predictors to the model without over-fitting. The `run_regression_submodels()` includes the option to add administrative boundaries to the feature space as one-hot encoded variables. In the code block below, we use this option to add region (first-level administrative division) identifiers to the predictors:
+
 ```{r run-with-region-effects}
-submodels_with_region_effects <- run_regression_submodels(
+submodels_with_region_effects <- mbg::run_regression_submodels(
   input_data = outcomes,
   id_raster = id_raster,
   covariates = covariates,
@@ -86,12 +106,23 @@ plot(
   terra::rast(submodels_with_region_effects$predictions),
   main = paste('Submodel prediction:', names(submodels_with_region_effects$predictions)),
   range = c(.2, .6),
-  fill_range = TRUE,
-  nr = 1
+  fill_range = TRUE
 )
 ```
 
+
 # Stacking ML models
+
+The `run_regression_submodels()` function allows users to estimate the outcome based on many different types of regression models which may not make similar predictions across the study area. How can we combine estimates from these models while also incorporating some of the geostatistical principles used in the baseline `mbg` model? One option is to use [stacked generalization](https://pmc.ncbi.nlm.nih.gov/articles/PMC6089257/), which combines model predictions to create a "super learner" with better performance than any individual model. [Previous studies](https://royalsocietypublishing.org/doi/full/10.1098/rsif.2017.0520) indicate that this "super learner" ensemble can replace the covariate term in a standard geostatistical model to improve prediction accuracy.
+
+To run a geostatistical model with stacked generalization, create a `MbgModelRunner` object where `use_stacking = TRUE`. The arguments `submodel_settings`, `stacking_cv_settings`, and `stacking_prediction_range` should also be set when running stacked generalization. In the example below, we also include administrative effects as one-hot encoded variables in the component submodels.
+
+After enabling stacking, run the `MbgModelRunner$run_mbg_pipeline()` method to complete the full model workflow. This will now include the following steps:
+
+- Run the component regression submodels
+- For each submodel, create estimates of the outcome at each pixel across the study area
+- Run the geostatistical model, replacing the standard covariate effect with the "super learner" ensemble based on the regression submodels
+- Generate final predictions from the geostatistical model
 
 ```{r run-stacked-geostatistical-model}
 # Run stacked generalization MBG model
@@ -109,11 +140,25 @@ model_runner <- MbgModelRunner$new(
   spde_integrate_to_zero = FALSE
 )
 model_runner$run_mbg_pipeline()
+```
 
+When `use_stacking = TRUE`, the submodel predictions are saved in the `MbgModelRunner$model_covariates` attribute. These can be pulled and plotted:
+
+```{r plot-submodels}
 # Get predictions from each component submodel
 mbg_component_models <- model_runner$model_covariates
 print(str(mbg_component_models))
 
+plot(
+  terra::rast(model_runner$model_covariates),
+  range = c(.2, .6),
+  fill_range = TRUE
+)
+```
+
+We can also plot mean estimates from the geostatistical model. Note how the geostatistical model blends estimates from the component submodels, while also including other effects including the latent spatial term and the nugget:
+
+```{r plot-model-results}
 # Get predictions from the overall model
 grid_cell_predictions <- model_runner$grid_cell_predictions
 # Plot mean estimates
@@ -122,7 +167,11 @@ plot(
   main = 'MBG mean estimates'
 )
 lines(regions)
+```
 
+Finally, we can plot model uncertainty by pixel:
+
+```{r plot-model-uncertainty}
 ui_raster <- grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower
 plot(
   ui_raster,
