@@ -22,3 +22,4 @@ The raster has the following specifications:
 \item Values: All NA. Used exclusively for creating a shapefile-specific ID raster
 }
 }
+\concept{core_inputs}

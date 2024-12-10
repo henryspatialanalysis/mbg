@@ -55,3 +55,4 @@ Fit an INLA model based on a constructed data stack and formula
 Using \code{\link[INLA:inla]{INLA::inla()}} with reasonable defaults and settings tuned to predict
 across a grid.
 }
+\concept{model_fit}

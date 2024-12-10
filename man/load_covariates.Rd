@@ -56,3 +56,4 @@ Load covariates
 \details{
 Load a list of covariates from a specified directory structure
 }
+\concept{core_inputs}

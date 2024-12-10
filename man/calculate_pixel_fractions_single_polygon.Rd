@@ -30,3 +30,4 @@ polygon
 \details{
 This is a helper function called by \code{build_aggregation_table()}.
 }
+\concept{aggregation}

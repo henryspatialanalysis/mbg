@@ -75,3 +75,4 @@ List with two items:
 \description{
 Wrapper to run many regression sub-models using the caret package
 }
+\concept{model_fit}

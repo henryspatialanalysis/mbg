@@ -71,3 +71,4 @@ statistics functions. Features include:
 \seealso{
 build_aggregation_table
 }
+\concept{aggregation}

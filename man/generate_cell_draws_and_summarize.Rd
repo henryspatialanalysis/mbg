@@ -71,3 +71,4 @@ Use INLA posteriors to predict out across a grid
 Based on a fitted INLA model, the survey area defined in an ID raster, and a set of
 covariates, generate predictive grid cell draws and summary rasters across a study area.
 }
+\concept{prediction}

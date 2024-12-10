@@ -43,3 +43,4 @@ A data.table containing at least the following fields:
 \description{
 Helper function to summarize a matrix or data.frame of predictive draws
 }
+\concept{prediction}

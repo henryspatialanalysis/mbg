@@ -113,3 +113,4 @@ information about penalized complexity priors, see Daniel Simpson's
 \seealso{
 \code{\link[=fit_inla_model]{fit_inla_model()}}
 }
+\concept{model_fit}

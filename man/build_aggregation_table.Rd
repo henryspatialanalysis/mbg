@@ -33,3 +33,4 @@ Build a table to quickly aggregate from pixels to polygons
 \seealso{
 calculate_pixel_fractions_single_polygon()
 }
+\concept{aggregation}

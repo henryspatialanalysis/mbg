@@ -17,6 +17,7 @@ Must be run after \link{generate_predictions}
 
 \link{rmse_raster_to_point} \link{log_posterior_density}
 }
+\concept{model_runner}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{

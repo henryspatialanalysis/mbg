@@ -32,3 +32,4 @@ non-NA pixels of the spatRaster.
 \seealso{
 \code{\link[=build_id_raster]{build_id_raster()}}
 }
+\concept{prediction}
