@@ -45,11 +45,13 @@ library(mbg)
 
 For this tutorial, we will estimate stunting rates among children under 5 years of age across Benin. Load point observations of this outcome from the package data and print the first few rows:
 
-```{r load-outcome-data}
+```{r load-outcome-data, message = FALSE, warning = FALSE}
 # Outcome: child stunting
-outcomes <- data.table::fread(system.file('extdata/child_stunting.csv', package = 'mbg'))
+outcomes <- data.table::fread(
+  system.file('extdata/child_stunting.csv', package = 'mbg')
+)
 
-print(head(outcomes))
+head(outcomes)
 ```
 
 The outcome data has 505 rows, each representing one surveyed location, and five columns:
@@ -62,16 +64,33 @@ The outcome data has 505 rows, each representing one surveyed location, and five
 
 Let's map this survey data over a map of Benin.
 
-```{r plot-outcome-data}
+```{r plot-outcome-data, message = FALSE, warning = FALSE}
 # Administrative boundaries
-communes <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+communes <- sf::st_read(
+  system.file('extdata/Benin_communes.gpkg', package = 'mbg'),
+  quiet = TRUE
+)
 
 # Convert point data to sf
-outcome_sf <- sf::st_as_sf(outcomes, coords = c('x', 'y'), crs = sf::st_crs(communes))
+outcome_sf <- sf::st_as_sf(
+  outcomes,
+  coords = c('x', 'y'),
+  crs = sf::st_crs(communes)
+)
 outcome_sf$stunting_rate <- outcome_sf$indicator / outcome_sf$samplesize
 
-plot(outcome_sf['stunting_rate'], pch = 16, main = 'Stunting point data', reset = FALSE)
-plot(sf::st_geometry(communes), col = NA, border = 'black', add = TRUE)
+plot(
+  outcome_sf['stunting_rate'],
+  pch = 16,
+  main = 'Stunting point data',
+  reset = FALSE
+)
+plot(
+  sf::st_geometry(communes),
+  col = NA,
+  border = 'black',
+  add = TRUE
+)
 ```
 
 We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be lowest in the coastal east of the country and on the islands, and higher in the west. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
@@ -87,7 +106,7 @@ A Bayesian geostatistical model can accomplish all of these goals. We will fit a
 2. Enhanced vegetation index (EVI)
 3. Mean annual temperature
 
-```{r load-covariates}
+```{r load-covariates, message = FALSE, warning = FALSE}
 # Spatial covariates
 covariates <- list(
   access = terra::rast(system.file('extdata/access.tif', package = 'mbg')),
@@ -95,7 +114,7 @@ covariates <- list(
   temperature = terra::rast(system.file('extdata/temperature.tif', package = 'mbg'))
 )
 # Plot the covariates
-plot(terra::rast(covariates))
+plot(terra::rast(covariates), nr = 1)
 ```
 
 ## Building MBG model inputs
@@ -106,7 +125,7 @@ The geostatistical model takes three more arguments:
 2. `aggregation_table` (`data.table::data.table`, optional): Used to aggregate model estimates from grid cells to commune polygons, preserving uncertainty
 3. `population_raster` (`terra::SpatRaster`, optional): population-based indicators like child stunting should be aggregated using population weighting, which places greater weight on grid cells with higher populations when summarizing those grid cell results by polygon.
 
-```{r aggregation-prep}
+```{r aggregation-prep, message = FALSE, warning = FALSE}
 # Create ID raster
 id_raster <- mbg::build_id_raster(
   polygons = communes,
