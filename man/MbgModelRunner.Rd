@@ -306,7 +306,7 @@ SPDE mesh inside (1) and outside (2) of the modeled region. Only considered if
 \item{\code{mesh_cutoff}}{(\code{numeric(1)}, default 0.04) Minimum size of the INLA mesh,
 usually reached in data-dense areas. Only considered if \code{use_gp} is TRUE.}
 
-\item{\code{spde_integrate_to_zero}}{(\code{boolean(1)}, default TRUE) Should the 'volume'
+\item{\code{spde_integrate_to_zero}}{(\code{boolean(1)}, default FALSE) Should the 'volume'
 under the SPDE mesh integrate to zero? Only considered if \code{use_gp} is TRUE.}
 
 \item{\code{prior_spde_range}}{(\code{list()}) A named list specifying the penalized complexity

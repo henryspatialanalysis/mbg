@@ -263,7 +263,7 @@ MbgModelRunner <- R6::R6Class(
     #'   `use_gp` is TRUE.
     #' @param mesh_cutoff (`numeric(1)`, default 0.04) Minimum size of the INLA mesh,
     #'   usually reached in data-dense areas. Only considered if `use_gp` is TRUE.
-    #' @param spde_integrate_to_zero (`boolean(1)`, default TRUE) Should the 'volume'
+    #' @param spde_integrate_to_zero (`boolean(1)`, default FALSE) Should the 'volume'
     #'   under the SPDE mesh integrate to zero? Only considered if `use_gp` is TRUE.
     #' @param prior_spde_range (`list()`) A named list specifying the penalized complexity
     #'   prior for the SPDE range. The two named items are "threshold", the test threshold
