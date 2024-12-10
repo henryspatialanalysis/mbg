@@ -12,6 +12,8 @@
 #' @param na.rm (`logical(1)`, default FALSE) Should NA values be dropped from the RMSE
 #'   calculation?
 #'
+#' @concept validation
+#'
 #' @return A single number giving RMSE between the point data and estimates raster.
 #' @importFrom terra extract
 #' @export
@@ -56,6 +58,8 @@ rmse_raster_to_point <- function(
 #'
 #' @return (`numeric(1)`) Log predictive density of the validation data given the draw
 #'   estimates.
+#'
+#' @concept validation
 #'
 #' @import data.table
 #' @importFrom terra extract

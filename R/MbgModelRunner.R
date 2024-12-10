@@ -3,6 +3,8 @@
 #' @description
 #' R6 class to run a full MBG model and make predictions.
 #'
+#' @concept model_runner
+#'
 #' @import data.table
 #' @importFrom R6 R6Class
 #' @importFrom matrixStats rowQuantiles

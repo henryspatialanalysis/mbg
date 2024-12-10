@@ -46,6 +46,8 @@
 #'   - "models": A list containing summary objects for each regression model
 #'   - "predictions": Model predictions covering the entire id_raster
 #'
+#' @concept model_fit
+#'
 #' @importFrom caret trainControl train
 #' @importFrom glue glue
 #' @importFrom stats model.matrix predict

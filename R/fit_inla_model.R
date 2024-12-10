@@ -27,6 +27,8 @@
 #'
 #' @return A fitted INLA model object created by [INLA::inla()]
 #'
+#' @concept model_fit
+#'
 #' @importFrom INLA inla inla.stack.data inla.stack.A
 #' @importFrom stats as.formula
 #' @export

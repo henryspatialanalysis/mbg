@@ -16,6 +16,8 @@
 #'   * area_fraction: fraction of the pixel area falling within this polygon
 #'   * polygon_id (optional): If `polygon_id` was defined, it is added to the table
 #'
+#' @concept aggregation
+#'
 #' @importFrom assertthat assert_that is.scalar
 #' @importFrom data.table data.table
 #' @importFrom terra vect same.crs extract
@@ -113,6 +115,8 @@ build_aggregation_table_validation <- function(
 #'   * Merged fields from the table of polygons
 #'
 #' @seealso calculate_pixel_fractions_single_polygon()
+#'
+#' @concept aggregation
 #'
 #' @import data.table
 #' @importFrom terra vect crop values

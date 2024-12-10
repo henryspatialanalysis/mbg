@@ -1,12 +1,12 @@
 #' Summarize draws
-#' 
+#'
 #' @description Helper function to summarize a matrix or data.frame of predictive draws
-#' 
+#'
 #' @param draws A matrix, data.frame, or data.table of predictive draws.
 #' @param id_fields (default NULL) Only considered for data.frame-like `draws`. What
 #'   identifier fields in the data should be kept in the summary table and not included
 #'   among the draw fields?
-#' @param draw_fields (default NULL) Only considered for data.frame-like `draws`. What 
+#' @param draw_fields (default NULL) Only considered for data.frame-like `draws`. What
 #'   fields represent actual draws, as opposed to identifier fields or other metadata like
 #'   population? If `NULL`, the default, automatically determines the draw fields as all
 #'   columns not included in the `id_fields`.
@@ -14,14 +14,16 @@
 #'   calculating the upper and lower summary rasters
 #' @param na.rm (logical, default TRUE) Should NA values be removed when calculating
 #'   summaries across draws?
-#' 
+#'
 #' @return A data.table containing at least the following fields:
 #'   - The `id_fields`, if passed
 #'   - "mean": Mean across predictive draws
 #'   - "lower": Lower bound of the (X%) uncertainty interval
 #'   - "upper": Upper bound of the (X%) uncertainty interval
 #'   - "ui_width": "upper" - "lower"
-#' 
+#'
+#' @concept prediction
+#'
 #' @import data.table
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles

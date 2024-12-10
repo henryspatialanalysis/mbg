@@ -11,6 +11,8 @@
 #'
 #' @returns terra SpatRaster matching the details above
 #'
+#' @concept core_inputs
+#'
 #' @importFrom terra rast crs
 #' @export
 make_world_template_raster <- function(){
@@ -35,6 +37,8 @@ make_world_template_raster <- function(){
 #'   default, uses the default world template raster from `make_world_template_raster()`.
 #'
 #' @return ID raster. A terra SpatRaster object that minimally encloses the polygons
+#'
+#' @concept core_inputs
 #'
 #' @importFrom terra vect same.crs crop values
 #' @importFrom assertthat assert_that
@@ -83,6 +87,8 @@ build_id_raster <- function(polygons, template_raster = NULL){
 #'   pixels in the ID raster) layers.
 #'
 #' @seealso [build_id_raster()]
+#'
+#' @concept prediction
 #'
 #' @importFrom terra values
 #' @importFrom assertthat assert_that

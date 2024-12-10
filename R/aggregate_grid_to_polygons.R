@@ -130,6 +130,8 @@ aggregate_raster_to_polygons_validation <- function(
 #'
 #' @seealso build_aggregation_table
 #'
+#' @concept aggregation
+#'
 #' @importFrom terra nlyr ncell values
 #' @importFrom stats weighted.mean
 #' @import data.table
@@ -353,6 +355,8 @@ aggregate_draws_to_polygons_validation <- function(
 #'
 #' @return data.table containing polygon identifiers, (optionally) layer identifiers in
 #'   the `z_dimension_name` column, and data values aggregated by polygon.
+#'
+#' @concept aggregation
 #'
 #' @seealso build_aggregation_table
 #'
