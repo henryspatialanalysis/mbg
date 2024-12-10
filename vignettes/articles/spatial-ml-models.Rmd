@@ -18,12 +18,10 @@ In this tutorial, we will run multiple machine learning models using point-geore
 
 ```{r setup}
 ## Load packages
-#+ message = FALSE, warning = FALSE
 library(data.table)
 library(sf)
 library(terra)
 library(mbg)
-#+
 
 ## Load data
 # Outcome: child stunting
@@ -36,15 +34,15 @@ covariates <- list(
 )
 covariates$intercept <- covariates[[1]] * 0 + 1
 # Administrative boundaries
-# Regions (first-level administrative divisions)
-regions <- sf::st_read(
-  system.file('extdata/Tanzania_regions.gpkg', package = 'mbg'),
+# Departments (first-level administrative divisions)
+departments <- sf::st_read(
+  system.file('extdata/Benin_departments.gpkg', package = 'mbg'),
   quiet = TRUE
 )
 
 # Create ID raster
 id_raster <- mbg::build_id_raster(
-  polygons = regions,
+  polygons = departments,
   template_raster = covariates[[1]]
 )
 ```
@@ -62,7 +60,7 @@ These models are fit and predictions generated across the study area using the `
 - `"models"`: The fitted caret models, which can be used to closely inspect the model results and generate new predictions
 - `"predictions"`: Rasters containing the predictions of the outcome generated from each model.
 
-In the code block below, we run three regression models, using child stunting in Tanzania as the outcome and three covariate predictors: elastic net (a penalized regression method), gradient boosted machines, and bagged regression trees. We then plot the results across Tanzania:
+In the code block below, we run three regression models, using child stunting in Benin as the outcome and three covariate predictors: elastic net (a penalized regression method), gradient boosted machines, and bagged regression trees. We then plot the results across Benin:
 
 ```{r run-ml-models}
 ## Run ML models using input covariates
@@ -83,29 +81,29 @@ submodels <- mbg::run_regression_submodels(
 plot(
   terra::rast(submodels$predictions),
   main = paste('Submodel prediction:', names(submodels$predictions)),
-  range = c(.2, .6),
+  range = c(.15, .45),
   fill_range = TRUE
 )
 ```
 
-Many machine learning models are robust to handling a large feature space, meaning that we can add more candidate predictors to the model without over-fitting. The `run_regression_submodels()` includes the option to add administrative boundaries to the feature space as one-hot encoded variables. In the code block below, we use this option to add region (first-level administrative division) identifiers to the predictors:
+Many machine learning models are robust to handling a large feature space, meaning that we can add more candidate predictors to the model without over-fitting. The `run_regression_submodels()` includes the option to add administrative boundaries to the feature space as one-hot encoded variables. In the code block below, we use this option to add department (first-level administrative division) identifiers to the predictors:
 
-```{r run-with-region-effects}
-submodels_with_region_effects <- mbg::run_regression_submodels(
+```{r run-with-department-effects}
+submodels_with_department_effects <- mbg::run_regression_submodels(
   input_data = outcomes,
   id_raster = id_raster,
   covariates = covariates,
   cv_settings = cross_validation_settings,
   model_settings = submodel_settings,
   use_admin_bounds = TRUE,
-  admin_bounds = regions,
-  admin_bounds_id = 'region_code',
+  admin_bounds = departments,
+  admin_bounds_id = 'department_code',
   prediction_range = c(0, 1)
 )
 plot(
-  terra::rast(submodels_with_region_effects$predictions),
-  main = paste('Submodel prediction:', names(submodels_with_region_effects$predictions)),
-  range = c(.2, .6),
+  terra::rast(submodels_with_department_effects$predictions),
+  main = paste('Submodel prediction:', names(submodels_with_department_effects$predictions)),
+  range = c(.15, .45),
   fill_range = TRUE
 )
 ```
@@ -135,8 +133,8 @@ model_runner <- MbgModelRunner$new(
   stacking_model_settings = submodel_settings,
   stacking_prediction_range = c(0, 1),
   stacking_use_admin_bounds = TRUE,
-  admin_bounds = regions,
-  admin_bounds_id = 'region_code',
+  admin_bounds = departments,
+  admin_bounds_id = 'department_code',
   spde_integrate_to_zero = FALSE
 )
 model_runner$run_mbg_pipeline()
@@ -147,11 +145,10 @@ When `use_stacking = TRUE`, the submodel predictions are saved in the `MbgModelR
 ```{r plot-submodels}
 # Get predictions from each component submodel
 mbg_component_models <- model_runner$model_covariates
-print(str(mbg_component_models))
 
 plot(
   terra::rast(model_runner$model_covariates),
-  range = c(.2, .6),
+  range = c(.15, .45),
   fill_range = TRUE
 )
 ```
@@ -166,10 +163,10 @@ plot(
   grid_cell_predictions$cell_pred_mean,
   main = 'MBG mean estimates'
 )
-lines(regions)
+lines(departments)
 ```
 
-Finally, we can plot model uncertainty by pixel:
+As as with the default model, we can plot uncertainty by pixel:
 
 ```{r plot-model-uncertainty}
 ui_raster <- grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower
@@ -178,5 +175,5 @@ plot(
   col = sf::sf.colors(n = 100),
   main = 'MBG estimates: 95% uncertainty interval width'
 )
-lines(regions)
+lines(departments)
 ```

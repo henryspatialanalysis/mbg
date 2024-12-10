@@ -43,7 +43,7 @@ library(terra)
 library(mbg)
 ```
 
-For this tutorial, we will estimate stunting rates among children under 5 years of age across Tanzania. Load point observations of this outcome from the package data and print the first few rows:
+For this tutorial, we will estimate stunting rates among children under 5 years of age across Benin. Load point observations of this outcome from the package data and print the first few rows:
 
 ```{r load-outcome-data}
 # Outcome: child stunting
@@ -52,7 +52,7 @@ outcomes <- data.table::fread(system.file('extdata/child_stunting.csv', package 
 print(head(outcomes))
 ```
 
-The outcome data has 603 rows, each representing one surveyed location, and five columns:
+The outcome data has 505 rows, each representing one surveyed location, and five columns:
 
 * **cluster_id**: A unique identifier for each surveyed location
 * **samplesize**: The number of children under 5 surveyed at the location
@@ -60,18 +60,18 @@ The outcome data has 603 rows, each representing one surveyed location, and five
 * **x**: The surveyed location's longitude
 * **y**: The surveyed location's latitude
 
-Let's map this survey data over a map of Tanzania.
+Let's map this survey data over a map of Benin.
 
 ```{r plot-outcome-data}
 # Administrative boundaries
-districts <- sf::st_read(system.file('extdata/Tanzania_districts.gpkg', package = 'mbg'))
+communes <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
 
 # Convert point data to sf
-outcome_sf <- sf::st_as_sf(outcomes, coords = c('x', 'y'), crs = sf::st_crs(districts))
+outcome_sf <- sf::st_as_sf(outcomes, coords = c('x', 'y'), crs = sf::st_crs(communes))
 outcome_sf$stunting_rate <- outcome_sf$indicator / outcome_sf$samplesize
 
 plot(outcome_sf['stunting_rate'], pch = 16, main = 'Stunting point data', reset = FALSE)
-plot(sf::st_geometry(districts), col = NA, border = 'black', add = TRUE)
+plot(sf::st_geometry(communes), col = NA, border = 'black', add = TRUE)
 ```
 
 We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be lowest in the coastal east of the country and on the islands, and higher in the west. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
@@ -103,20 +103,20 @@ plot(terra::rast(covariates))
 The geostatistical model takes three more arguments:
 
 1. `id_raster`: A `terra::SpatRaster` that lays out the prediction grid. The model will make predictions for all non-NA cells in the `id_raster`.
-2. `aggregation_table` (`data.table::data.table`, optional): Used to aggregate model estimates from grid cells to district polygons, preserving uncertainty
+2. `aggregation_table` (`data.table::data.table`, optional): Used to aggregate model estimates from grid cells to commune polygons, preserving uncertainty
 3. `population_raster` (`terra::SpatRaster`, optional): population-based indicators like child stunting should be aggregated using population weighting, which places greater weight on grid cells with higher populations when summarizing those grid cell results by polygon.
 
 ```{r aggregation-prep}
 # Create ID raster
 id_raster <- mbg::build_id_raster(
-  polygons = districts,
+  polygons = communes,
   template_raster = covariates[[1]]
 )
 # Table to help with aggregation to higher administrative levels
 aggregation_table <- mbg::build_aggregation_table(
-  polygons = districts,
+  polygons = communes,
   id_raster = id_raster,
-  polygon_id_field = 'district_code'
+  polygon_id_field = 'commune_code'
 )
 # Population raster: used for aggregation to administrative boundaries
 population_raster <- terra::rast(
@@ -128,7 +128,7 @@ population_raster <- terra::rast(
 
 The entire Bayesian geostatistical regression workflow can be run using the `mbg::MbgModelRunner` class. The `MbgModelRunner$new()` method creates a new instance of the class, and the `MbgModelRunner$run_mbg_pipeline()` runs the entire workflow based on the passed inputs.
 
-The following code block runs the `mbg` model using mainly default settings. A typical workflow can take a few to finish, although intermediate steps will be printed to screen. Because we want a regression intercept in this model, the first line in the code block below creates the intercept as one of the covariate rasters.
+The following code block runs the `mbg` model using mainly default settings. A typical workflow can take a few minutes to finish, although intermediate steps will be printed to screen. Because we want a regression intercept in this model, the first line in the code block below creates the intercept as one of the covariate rasters.
 
 ```{r fit-mbg-model}
 # Add an intercept to the model
@@ -140,8 +140,8 @@ model_runner <- MbgModelRunner$new(
   covariate_rasters = covariates,
   aggregation_table = aggregation_table,
   aggregation_levels = list(
-    district = c('district_code', 'district'),
-    region = c('region_code', 'region')
+    commune = c('commune_code', 'commune', 'department_code', 'department'),
+    region = c('department_code', 'department')
   ),
   population_raster = population_raster
 )
@@ -170,7 +170,7 @@ plot(
   grid_cell_predictions$cell_pred_mean,
   main = 'MBG mean estimates'
 )
-lines(districts)
+lines(communes)
 ```
 
 We can also show the width of the 95% uncertainty interval by subtracting the "lower" from the "upper" summary raster:
@@ -182,12 +182,12 @@ plot(
   col = sf::sf.colors(n = 100),
   main = 'MBG estimates: 95% uncertainty interval width'
 )
-lines(districts)
+lines(communes)
 ```
 
-Compare these gridded estimates to the underlying point data. The results seem to meet our goals for estimating stunting risk across Tanzania:
+Compare these gridded estimates to the underlying point data. The results seem to meet our goals for estimating stunting risk across Benin:
 
-1. Gridded estimates are available for every region in Tanzania, not just at survey points
+1. Gridded estimates are available for every region in Benin, not just at survey points
 2. The mean estimates for stunting risk show a similar spatial pattern to the underlying point data---lower on the coast and islands, higher in the west and northwest
 3. Some extreme values from the point data, which may have been noisy due to small sample sizes, have been smoothed out in these estimates
 4. Model uncertainty, as shown by the width of the 95% uncertainty interval, is higher in areas that were far from any surveyed points.
@@ -205,34 +205,34 @@ Aggregated samples and summaries are available from the `MbgModelRunner$aggregat
 * `'draws'` (`data.table::data.table`): Predictive model samples by aggregated polygon unit
 * `'summary'` (`data.table::data.table`): Summaries of `draws` for each aggregated polygon unit, including the mean and the bounds of the 95% uncertainty interval across samples
 
-We can merge the district estimate summaries back onto the `districts` sf object to plot the results.
+We can merge the commune estimate summaries back onto the `communes` sf object to plot the results.
 
-```{r plot-district-mean-predictions}
-# Get predictions by district
+```{r plot-commune-mean-predictions}
+# Get predictions by commune
 aggregated_predictions <- model_runner$aggregated_predictions
-district_summary <- aggregated_predictions$district$summary
-district_summary_sf <- merge(
-  x = districts,
-  y = district_summary,
-  by = c('district_code', 'district')
+commune_summary <- aggregated_predictions$commune$summary
+commune_summary_sf <- merge(
+  x = communes,
+  y = commune_summary,
+  by = c('commune_code', 'commune', 'department_code', 'department')
 )
-# Plot aggregated estimates by district
+# Plot aggregated estimates by commune
 plot(
-  district_summary_sf['mean'],
-  main = 'MBG mean estimates by district',
-  pal = terra::map.pal('viridis', 9),
-  nbreaks = 10
+  commune_summary_sf['mean'],
+  main = 'MBG mean estimates by commune',
+  pal = terra::map.pal('viridis', 6),
+  breaks = seq(0.15, .45, by = .05)
 )
 ```
 
-We can also plot the width of the 95% uncertainty interval by district.
+We can also plot the width of the 95% uncertainty interval by commune.
 
-```{r plot-district-ui-widths}
-# Plot aggregated uncertainty interval widths by district
-district_summary_sf$ui <- district_summary_sf$upper - district_summary_sf$lower
+```{r plot-commune-ui-widths}
+# Plot aggregated uncertainty interval widths by commune
+commune_summary_sf$ui <- commune_summary_sf$upper - commune_summary_sf$lower
 plot(
-  district_summary_sf['ui'],
-  main = 'MBG 95% uncertainty interval width by district'
+  commune_summary_sf['ui'],
+  main = 'MBG 95% uncertainty interval width by commune'
 )
 ```
 
