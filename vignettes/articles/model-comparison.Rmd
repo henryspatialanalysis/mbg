@@ -122,7 +122,8 @@ First, run both the standard and stacking model types using the full dataset. Th
 standard_model_is <- mbg::MbgModelRunner$new(
   input_data = outcomes,
   id_raster = id_raster,
-  covariate_rasters = covariates
+  covariate_rasters = covariates,
+  verbose = FALSE
 )
 standard_model_is$run_mbg_pipeline()
 
@@ -140,7 +141,8 @@ stacking_model_is <- mbg::MbgModelRunner$new(
   stacking_prediction_range = c(0, 1),
   stacking_use_admin_bounds = TRUE,
   admin_bounds = departments,
-  admin_bounds_id = 'department_code'
+  admin_bounds_id = 'department_code',
+  verbose = FALSE
 )
 stacking_model_is$run_mbg_pipeline()
 ```
@@ -197,7 +199,7 @@ To better approximate model performance with unobserved data, we will perform 10
 
 Note that WAIC is an in-sample predictive validity metric: because `in_sample = FALSE`, WAIC is not generated during these runs.
 
-```{r set-seed, include = FALSE}
+```{r set-seed, echo = FALSE}
 # Use consistent holdouts
 set.seed(seed = 24680)
 ```
@@ -212,14 +214,14 @@ outcomes$holdout_id <- seq_len(n_holdouts) |>
 # For each of the 10 holdouts, get both models' *out-of-sample* predictive validity
 metrics_by_holdout <- lapply(seq_len(n_holdouts), function(holdout){
   # Split into (observed) training data and (unobserved) testing data
-  mbg::logging_start_timer(paste0("Running holdout #", holdout))
   train <- outcomes[holdout_id != holdout,]
   test <- outcomes[holdout_id == holdout,]
   # Run both models
   standard_model_oos <- mbg::MbgModelRunner$new(
     input_data = train,
     id_raster = id_raster,
-    covariate_rasters = covariates
+    covariate_rasters = covariates,
+    verbose = FALSE
   )
   standard_model_oos$run_mbg_pipeline()
   stacking_model_oos <- mbg::MbgModelRunner$new(
@@ -232,7 +234,8 @@ metrics_by_holdout <- lapply(seq_len(n_holdouts), function(holdout){
     stacking_prediction_range = c(0, 1),
     stacking_use_admin_bounds = TRUE,
     admin_bounds = departments,
-    admin_bounds_id = 'department_code'
+    admin_bounds_id = 'department_code',
+    verbose = FALSE
   )
   stacking_model_oos$run_mbg_pipeline()
 
@@ -249,24 +252,27 @@ metrics_by_holdout <- lapply(seq_len(n_holdouts), function(holdout){
   this_holdout_metrics$holdout_id <- holdout
 
   # Return the combined metrics for this holdout
-  mbg::logging_stop_timer(echo = TRUE)
   return(this_holdout_metrics)
 }) |>
   data.table::rbindlist()
-
-# Show the data by holdout
-metrics_by_holdout
 ```
 
+
+```{r holdouts-table, results = 'asis', echo = FALSE}
+knitr::kable(metrics_by_holdout)
+```
 
 The models trade off for better performance across the ten holdout folds. To get an overall comparison of out-of-sample predictive validity, we combine these metrics across holdouts:
 
 ```{r summarize-out-of-sample}
-out_of_sample_overall <- out_of_sample_metrics_by_holdout[
+out_of_sample_overall <- metrics_by_holdout[
   , .(rmse_oos = mean(rmse_oos), lpd_oos = sum(lpd_oos)),
   by = model_type
 ]
-out_of_sample_overall
+```
+
+```{r holdouts-table, results = 'asis', echo = FALSE}
+knitr::kable(out_of_sample_overall)
 ```
 
 In this case, the standard model has better out-of-sample LPD and RMSE, suggesting that it is the superior model for predicting new child stunting observations in Benin.
