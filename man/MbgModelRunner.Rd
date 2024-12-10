@@ -494,7 +494,9 @@ pixel. Lower RMSE is better.\cr
 \item 'lpd': Log posterior predictive density when compared against pixel-level
 samples from the model. Higher LPD is better.\cr
 \item 'waic' (in-sample only): Watanable-Aikake information criterion estimated by
-INLA. Lower WAIC is better.
+INLA. Lower WAIC is better.\cr
+For clarity, these fields will have the suffix "_is" for in-sample models, and
+"_oos" for out-of-sample models.
 }
 }
 }
