@@ -23,8 +23,8 @@ reference:
     desc: Generate predictive validity metrics. Can also be executed through the `MbgModelRunner` class.
     contents:
       - has_concept("validation")
-  - title: Aggregate rasters and draw matrices to polygons. Can also be executed through the `MbgModelRunner` class.
-    desc: ~
+  - title: Aggregate rasters and draw matrices to polygons.
+    desc: Can also be executed through the `MbgModelRunner` class.
     contents:
       - has_concept("aggregation")
   - title: Other
