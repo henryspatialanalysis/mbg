@@ -1,10 +1,10 @@
 #' Fit INLA model
-#' 
+#'
 #' @description Fit an INLA model based on a constructed data stack and formula
-#' 
+#'
 #' @details Using [INLA::inla()] with reasonable defaults and settings tuned to predict
 #'   across a grid.
-#' 
+#'
 #' @param formula (character) INLA formula to fit. Generated in
 #'   [prepare_inla_data_stack()], then interpreted using [stats::as.formula()] within the
 #'   call to [INLA::inla()].
@@ -24,14 +24,14 @@
 #'   the test threshold for the size of each fixed effect, and "prob_above", the prior
 #'   probability that the beta for each covariate will EXCEED that threshold.
 #' @param verbose (`logical(1)`, default TRUE) Log progress for INLA model fitting?
-#' 
+#'
 #' @return A fitted INLA model object created by [INLA::inla()]
-#' 
+#'
 #' @importFrom INLA inla inla.stack.data inla.stack.A
 #' @importFrom stats as.formula
 #' @export
 fit_inla_model <- function(
-  formula, data_stack, spde, samplesize_vec = 1, precision_vec = 1, 
+  formula, data_stack, spde, samplesize_vec = 1, precision_vec = 1,
   family = 'binomial', link = 'logit',
   fixed_effects_pc_prior = list(threshold = 3, prob_above = 0.05),
   verbose = TRUE
@@ -45,7 +45,10 @@ fit_inla_model <- function(
     Ntrials = if(family == 'binomial') samplesize_vec else NULL,
     scale = if(family == 'gaussian') precision_vec else NULL,
     data = INLA::inla.stack.data(data_stack),
-    control.compute = list(config = TRUE),
+    control.compute = list(
+      config = TRUE,
+      waic = TRUE
+    ),
     control.fixed = list(
       prec = list(
         prior = 'pc.prec',
