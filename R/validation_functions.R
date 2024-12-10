@@ -1,0 +1,76 @@
+#' Generate RMSE from an estimated raster surface and point data
+#'
+#' @param estimates ([terra][SpatRaster]) Raster surface containing point estimates. This
+#'   could also be the mean surface of a Bayesian geostatistical model
+#' @field validation_data ([data.frame])\cr
+#'   Table containing at least the following fields:\cr
+#'   * x (`numeric`) location x position, in the same projection as `estimates`\cr
+#'   * y (`numeric`) location y position, in the same projection as `estimates`\cr
+#'   * (Outcome field) See below
+#' @param outcome_field (`character(1)`) Column in `validation_data` containing the values
+#'   that should be compared against the `estimates` raster surface.
+#' @param na.rm (`logical(1)`, default FALSE) Should NA values be dropped from the RMSE
+#'   calculation?
+#'
+#' @return A single number giving RMSE between the point data and estimates raster.
+#' @importFrom terra extract
+#' @export
+rmse_raster_to_point <- function(
+  estimates,
+  validation_data,
+  outcome_field,
+  na.rm = FALSE
+){
+  point_estimates <- terra::extract(
+    x = estimates,
+    y = data_points[, c('x', 'y')]
+  )
+  rmse <- (point_estimates - data_points[[outcome_field]])**2 |>
+    mean(na.rm = na.rm) |>
+    sqrt()
+  return(rmse)
+}
+
+
+#' Generate log posterior predictive density from a geostatistical surface onto point data
+#'
+#' @details Calculated across draws. Requires an ID raster to match each point observation
+#'   to a set of draws. Assumes binomial data.
+#'
+#' @seealso https://shorturl.at/P5zBT
+#'
+#' @param draws ([matrix]) A predictive draw matrix, where each row corresponds to a
+#'   pixel in the `id_raster` and each column corresponds to one sampled estimate of the
+#'   outcome.
+#' @field validation_data ([data.frame]) Table containing at least the following
+#'  fields:\cr
+#'   * x (`numeric`) location x position, in the same projection as `id_raster`\cr
+#'   * y (`numeric`) location y position, in the same projection as `id_raster`\cr
+#'   * indicator (`integer`) The number of events in the population\cr
+#'   * samplesize (`integer`) The total population, denominator for `indicator`
+#' @param id_raster ([terra][terra::rast]) Raster showing the sample study area, created
+#'   using [build_id_raster].
+#' @param na.rm (`logical(1)`, default FALSE) Should NA values be omitted from the LPD
+#'   calculation?
+#'
+#' @return (`numeric(1)`) Log predictive density of the validation data given the draw
+#'   estimates.
+#'
+#' @importFrom terra extract
+#' @export
+log_posterior_density <- function(draws, validation_data, id_raster, na.rm = FALSE){
+  # Get the pixel IDs of each data point
+  pixel_ids <- terra::extract(x = id_raster, y = validation_data[, c('x', 'y')])
+  # Get log density at each data point
+  log_density_by_observation <- lapply(seq_len(nrow(validation_data)), function(row_ii){
+    dbinom(
+      x = validation_data$indicator[row_ii],
+      size = validation_data$samplesize[row_ii],
+      prob = draws[pixel_ids[row_ii], ]
+    ) |>
+      mean(na.rm = na.rm) |>
+      log()
+  })
+  log_density <- sum(log_density_by_observation, na.rm = na.rm)
+  return(log_density)
+}
