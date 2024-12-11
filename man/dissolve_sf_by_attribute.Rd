@@ -7,12 +7,12 @@
 dissolve_sf_by_attribute(x, by = character(0))
 }
 \arguments{
-\item{x}{(\link[sf:sf]{sf} object) SF object to dissolve}
+\item{x}{(\link[sf:sf]{sf::sf} object) SF object to dissolve}
 
 \item{by}{(\code{character(N)}, default character(0)) Attributes to dissolve by}
 }
 \value{
-Dissolved \link[sf:sf]{sf} object
+Dissolved \link[sf:sf]{sf::sf} object
 }
 \description{
 Dissolve an SF object by attribute

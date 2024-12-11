@@ -7,10 +7,11 @@
 build_aggregation_table(polygons, id_raster, polygon_id_field, verbose = FALSE)
 }
 \arguments{
-\item{polygons}{terra SpatVector object. Should contain a unique ID field.}
+\item{polygons}{\link[terra:SpatVector-class]{terra::SpatVector} object. Should contain a unique ID field.}
 
-\item{id_raster}{terra SpatRaster object. ID raster created by \code{build_id_raster()} for
-the polygons object. Should have the same CRS as \code{polygons} and completely cover it.}
+\item{id_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} object. ID raster created by \code{build_id_raster()}
+for the polygons object. Should have the same CRS as \code{polygons} and completely cover
+it.}
 
 \item{polygon_id_field}{(\code{character(1)}) Unique identifier field in \code{polygons}.}
 

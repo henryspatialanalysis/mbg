@@ -28,7 +28,7 @@ run_regression_submodels(
 \item 'y': y position, often latitude
 }}
 
-\item{id_raster}{terra SpatRaster with non-NA pixels delineating the extent of the
+\item{id_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} with non-NA pixels delineating the extent of the
 study area}
 
 \item{covariates}{(list) Named list of all covariate effects included in the model,

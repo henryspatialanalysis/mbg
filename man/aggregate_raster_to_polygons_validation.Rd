@@ -17,7 +17,7 @@ aggregate_raster_to_polygons_validation(
 )
 }
 \arguments{
-\item{data_raster}{SpatRaster containing data to be aggregated to polygons.}
+\item{data_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} containing data to be aggregated to polygons.}
 
 \item{aggregation_table}{Aggregation table linking pixels to polygon identifiers,
 created using \code{build_aggregation_table()}}
@@ -37,9 +37,9 @@ layers, how should each layer be identified?}
 \item{z_dimension_name}{(default 'z') The field name for the "z" dimension
 corresponding to each layer of the \code{data_raster}.}
 
-\item{weighting_raster}{(spatRaster, default NULL) The relative weighting of each whole
-pixel to the overall polygon value, for example, if calculating a population-weighted
-mean.}
+\item{weighting_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}, default NULL) The relative weighting of
+each whole pixel to the overall polygon value, for example, if calculating a
+population-weighted mean.}
 
 \item{na.rm}{(bool, default TRUE) How to handle NA pixels in \code{data_raster} and
 \code{weighting_raster}.}
@@ -53,4 +53,4 @@ Data validation for aggregate_raster_to_polygons
 \seealso{
 aggregate_raster_to_polygons
 }
-\concept{internal}
+\keyword{internal}

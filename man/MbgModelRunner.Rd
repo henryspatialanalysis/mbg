@@ -6,22 +6,11 @@
 \description{
 R6 class to run a full MBG model and make predictions.
 }
-\seealso{
-\link{run_regression_submodels}
-
-\link{prepare_inla_data_stack}, \link{fit_inla_model}
-
-\link{generate_cell_draws_and_summarize}
-
-Must be run after \link{generate_predictions}
-
-\link{rmse_raster_to_point} \link{log_posterior_density}
-}
 \concept{model_runner}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}
 \describe{
-\item{\code{input_data}}{(\link[data.table:data.table]{data.table})\cr
+\item{\code{input_data}}{(\link[data.table:data.table]{data.table::data.table})\cr
 Table containing at least the following fields:\cr
 \itemize{
 \item x (\code{numeric}) location longitude in decimal degrees\cr
@@ -30,15 +19,15 @@ Table containing at least the following fields:\cr
 \item samplesize (\code{integer}) The total population, denominator for \code{indicator}
 }}
 
-\item{\code{id_raster}}{(\link[terra:rast]{terra})\cr
+\item{\code{id_raster}}{(\link[terra:SpatRaster-class]{terra::SpatRaster})\cr
 raster showing the total area that will be predicted using this model.}
 
 \item{\code{covariate_rasters}}{(\code{list()})\cr
 A list containing all predictor covariates. Each covariate is a
-\link[terra:rast]{terra} object with the same extent and dimensions as
+\link[terra:SpatRaster-class]{terra::SpatRaster} object with the same extent and dimensions as
 \code{id_raster}.}
 
-\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table})\cr
+\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table::data.table})\cr
 A table created by \link{build_aggregation_table}, used to link each grid cell to
 higher-level administrative units.}
 
@@ -47,13 +36,13 @@ A named list: for each named item, the name is the label for that aggregation
 level, and the value is a character vector of all fields in the original polygons
 to be used for aggregation at that level.}
 
-\item{\code{population_raster}}{(\link[terra:rast]{terra})\cr
+\item{\code{population_raster}}{(\link[terra:SpatRaster-class]{terra::SpatRaster})\cr
 A raster giving population for each grid cell, to be used for population-weighted
 aggregation from grid cells to polygon boundaries. Should have the same dimensions
 as \code{id_raster}. If no population raster is passed and the results are aggregated,
 aggregation will be by simple mean rather than population-weighted mean}
 
-\item{\code{admin_bounds}}{(\link[sf:sf]{sf})\cr
+\item{\code{admin_bounds}}{(\link[sf:sf]{sf::sf})\cr
 Polygons showing the boundaries of administrative divisions within the study
 region. Only required if \code{use_admin_effect} OR \code{stacking_use_admin_bounds} is
 \code{TRUE}.}
@@ -150,7 +139,7 @@ Link function for fitting the INLA model, typically related to the GLM \code{fam
 Inverse function of \code{inla_link}.}
 
 \item{\code{inla_family}}{(character)\cr
-GLM family to use. For more information, see \code{\link[stats:family]{stats::family()}}.}
+GLM family to use. For more information, see \link[stats:family]{stats::family}.}
 
 \item{\code{nugget_in_predict}}{(\code{logical(1)})\cr
 If the nugget is used in model fitting, should it also be included as an IID effect
@@ -231,7 +220,7 @@ Create a new MbgModelRunner object
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{input_data}}{(\link[data.table:data.table]{data.table}) Table containing at least
+\item{\code{input_data}}{(\link[data.table:data.table]{data.table::data.table}) Table containing at least
 the following fields:\cr
 \itemize{
 \item x (\code{numeric}) location x position, in the same projection as the \code{id_raster}\cr
@@ -240,27 +229,27 @@ the following fields:\cr
 \item samplesize (\code{integer}) The total population, denominator for \code{indicator}\cr
 }}
 
-\item{\code{id_raster}}{(\link[terra:rast]{terra}) raster showing the total area that
+\item{\code{id_raster}}{(\link[terra:SpatRaster-class]{terra::SpatRaster}) raster showing the total area that
 will be predicted using this model}
 
 \item{\code{covariate_rasters}}{(\code{list()}, default NULL) A list containing all predictor
-covariates. Each covariate is a \link[terra:rast]{terra} object with the same extent
+covariates. Each covariate is a \link[terra:SpatRaster-class]{terra::SpatRaster} object with the same extent
 and dimensions as \code{id_raster}.}
 
-\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table}) A table created by
+\item{\code{aggregation_table}}{(\link[data.table:data.table]{data.table::data.table}) A table created by
 \link{build_aggregation_table}, linking each grid cell to one or more polygons}
 
 \item{\code{aggregation_levels}}{(\code{list()}) A named list: for each named item, the name is
 the label for that aggregation level, and the value is a character vector of all
 fields in the original polygons to be used for aggregation at that level.}
 
-\item{\code{population_raster}}{(\link[terra:rast]{terra}) A raster giving population for each
+\item{\code{population_raster}}{(\link[terra:SpatRaster-class]{terra::SpatRaster}) A raster giving population for each
 grid cell, to be used for population-weighted aggregation from grid cells to
 polygon boundaries. Should have the same dimensions as \code{id_raster}. If no
 population raster is passed and the results are aggregated, aggregation will be by
 simple mean rather than population-weighted mean}
 
-\item{\code{admin_bounds}}{(\link[sf:sf]{sf}, default \code{NULL}) Polygons showing the boundaries
+\item{\code{admin_bounds}}{(\link[sf:sf]{sf::sf}, default \code{NULL}) Polygons showing the boundaries
 of administrative divisions within the study region. Only required if
 \code{use_admin_effect} OR \code{stacking_use_admin_bounds} is \code{TRUE}.}
 
@@ -339,7 +328,7 @@ EXCEED that threshold. Only considered if \code{use_admin_effect} is TRUE.}
 complexity prior for all covariate effects except for the intercept, if an
 intercept is included. The two named items are "threshold", the test threshold
 for the size of each fixed effect, and "prob_above", the prior probability that
-the beta for each covariate will EXCEED that threshold. Only considered if
+the beta for each covariate will exceed that threshold. Only considered if
 \code{use_covariates} is TRUE and \code{use_stacking} is FALSE.}
 
 \item{\code{inla_link}}{(\code{character(1)}, default 'logit') Link function for fitting the
@@ -465,9 +454,9 @@ Get predictive validity metrics for the fitted model
 the data used to generate the model? If FALSE, does not return the WAIC, which
 is only useful for in-sample predictive validity.}
 
-\item{\code{validation_data}}{(\code{data.table}, default NULL) Observed data to compare
-against. Expected for out-of-sample model validation. Table containing at least
-the following fields:\cr
+\item{\code{validation_data}}{(\link[data.table:data.table]{data.table::data.table}, default NULL) Observed data to
+compare against. Expected for out-of-sample model validation. Table containing at
+least the following fields:\cr
 \itemize{
 \item x (\code{numeric}) location x position, in the same projection as the \code{id_raster}\cr
 \item y (\code{numeric}) location y position, in the same projection as the \code{id_raster}\cr
@@ -488,7 +477,7 @@ predictive validity).
 }
 
 \subsection{Returns}{
-\link{data.table} Containing the following fields:\cr
+\link[data.table:data.table]{data.table::data.table} Containing the following fields:\cr
 \itemize{
 \item 'rmse': Root mean squared error when compared against the mean estimates by
 pixel. Lower RMSE is better.\cr

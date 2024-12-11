@@ -7,11 +7,11 @@
 calculate_pixel_fractions_single_polygon(polygon, id_raster, polygon_id = NULL)
 }
 \arguments{
-\item{polygon}{terra SpatVector object of length 1. The polygon to calculate fractional
-areas across.}
+\item{polygon}{\link[terra:SpatVector-class]{terra::SpatVector} object of length 1. The polygon to calculate
+fractional areas across.}
 
-\item{id_raster}{terra SpatRaster object. ID raster created for the set of all polygons
-to be considered, created by \code{build_id_raster()}.}
+\item{id_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} object. ID raster created for the set of all
+polygons to be considered, created by \code{build_id_raster()}.}
 
 \item{polygon_id}{(optional). ID for this polygon. Must have length 1.}
 }

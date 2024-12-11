@@ -7,7 +7,7 @@
 make_world_template_raster()
 }
 \value{
-terra SpatRaster matching the details above
+\link[terra:SpatRaster-class]{terra::SpatRaster} object matching the specifications above
 }
 \description{
 Create a template raster for the world with approximately 5x5km resolution

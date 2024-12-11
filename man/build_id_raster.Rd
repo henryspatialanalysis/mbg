@@ -7,14 +7,14 @@
 build_id_raster(polygons, template_raster = NULL)
 }
 \arguments{
-\item{polygons}{terra SpatVector object. The polygons to be aggregated to}
+\item{polygons}{\link[terra:SpatVector-class]{terra::SpatVector} object. The polygons to be aggregated to}
 
-\item{template_raster}{(optional) terra SpatRaster object. The template raster should
+\item{template_raster}{(optional) \link[terra:SpatRaster-class]{terra::SpatRaster} object. The template raster should
 contain and have the same CRS as the polygons. If template raster is \code{NULL}, the
 default, uses the default world template raster from \code{make_world_template_raster()}.}
 }
 \value{
-ID raster. A terra SpatRaster object that minimally encloses the polygons
+ID raster. A \link[terra:SpatRaster-class]{terra::SpatRaster} object that minimally encloses the polygons
 }
 \description{
 Build an ID raster matching the extent of a vector dataset

@@ -7,11 +7,11 @@
 log_posterior_density(draws, validation_data, id_raster, na.rm = FALSE)
 }
 \arguments{
-\item{draws}{(\link{matrix}) A predictive draw matrix, where each row corresponds to a
+\item{draws}{(\code{matrix}) A predictive draw matrix, where each row corresponds to a
 pixel in the \code{id_raster} and each column corresponds to one sampled estimate of the
 outcome.}
 
-\item{id_raster}{(\link[terra:rast]{terra}) Raster showing the sample study area, created
+\item{id_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}) Raster showing the sample study area, created
 using \link{build_id_raster}.}
 
 \item{na.rm}{(\code{logical(1)}, default FALSE) Should NA values be omitted from the LPD
@@ -31,7 +31,7 @@ to a set of draws. Assumes binomial data.
 \section{Fields}{
 
 \describe{
-\item{\code{validation_data}}{(\link{data.frame}) Table containing at least the following
+\item{\code{validation_data}}{(\code{data.frame}) Table containing at least the following
 fields:\cr
 \itemize{
 \item x (\code{numeric}) location x position, in the same projection as \code{id_raster}\cr

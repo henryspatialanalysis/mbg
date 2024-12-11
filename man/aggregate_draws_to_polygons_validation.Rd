@@ -16,11 +16,11 @@ aggregate_draws_to_polygons_validation(
 )
 }
 \arguments{
-\item{draws_matrix}{matrix, array, data.frame, corresponding to grid cell draws that
-will be aggregated to polygons.}
+\item{draws_matrix}{\code{matrix}, \code{array}, or \code{data.frame} corresponding to grid cell draws
+that will be aggregated to polygons.}
 
-\item{aggregation_table}{Aggregation table linking pixels to polygon identifiers,
-created using \code{build_aggregation_table()}}
+\item{aggregation_table}{\link[data.table:data.table]{data.table::data.table} Aggregation table linking pixels to
+polygon identifiers, created using \code{build_aggregation_table()}}
 
 \item{aggregation_cols}{(character vector, default 'polygon_id') Polygon identifiers
 to use for aggregation.}
@@ -34,9 +34,9 @@ sets of estimates, how should each layer be identified?}
 \item{z_dimension_name}{(default 'z') The field name for the "z" dimension
 corresponding to each set of estimates contained in \code{draws_matrix}.}
 
-\item{weighting_raster}{(spatRaster, default NULL) The relative weighting of each whole
-pixel to the overall polygon value, for example, if calculating a population-weighted
-mean.}
+\item{weighting_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}, default NULL) The relative weighting of
+each whole pixel to the overall polygon value, for example, if calculating a
+population-weighted mean.}
 
 \item{na.rm}{(bool, default TRUE) How to handle NA values in \code{draws_matrix} and
 \code{weighting_raster}.}
@@ -50,4 +50,4 @@ Data validation for aggregate_draws_to_polygons
 \seealso{
 aggregate_draws_to_polygons
 }
-\concept{internal}
+\keyword{internal}

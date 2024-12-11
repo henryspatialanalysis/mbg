@@ -13,7 +13,7 @@ summarize_draws(
 )
 }
 \arguments{
-\item{draws}{A matrix, data.frame, or data.table of predictive draws.}
+\item{draws}{A \code{matrix}, \code{data.frame}, or \link[data.table:data.table]{data.table::data.table} of predictive draws.}
 
 \item{id_fields}{(default NULL) Only considered for data.frame-like \code{draws}. What
 identifier fields in the data should be kept in the summary table and not included
@@ -24,14 +24,14 @@ fields represent actual draws, as opposed to identifier fields or other metadata
 population? If \code{NULL}, the default, automatically determines the draw fields as all
 columns not included in the \code{id_fields}.}
 
-\item{ui_width}{(numeric, default 0.95) Size of the uncertainty interval width when
+\item{ui_width}{(\code{numeric}, default 0.95) Size of the uncertainty interval width when
 calculating the upper and lower summary rasters}
 
-\item{na.rm}{(logical, default TRUE) Should NA values be removed when calculating
+\item{na.rm}{(\code{logical}, default TRUE) Should NA values be removed when calculating
 summaries across draws?}
 }
 \value{
-A data.table containing at least the following fields:
+A \link{data.table:;data.table} containing at least the following fields:
 \itemize{
 \item The \code{id_fields}, if passed
 \item "mean": Mean across predictive draws

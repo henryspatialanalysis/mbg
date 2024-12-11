@@ -17,10 +17,10 @@ aggregate_raster_to_polygons(
 )
 }
 \arguments{
-\item{data_raster}{SpatRaster containing data to be aggregated to polygons.}
+\item{data_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} containing data to be aggregated to polygons.}
 
-\item{aggregation_table}{Aggregation table linking pixels to polygon identifiers,
-created using \code{build_aggregation_table()}}
+\item{aggregation_table}{\link[data.table:data.table]{data.table::data.table} Aggregation table linking pixels to
+polygon identifiers, created using \code{build_aggregation_table()}}
 
 \item{aggregation_cols}{(character vector, default 'polygon_id') Polygon identifiers
 to use for aggregation. Must be field names within \code{aggregation_table}.}
@@ -42,10 +42,10 @@ the number of layers in \code{data_raster}. If left as \code{NULL}, the default,
 corresponding to each layer of the \code{data_raster}. This field is only added if
 \code{z_dimension} is passed or if \code{data_raster} has more than one layer.}
 
-\item{weighting_raster}{(spatRaster, default NULL) The relative weighting of each whole
-pixel to the overall polygon value, for example, if calculating a population-weighted
-mean. Required for methods 'weighted.mean' and 'weighted.sum', ignored for the other
-methods.}
+\item{weighting_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}, default NULL) The relative weighting of
+each whole pixel to the overall polygon value, for example, if calculating a
+population-weighted mean. Required for methods 'weighted.mean' and 'weighted.sum',
+ignored for the other methods.}
 
 \item{na.rm}{(bool, default TRUE) How to handle NA pixels in \code{data_raster} and
 \code{weighting_raster}. If set to TRUE but ALL pixels in a polygon are NA, will still

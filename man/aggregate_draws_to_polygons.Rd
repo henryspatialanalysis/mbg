@@ -16,21 +16,21 @@ aggregate_draws_to_polygons(
 )
 }
 \arguments{
-\item{draws_matrix}{matrix, array, data.frame, corresponding to grid cell draws that
-will be aggregated to polygons:
+\item{draws_matrix}{\code{matrix}, \code{array}, or \code{data.frame} corresponding to grid cell draws
+that will be aggregated to polygons:\cr
 \itemize{
 \item Each row represents a non-NA grid cell in the ID raster. If the matrix contains
 multiple years of estimates, the matrix is ordered by year, then by
 masked_pixel_id. For example, if there are 200 non-NA pixels in the ID raster and
 five years of draws, then the matrix contains 1000 rows: row 200 corresponds to
 (year 1, masked_pixel_id 200), row 201 corresponds to (year 2, masked_pixel_id 1),
-and so on.
+and so on.\cr
 \item Each column represents a draw. There should be no non-draw columns (such as ID
 fields) in the \code{draws_matrix}.
 }}
 
-\item{aggregation_table}{Aggregation table linking pixels to polygon identifiers,
-created using \code{build_aggregation_table()}}
+\item{aggregation_table}{\link[data.table:data.table]{data.table::data.table} Aggregation table linking pixels to
+polygon identifiers, created using \code{build_aggregation_table()}}
 
 \item{aggregation_cols}{(character vector, default 'polygon_id') Polygon identifiers
 to use for aggregation. Must be field names within \code{aggregation_table}.}
@@ -49,18 +49,18 @@ the number of layers in \code{data_raster}. If left as \code{NULL}, the default,
 corresponding to each layer of the \code{data_raster}. This field is only added if
 \code{z_dimension} is passed or if \code{data_raster} has more than one layer.}
 
-\item{weighting_raster}{(spatRaster, default NULL) The relative weighting of each whole
-pixel to the overall polygon value, for example, if calculating a population-weighted
-mean. Required for methods 'weighted.mean' and 'weighted.sum', ignored for the other
-methods.}
+\item{weighting_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}, default NULL) The relative weighting of
+each whole pixel to the overall polygon value, for example, if calculating a
+population-weighted mean. Required for methods 'weighted.mean' and 'weighted.sum',
+ignored for the other methods.}
 
 \item{na.rm}{(bool, default TRUE) How to handle NA pixels in \code{data_raster} and
 \code{weighting_raster}. If set to TRUE but ALL pixels in a polygon are NA, will still
 return an NA value for the polygon.}
 }
 \value{
-data.table containing polygon identifiers, (optionally) layer identifiers in
-the \code{z_dimension_name} column, and data values aggregated by polygon.
+\link[data.table:data.table]{data.table::data.table} containing polygon identifiers, (optionally) layer
+identifiers in the \code{z_dimension_name} column, and data values aggregated by polygon.
 }
 \description{
 Aggregate grid cell draws to polygons using an aggregation table

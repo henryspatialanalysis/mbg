@@ -9,4 +9,4 @@ get_current_year()
 \description{
 Helper function to get the current year
 }
-\concept{internal}
+\keyword{internal}

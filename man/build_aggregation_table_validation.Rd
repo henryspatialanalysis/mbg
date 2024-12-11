@@ -12,12 +12,13 @@ build_aggregation_table_validation(
 )
 }
 \arguments{
-\item{polygons}{terra SpatVector object. Should contain a unique ID field.}
+\item{polygons}{\link[terra:SpatVector-class]{terra::SpatVector} object. Should contain a unique ID field.}
 
-\item{id_raster}{terra SpatRaster object. ID raster created by \code{build_id_raster()} for
-the polygons object. Should have the same CRS as \code{polygons} and completely cover it.}
+\item{id_raster}{\link[terra:SpatRaster-class]{terra::SpatRaster} object. ID raster created by \code{build_id_raster()}
+for the polygons object. Should have the same CRS as \code{polygons} and completely cover
+it.}
 
-\item{polygon_id_field}{(character) Unique identifier field in \code{polygons}.}
+\item{polygon_id_field}{(\code{character}) Unique identifier field in \code{polygons}.}
 
 \item{polygon_ids}{(vector, any type) Polygon identifiers from \code{polygon_id_field}.}
 }
@@ -30,4 +31,4 @@ Input data validation for \code{build_aggregation_table()}
 \seealso{
 build_aggregation_table
 }
-\concept{internal}
+\keyword{internal}
