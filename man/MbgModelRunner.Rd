@@ -209,7 +209,7 @@ Create a new MbgModelRunner object
   use_nugget = TRUE,
   use_stacking = FALSE,
   stacking_cv_settings = list(method = "repeatedcv", number = 5, repeats = 5),
-  stacking_model_settings = list(gam = NULL, gbm = NULL, treebag = NULL, rf = NULL),
+  stacking_model_settings = list(gbm = NULL, treebag = NULL, rf = NULL),
   stacking_use_admin_bounds = FALSE,
   stacking_prediction_range = NULL,
   mesh_max_edge = c(0.2, 5),

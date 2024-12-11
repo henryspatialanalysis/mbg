@@ -14,7 +14,7 @@ when running batches of related models}
 the timestamp? Useful when launching many models in quick succession.}
 }
 \value{
-A string formatted as 'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'
+A string formatted as \code{'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'}
 }
 \description{
 Create a string time stamp based on current detailed date/time

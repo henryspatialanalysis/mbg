@@ -53,3 +53,4 @@ Data validation for aggregate_raster_to_polygons
 \seealso{
 aggregate_raster_to_polygons
 }
+\concept{internal}

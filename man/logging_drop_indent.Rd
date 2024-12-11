@@ -12,3 +12,4 @@ Change a global option that controls indentation for MBG package logging
 \details{
 Decreases the \code{MbgLoggingIndent} option, with default of zero if not set
 }
+\concept{internal}

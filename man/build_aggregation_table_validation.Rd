@@ -30,3 +30,4 @@ Input data validation for \code{build_aggregation_table()}
 \seealso{
 build_aggregation_table
 }
+\concept{internal}
