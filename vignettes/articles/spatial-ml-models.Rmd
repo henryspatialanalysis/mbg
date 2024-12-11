@@ -1,6 +1,11 @@
 ---
 title: "Running spatial machine learning models"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: default
+vignette: >
+  %\VignetteIndexEntry{Running spatial machine learning models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r, include = FALSE}
@@ -52,9 +57,9 @@ id_raster <- mbg::build_id_raster(
 
 # Running ML models with `mbg` and `caret`
 
-The `mbg` package wraps `[caret](https://topepo.github.io/caret/)` package to run predictive models over space. The caret (Classification And REgression Training) package contains 137 different model specifications for regression: these include linear regression and generalized linear models, generalized additive models, penalized regression (LASSO, ridge, elastic net), support vector machines, regression trees, gradient boosting, neural nets, and more.
+The `mbg` package wraps the [`caret`](https://topepo.github.io/caret/) package to run predictive models over space. The caret (Classification And REgression Training) package contains 137 different model specifications for regression: these include linear regression and generalized linear models, generalized additive models, penalized regression (LASSO, ridge, elastic net), support vector machines, regression trees, gradient boosting, neural nets, and more.
 
-You can search the full list of available regression models in the [`caret` documentation](https://topepo.github.io/caret/available-models.html). Note that some models have tuning parameters that can be set beforehand. We will create a named list of `submodel_settings`, where each name corresponds to the name of the model we will be using, and each value is an optional named list containing any tuning parameters we want to pass to that model.
+You can search the full list of available regression models in the `caret` [documentation](https://topepo.github.io/caret/available-models.html). Note that some models have tuning parameters that can be set beforehand. We will create a named list of `submodel_settings`, where each name corresponds to the name of the model we will be using, and each value is an optional named list containing any tuning parameters we want to pass to that model.
 
 Each ML model will be tuned using cross-validation. We can control model tuning by editing `cross_validation_settings`, a named list of arguments that will be passed to the `caret::trainControl` function.
 
