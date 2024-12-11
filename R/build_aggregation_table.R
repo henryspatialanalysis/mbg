@@ -71,6 +71,8 @@ calculate_pixel_fractions_single_polygon <- function(
 #'
 #' @seealso build_aggregation_table
 #'
+#' @concept internal
+#'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra same.crs
 #' @importFrom glue glue

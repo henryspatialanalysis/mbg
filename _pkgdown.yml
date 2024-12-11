@@ -1,33 +1,53 @@
 url: ~
 template:
   bootstrap: 5
+  bootswatch: flatly
+  theme: a11y-dark
 
-# Manually curate the "reference" section rather than simple alphabetization
-# Based on the @family tags in roxygen function headers
-# if new sections are added in, they must also be added to the "other" section (which takes everthing - existing sections)
+# Define the top navigation bar
+navbar:
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "Getting started"
+      href: articles/mbg.html
+    - text: "More tutorials"
+      menu:
+        - text: "Running spatial ML models"
+          href: articles/spatial-ml-models.html
+        - text: "All model runner options"
+          href: articles/all-model-options.html
+        - text: "Model validation and comparison"
+          href: articles/model-comparison.html
+  right:
+    - text: "Function reference"
+      href: reference/index.html
+
+
+# Organize the "Reference section"
 reference:
   - title: MBG Model Runner
     desc: Model runner class
     contents:
       - has_concept("model_runner")
   - title: MBG core inputs
-    desc: Core inputs to MBG - ID raster and covariates
+    desc: "Functions to build the ID raster and load model covariates"
     contents:
       - has_concept("core_inputs")
   - title: MBG model fitting and prediction
-    desc: Individual functions for model fitting and prediction. Can also be executed through the `MbgModelRunner` class.
+    desc: Individual functions for model fitting and prediction. These can also be executed through the `MbgModelRunner` class.
     contents:
       - has_concept("model_fit")
       - has_concept("prediction")
   - title: Model validation
-    desc: Generate predictive validity metrics. Can also be executed through the `MbgModelRunner` class.
+    desc: Functions for generating predictive validity metrics. These can also be executed through the `MbgModelRunner` class.
     contents:
       - has_concept("validation")
-  - title: Aggregate rasters and draw matrices to polygons.
-    desc: Can also be executed through the `MbgModelRunner` class.
+  - title: Pixel-to-polygon aggregation
+    desc: Functions to aggregate rasters and pixel-level predictive draw matrices to polygon boundaries. These can also be executed through the `MbgModelRunner` class.
     contents:
       - has_concept("aggregation")
   - title: Other
     desc: Miscellaneous helper functions
     contents:
-    - -has_concept(c("model_runner", "core_inputs", "model_fit", "prediction", "validation", "aggregation"))
+    - -has_concept(c("model_runner", "core_inputs", "model_fit", "prediction", "validation", "aggregation", "internal"))

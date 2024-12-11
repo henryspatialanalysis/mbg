@@ -1,4 +1,7 @@
 #' Helper function to get the current year
+#'
+#' @concept internal
+#'
 get_current_year <- function(){
   return(format(Sys.Date(), '%Y') |> as.integer())
 }

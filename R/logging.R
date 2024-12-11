@@ -5,22 +5,26 @@
 ## #######################################################################################
 
 #' Add global indent for logging
-#' 
+#'
 #' @description Change a global option that controls indentation for MBG package logging
-#' 
+#'
 #' @details Increases the `MbgLoggingIndent` option, with default of one if not set
-#' 
+#'
+#' @concept internal
+#'
 logging_add_indent <- function(){
   options(MbgLoggingIndent = max(getOption('MbgLoggingIndent', default = 0) + 1, 1))
   invisible()
 }
 
 #' Remove global indent for logging
-#' 
+#'
 #' @description Change a global option that controls indentation for MBG package logging
-#' 
+#'
 #' @details Decreases the `MbgLoggingIndent` option, with default of zero if not set
-#' 
+#'
+#' @concept internal
+#'
 logging_drop_indent <- function(){
   options(MbgLoggingIndent = max(getOption('MbgLoggingIndent', default = 1) - 1, 0))
   invisible()
@@ -28,19 +32,22 @@ logging_drop_indent <- function(){
 
 
 #' Start logging timer
-#' 
+#'
 #' @description Start a nested timer with an optional message
-#' 
+#'
 #' @param msg (`character(1)`) Logging message
 #' @param echo (`logical(1)`, default TRUE) Should the message be written to screen?
 #' @param indentation_text (`character(1)`, default "  ") Text that will be repeated at
 #'   the beginning of the message for each layer of indentation
-#' 
+#'
 #' @importFrom tictoc tic
 #' @export
 logging_start_timer <- function(msg, echo = TRUE, indentation_text = '  '){
   # Add indentation to the message
-  indentation <- rep(indentation_text, times = getOption('MbgLoggingIndent', default = 0)) |>
+  indentation <- rep(
+    indentation_text,
+    times = getOption('MbgLoggingIndent', default = 0)
+  ) |>
     paste0(collapse = '')
   msg <- paste0(indentation, msg)
   tictoc::tic(msg = msg)
@@ -52,11 +59,11 @@ logging_start_timer <- function(msg, echo = TRUE, indentation_text = '  '){
 
 
 #' End logging timer
-#' 
+#'
 #' @description End a nested timer
-#' 
+#'
 #' @param echo (`logical(1)`, default = TRUE) Should the message be written to screen?
-#' 
+#'
 #' @importFrom tictoc toc
 #' @export
 logging_stop_timer <- function(echo = TRUE){
@@ -68,16 +75,16 @@ logging_stop_timer <- function(echo = TRUE){
 
 
 #' Get timer log
-#' 
+#'
 #' @description Return a log of all timed events as a data.table
-#' 
+#'
 #' @param clear_log (`logical(1)`, default FALSE) Should the log be cleared afterwards?
 #' @param deindent (`logical(1)`, default TRUE) Should leading whitespace be removed from
 #'   timer messages?
-#' 
+#'
 #' @importFrom tictoc tic.log tic.clearlog
 #' @import data.table
-#' @export 
+#' @export
 logging_get_timer_log <- function(clear_log = FALSE, deindent = TRUE){
   timer_log <- tictoc::tic.log(format = FALSE) |>
     lapply(data.table::as.data.table) |>

@@ -1,18 +1,18 @@
 #' Make time stamp
-#' 
+#'
 #' @description Create a string time stamp based on current detailed date/time
-#' 
+#'
 #' @param suffix (`character(1)`, default NULL) suffix to append to the time stamp. Useful
-#'   when running batches of related models 
+#'   when running batches of related models
 #' @param milliseconds (`logical(1)`, default TRUE) Should milliseconds be appended to
 #'   the timestamp? Useful when launching many models in quick succession.
-#' 
-#' @return A string formatted as 'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'
-#' 
+#'
+#' @return A string formatted as `'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'`
+#'
 #' @export
 make_time_stamp <- function(suffix = NULL, milliseconds = T){
   if(milliseconds){
-    time_stamp <- strftime(x = Sys.time(), format = '%Y%m%d_%H_%M_%OS3') |> 
+    time_stamp <- strftime(x = Sys.time(), format = '%Y%m%d_%H_%M_%OS3') |>
       gsub(pattern = '\\.', replacement = '_')
   } else {
     time_stamp <- strftime(x = Sys.time(), format = '%Y%m%d_%H_%M_%S')
@@ -27,18 +27,18 @@ make_time_stamp <- function(suffix = NULL, milliseconds = T){
 
 
 #' Dissolve sf object by attribute
-#' 
+#'
 #' @description Dissolve an SF object by attribute
-#' 
-#' @details Inspired by "sf_dissolve" from the 
+#'
+#' @details Inspired by "sf_dissolve" from the
 #'   \url{https://cran.r-project.org/web/packages/spatialEco/index.html}{spatialEco}
 #'   package.
-#' 
+#'
 #' @param x ([sf][sf::sf] object) SF object to dissolve
 #' @param by (`character(N)`, default character(0)) Attributes to dissolve by
-#' 
+#'
 #' @return Dissolved [sf][sf::sf] object
-#' 
+#'
 #' @importFrom sf st_drop_geometry
 #' @export
 dissolve_sf_by_attribute <- function(x, by = character(0)){

@@ -25,6 +25,8 @@
 #'
 #' @return Errors if checks fail; silently passes if checks pass
 #'
+#' @concept internal
+#'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra compareGeom ncell nlyr
 aggregate_raster_to_polygons_validation <- function(
@@ -242,6 +244,8 @@ aggregate_raster_to_polygons <- function(
 #'   `weighting_raster`.
 #'
 #' @return Errors if checks fail; silently passes if checks pass
+#'
+#' @concept internal
 #'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra compareGeom ncell nlyr
