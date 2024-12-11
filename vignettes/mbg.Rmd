@@ -88,8 +88,9 @@ ggplot2::ggplot() +
   ggplot2::geom_sf(
     data = outcome_sf,
     ggplot2::aes(color = stunting_rate, size = samplesize),
-    alpha = 0.9
+    alpha = 0.75
   ) +
+  ggplot2::scale_size_continuous(range = c(0.5, 3)) +
   ggplot2::scale_color_gradientn(
     colors = terra::map.pal('viridis'),
     labels = scales::percent
@@ -102,7 +103,7 @@ ggplot2::ggplot() +
   ggplot2::theme_minimal()
 ```
 
-We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be around Porto Novo in the far south and Parakou in the center north, and higher in the far north and the inland south. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
+We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be lower around the urban regions of Porto Novo in the coastal south and Parakou in the center north, and higher in the far north and the inland south. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
 
 * Adjust for noise in the outcome due to small sample sizes in the point-level survey data;
 * Understand likely stunting risk not just at surveyed points, but at locations across the entire country;
