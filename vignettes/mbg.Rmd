@@ -1,6 +1,7 @@
 ---
 title: "Getting started with MBG"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette: default
 vignette: >
   %\VignetteIndexEntry{Getting started with MBG}
   %\VignetteEngine{knitr::rmarkdown}
@@ -33,11 +34,12 @@ In this tutorial, we will run a simple `mbg` model with prepared data to demonst
 
 # Setting up
 
-Load the `mbg` package, as well as the `data.table`, `sf`, and `terra` packages for data processing.
+Load the `mbg` package, as well as the `data.table`, `sf`, and `terra` packages for data processing, and the `ggplot2` package for plotting.
 
 ```{r setup, message = FALSE, warning = FALSE}
 # Load packages
 library(data.table)
+library(ggplot2)
 library(sf)
 library(terra)
 library(mbg)
@@ -50,8 +52,10 @@ For this tutorial, we will estimate stunting rates among children under 5 years 
 outcomes <- data.table::fread(
   system.file('extdata/child_stunting.csv', package = 'mbg')
 )
+```
 
-head(outcomes)
+```{r head-outcome-data, asis = TRUE, echo = FALSE}
+knitr::kable(head(outcomes))
 ```
 
 The outcome data has 505 rows, each representing one surveyed location, and five columns:
@@ -79,21 +83,26 @@ outcome_sf <- sf::st_as_sf(
 )
 outcome_sf$stunting_rate <- outcome_sf$indicator / outcome_sf$samplesize
 
-plot(
-  outcome_sf['stunting_rate'],
-  pch = 16,
-  main = 'Stunting point data',
-  reset = FALSE
-)
-plot(
-  sf::st_geometry(communes),
-  col = NA,
-  border = 'black',
-  add = TRUE
-)
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = communes) +
+  ggplot2::geom_sf(
+    data = outcome_sf,
+    ggplot2::aes(color = stunting_rate, size = samplesize),
+    alpha = 0.9
+  ) +
+  ggplot2::scale_color_gradientn(
+    colors = terra::map.pal('viridis'),
+    labels = scales::percent
+  ) +
+  ggplot2::labs(
+    title = 'Stunting point data',
+    color = 'Observed\nstunting\nrate',
+    size = 'Sample\nsize'
+  ) +
+  ggplot2::theme_minimal()
 ```
 
-We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be lowest in the coastal east of the country and on the islands, and higher in the west. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
+We can see that there seem to be spatial patterns in the surveyed stunting data---stunting generally seems to be around Porto Novo in the far south and Parakou in the center north, and higher in the far north and the inland south. To better understand the underlying trends in stunting risk across the country, we would ideally like to:
 
 * Adjust for noise in the outcome due to small sample sizes in the point-level survey data;
 * Understand likely stunting risk not just at surveyed points, but at locations across the entire country;
@@ -186,8 +195,8 @@ We can plot the mean estimates from the geostatistical model:
 grid_cell_predictions <- model_runner$grid_cell_predictions
 # Plot mean estimates
 plot(
-  grid_cell_predictions$cell_pred_mean,
-  main = 'MBG mean estimates'
+  grid_cell_predictions$cell_pred_mean * 100,
+  main = 'MBG mean estimates (%)'
 )
 lines(communes)
 ```
@@ -197,9 +206,9 @@ We can also show the width of the 95% uncertainty interval by subtracting the "l
 ```{r plot-pixel-ui-predictions}
 # Plot estimate uncertainty
 plot(
-  grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower,
+  (grid_cell_predictions$cell_pred_upper - grid_cell_predictions$cell_pred_lower) * 100,
   col = sf::sf.colors(n = 100),
-  main = 'MBG estimates: 95% uncertainty interval width'
+  main = 'MBG estimates: 95% uncertainty interval width (%)'
 )
 lines(communes)
 ```
@@ -207,7 +216,7 @@ lines(communes)
 Compare these gridded estimates to the underlying point data. The results seem to meet our goals for estimating stunting risk across Benin:
 
 1. Gridded estimates are available for every region in Benin, not just at survey points
-2. The mean estimates for stunting risk show a similar spatial pattern to the underlying point data---lower on the coast and islands, higher in the west and northwest
+2. The mean estimates for stunting risk show a similar spatial pattern to the underlying point data
 3. Some extreme values from the point data, which may have been noisy due to small sample sizes, have been smoothed out in these estimates
 4. Model uncertainty, as shown by the width of the 95% uncertainty interval, is higher in areas that were far from any surveyed points.
 5. Underlying relationships between the raster predictors and the point outcomes seem to have influenced estimates: for example, locations with a higher travel time to cities generally also have higher estimated stunting risk.
@@ -230,29 +239,42 @@ We can merge the commune estimate summaries back onto the `communes` sf object t
 # Get predictions by commune
 aggregated_predictions <- model_runner$aggregated_predictions
 commune_summary <- aggregated_predictions$commune$summary
-commune_summary_sf <- merge(
+summary_sf <- merge(
   x = communes,
   y = commune_summary,
   by = c('commune_code', 'commune', 'department_code', 'department')
 )
 # Plot aggregated estimates by commune
-plot(
-  commune_summary_sf['mean'],
-  main = 'MBG mean estimates by commune',
-  pal = terra::map.pal('viridis', 6),
-  breaks = seq(0.15, .45, by = .05)
-)
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = summary_sf, ggplot2::aes(fill = mean), color = 'black') +
+  ggplot2::scale_fill_gradientn(
+    colors = terra::map.pal('viridis'),
+    breaks = seq(0.15, 0.45, by = .05),
+    labels = scales::percent
+  ) +
+  ggplot2::labs(
+    title = 'MBG mean estimates by commune',
+    fill = "Estimated\nstunting\nrate"
+  ) +
+  ggplot2::theme_minimal()
 ```
 
 We can also plot the width of the 95% uncertainty interval by commune.
 
 ```{r plot-commune-ui-widths}
 # Plot aggregated uncertainty interval widths by commune
-commune_summary_sf$ui <- commune_summary_sf$upper - commune_summary_sf$lower
-plot(
-  commune_summary_sf['ui'],
-  main = 'MBG 95% uncertainty interval width by commune'
-)
+summary_sf$ui <- summary_sf$upper - summary_sf$lower
+ggplot2::ggplot() +
+  ggplot2::geom_sf(data = summary_sf, ggplot2::aes(fill = ui), color = 'black') +
+  ggplot2::scale_fill_gradientn(
+    colors = sf::sf.colors(n = 100),
+    labels = scales::percent
+  ) +
+  ggplot2::labs(
+    title = 'MBG 95% uncertainty interval width by commune',
+    fill = 'Uncertainty\ninterval\nwidth'
+  ) +
+  ggplot2::theme_minimal()
 ```
 
 Note that in general, uncertainty intervals tend to be wider at the pixel level than for aggregated polygons. This is because some sources of uncertainty are uncorrelated between pixels, and this uncorrelated uncertainty shrinks when estimates are aggregated across pixels.
