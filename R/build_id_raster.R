@@ -9,7 +9,7 @@
 #'   * CRS: WGS 1984 unprojected latitude/longitude, `terra::crs('EPSG:4326')`
 #'   * Values: All NA. Used exclusively for creating a shapefile-specific ID raster
 #'
-#' @returns terra SpatRaster matching the details above
+#' @returns [terra::SpatRaster] object matching the specifications above
 #'
 #' @concept core_inputs
 #'
@@ -31,12 +31,12 @@ make_world_template_raster <- function(){
 #' @details The ID raster will be used to build the aggregation table. Each pixel has a
 #'   unique integer value from 1 to the number of pixels in the ID raster.
 #'
-#' @param polygons terra SpatVector object. The polygons to be aggregated to
-#' @param template_raster (optional) terra SpatRaster object. The template raster should
+#' @param polygons [terra::SpatVector] object. The polygons to be aggregated to
+#' @param template_raster (optional) [terra::SpatRaster] object. The template raster should
 #'   contain and have the same CRS as the polygons. If template raster is `NULL`, the
 #'   default, uses the default world template raster from `make_world_template_raster()`.
 #'
-#' @return ID raster. A terra SpatRaster object that minimally encloses the polygons
+#' @return ID raster. A [terra::SpatRaster] object that minimally encloses the polygons
 #'
 #' @concept core_inputs
 #'

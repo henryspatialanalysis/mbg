@@ -5,10 +5,10 @@
 #'
 #' @details This is a helper function called by `build_aggregation_table()`.
 #'
-#' @param polygon terra SpatVector object of length 1. The polygon to calculate fractional
-#'   areas across.
-#' @param id_raster terra SpatRaster object. ID raster created for the set of all polygons
-#'   to be considered, created by `build_id_raster()`.
+#' @param polygon [terra::SpatVector] object of length 1. The polygon to calculate
+#'   fractional areas across.
+#' @param id_raster [terra::SpatRaster] object. ID raster created for the set of all
+#'   polygons to be considered, created by `build_id_raster()`.
 #' @param polygon_id (optional). ID for this polygon. Must have length 1.
 #'
 #' @return data.table containing two or three columns:
@@ -61,17 +61,18 @@ calculate_pixel_fractions_single_polygon <- function(
 #'
 #' @description Input data validation for `build_aggregation_table()`
 #'
-#' @param polygons terra SpatVector object. Should contain a unique ID field.
-#' @param id_raster terra SpatRaster object. ID raster created by `build_id_raster()` for
-#'   the polygons object. Should have the same CRS as `polygons` and completely cover it.
-#' @param polygon_id_field (character) Unique identifier field in `polygons`.
+#' @param polygons [terra::SpatVector] object. Should contain a unique ID field.
+#' @param id_raster [terra::SpatRaster] object. ID raster created by `build_id_raster()`
+#'   for the polygons object. Should have the same CRS as `polygons` and completely cover
+#'   it.
+#' @param polygon_id_field (`character`) Unique identifier field in `polygons`.
 #' @param polygon_ids (vector, any type) Polygon identifiers from `polygon_id_field`.
 #'
 #' @return Errors if checks fail; silently passes if checks pass
 #'
 #' @seealso build_aggregation_table
 #'
-#' @concept internal
+#' @keywords internal
 #'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra same.crs
@@ -102,9 +103,10 @@ build_aggregation_table_validation <- function(
 #'
 #' @description Build a table to quickly aggregate from pixels to polygons
 #'
-#' @param polygons terra SpatVector object. Should contain a unique ID field.
-#' @param id_raster terra SpatRaster object. ID raster created by `build_id_raster()` for
-#'   the polygons object. Should have the same CRS as `polygons` and completely cover it.
+#' @param polygons [terra::SpatVector] object. Should contain a unique ID field.
+#' @param id_raster [terra::SpatRaster] object. ID raster created by `build_id_raster()`
+#'   for the polygons object. Should have the same CRS as `polygons` and completely cover
+#'   it.
 #' @param polygon_id_field (`character(1)`) Unique identifier field in `polygons`.
 #' @param verbose (`logical(1)`, default FALSE) Show progress for building aggregation
 #'   rows for each polygon?

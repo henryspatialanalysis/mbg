@@ -4,7 +4,7 @@
 #'
 #' @seealso aggregate_raster_to_polygons
 #'
-#' @param data_raster SpatRaster containing data to be aggregated to polygons.
+#' @param data_raster [terra::SpatRaster] containing data to be aggregated to polygons.
 #' @param aggregation_table Aggregation table linking pixels to polygon identifiers,
 #'   created using `build_aggregation_table()`
 #' @param aggregation_cols (character vector, default 'polygon_id') Polygon identifiers
@@ -17,15 +17,15 @@
 #'   layers, how should each layer be identified?
 #' @param z_dimension_name (default 'z') The field name for the "z" dimension
 #'   corresponding to each layer of the `data_raster`.
-#' @param weighting_raster (spatRaster, default NULL) The relative weighting of each whole
-#'   pixel to the overall polygon value, for example, if calculating a population-weighted
-#'   mean.
+#' @param weighting_raster ([terra::SpatRaster], default NULL) The relative weighting of
+#'   each whole pixel to the overall polygon value, for example, if calculating a
+#'   population-weighted mean.
 #' @param na.rm (bool, default TRUE) How to handle NA pixels in `data_raster` and
 #'   `weighting_raster`.
 #'
 #' @return Errors if checks fail; silently passes if checks pass
 #'
-#' @concept internal
+#' @keywords internal
 #'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra compareGeom ncell nlyr
@@ -101,9 +101,9 @@ aggregate_raster_to_polygons_validation <- function(
 #'   - Means or sums of raster values across polygons
 #'   - Optionally aggregate multiple years of raster data at once
 #'
-#' @param data_raster SpatRaster containing data to be aggregated to polygons.
-#' @param aggregation_table Aggregation table linking pixels to polygon identifiers,
-#'   created using `build_aggregation_table()`
+#' @param data_raster [terra::SpatRaster] containing data to be aggregated to polygons.
+#' @param aggregation_table [data.table::data.table] Aggregation table linking pixels to
+#'   polygon identifiers, created using `build_aggregation_table()`
 #' @param aggregation_cols (character vector, default 'polygon_id') Polygon identifiers
 #'   to use for aggregation. Must be field names within `aggregation_table`.
 #' @param method (character, default 'mean') Aggregation method: one of 'mean', 'sum',
@@ -119,10 +119,10 @@ aggregate_raster_to_polygons_validation <- function(
 #' @param z_dimension_name (default 'z') The field name for the "z" dimension
 #'   corresponding to each layer of the `data_raster`. This field is only added if
 #'   `z_dimension` is passed or if `data_raster` has more than one layer.
-#' @param weighting_raster (spatRaster, default NULL) The relative weighting of each whole
-#'   pixel to the overall polygon value, for example, if calculating a population-weighted
-#'   mean. Required for methods 'weighted.mean' and 'weighted.sum', ignored for the other
-#'   methods.
+#' @param weighting_raster ([terra::SpatRaster], default NULL) The relative weighting of
+#'   each whole pixel to the overall polygon value, for example, if calculating a
+#'   population-weighted mean. Required for methods 'weighted.mean' and 'weighted.sum',
+#'   ignored for the other methods.
 #' @param na.rm (bool, default TRUE) How to handle NA pixels in `data_raster` and
 #'   `weighting_raster`. If set to TRUE but ALL pixels in a polygon are NA, will still
 #'   return an NA value for the polygon.
@@ -225,10 +225,10 @@ aggregate_raster_to_polygons <- function(
 #'
 #' @seealso aggregate_draws_to_polygons
 #'
-#' @param draws_matrix matrix, array, data.frame, corresponding to grid cell draws that
-#'   will be aggregated to polygons.
-#' @param aggregation_table Aggregation table linking pixels to polygon identifiers,
-#'   created using `build_aggregation_table()`
+#' @param draws_matrix `matrix`, `array`, or `data.frame` corresponding to grid cell draws
+#'   that will be aggregated to polygons.
+#' @param aggregation_table [data.table::data.table] Aggregation table linking pixels to
+#'   polygon identifiers, created using `build_aggregation_table()`
 #' @param aggregation_cols (character vector, default 'polygon_id') Polygon identifiers
 #'   to use for aggregation.
 #' @param method (character, default 'mean') Aggregation method: one of 'mean', 'sum',
@@ -237,15 +237,15 @@ aggregate_raster_to_polygons <- function(
 #'   sets of estimates, how should each layer be identified?
 #' @param z_dimension_name (default 'z') The field name for the "z" dimension
 #'   corresponding to each set of estimates contained in `draws_matrix`.
-#' @param weighting_raster (spatRaster, default NULL) The relative weighting of each whole
-#'   pixel to the overall polygon value, for example, if calculating a population-weighted
-#'   mean.
+#' @param weighting_raster ([terra::SpatRaster], default NULL) The relative weighting of
+#'   each whole pixel to the overall polygon value, for example, if calculating a
+#'   population-weighted mean.
 #' @param na.rm (bool, default TRUE) How to handle NA values in `draws_matrix` and
 #'   `weighting_raster`.
 #'
 #' @return Errors if checks fail; silently passes if checks pass
 #'
-#' @concept internal
+#' @keywords internal
 #'
 #' @importFrom assertthat assert_that has_name noNA
 #' @importFrom terra compareGeom ncell nlyr
@@ -324,18 +324,18 @@ aggregate_draws_to_polygons_validation <- function(
 #'   - Means or sums of raster values across polygons
 #'   - Optionally aggregate multiple years of raster data at once
 #'
-#' @param draws_matrix matrix, array, data.frame, corresponding to grid cell draws that
-#'   will be aggregated to polygons:
+#' @param draws_matrix `matrix`, `array`, or `data.frame` corresponding to grid cell draws
+#'   that will be aggregated to polygons:\cr
 #'   - Each row represents a non-NA grid cell in the ID raster. If the matrix contains
 #'     multiple years of estimates, the matrix is ordered by year, then by
 #'     masked_pixel_id. For example, if there are 200 non-NA pixels in the ID raster and
 #'     five years of draws, then the matrix contains 1000 rows: row 200 corresponds to
 #'     (year 1, masked_pixel_id 200), row 201 corresponds to (year 2, masked_pixel_id 1),
-#'     and so on.
+#'     and so on.\cr
 #'   - Each column represents a draw. There should be no non-draw columns (such as ID
 #'     fields) in the `draws_matrix`.
-#' @param aggregation_table Aggregation table linking pixels to polygon identifiers,
-#'   created using `build_aggregation_table()`
+#' @param aggregation_table [data.table::data.table] Aggregation table linking pixels to
+#'   polygon identifiers, created using `build_aggregation_table()`
 #' @param aggregation_cols (character vector, default 'polygon_id') Polygon identifiers
 #'   to use for aggregation. Must be field names within `aggregation_table`.
 #' @param method (character, default 'mean') Aggregation method: one of 'mean', 'sum',
@@ -349,16 +349,16 @@ aggregate_draws_to_polygons_validation <- function(
 #' @param z_dimension_name (default 'z') The field name for the "z" dimension
 #'   corresponding to each layer of the `data_raster`. This field is only added if
 #'   `z_dimension` is passed or if `data_raster` has more than one layer.
-#' @param weighting_raster (spatRaster, default NULL) The relative weighting of each whole
-#'   pixel to the overall polygon value, for example, if calculating a population-weighted
-#'   mean. Required for methods 'weighted.mean' and 'weighted.sum', ignored for the other
-#'   methods.
+#' @param weighting_raster ([terra::SpatRaster], default NULL) The relative weighting of
+#'   each whole pixel to the overall polygon value, for example, if calculating a
+#'   population-weighted mean. Required for methods 'weighted.mean' and 'weighted.sum',
+#'   ignored for the other methods.
 #' @param na.rm (bool, default TRUE) How to handle NA pixels in `data_raster` and
 #'   `weighting_raster`. If set to TRUE but ALL pixels in a polygon are NA, will still
 #'   return an NA value for the polygon.
 #'
-#' @return data.table containing polygon identifiers, (optionally) layer identifiers in
-#'   the `z_dimension_name` column, and data values aggregated by polygon.
+#' @return [data.table::data.table] containing polygon identifiers, (optionally) layer
+#'   identifiers in the `z_dimension_name` column, and data values aggregated by polygon.
 #'
 #' @concept aggregation
 #'

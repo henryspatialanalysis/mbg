@@ -1,6 +1,6 @@
 #' Helper function to get the current year
 #'
-#' @concept internal
+#' @keywords internal
 #'
 get_current_year <- function(){
   return(format(Sys.Date(), '%Y') |> as.integer())
@@ -20,21 +20,21 @@ get_current_year <- function(){
 #'   - 'normalize': (logical) Should the covariate be rescaled to have mean 0 and standard
 #'     deviation 1 across all pixels in the study area? Generally should be set to TRUE
 #'     for predictive covariates.
-#' @param id_raster terra SpatRaster with non-NA pixels delineating the extent of the
+#' @param id_raster [terra::SpatRaster] with non-NA pixels delineating the extent of the
 #'   study area
-#' @param year (numeric, default NULL) Year of data to for time-varying covariates.
+#' @param year (`numeric`, default NULL) Year of data to for time-varying covariates.
 #'   If NULL, the default, uses the current year.
-#' @param file_format (character, default 'tif') File format for the raster covariate
+#' @param file_format (`character`, default 'tif') File format for the raster covariate
 #'   data. Used to search for the input file within the proper containing folder.
-#' @param add_intercept (logical, default FALSE) Should a covariate called "intercept",
+#' @param add_intercept (`logical`, default FALSE) Should a covariate called "intercept",
 #'   a raster object with 1s in all required cells, be placed at the start of the returned
 #'   covariates list?
-#' @param check_previous_years (integer > 0, default 10) If annual data is not found in
+#' @param check_previous_years (`integer` > 0, default 10) If annual data is not found in
 #'   this year, how many previous years should be checked? If 0, will not check any
 #'   previous years.
 #'
-#' @return A named list of formatted covariates. Each list item is a terra SpatRaster with
-#'   one layer and the same dimensions as the `id_raster`
+#' @return A named list of formatted covariates. Each list item is a [terra::SpatRaster]
+#'   with one layer and the same dimensions as the `id_raster`
 #'
 #' @concept core_inputs
 #'

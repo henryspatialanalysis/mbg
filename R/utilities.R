@@ -34,10 +34,10 @@ make_time_stamp <- function(suffix = NULL, milliseconds = T){
 #'   \url{https://cran.r-project.org/web/packages/spatialEco/index.html}{spatialEco}
 #'   package.
 #'
-#' @param x ([sf][sf::sf] object) SF object to dissolve
+#' @param x ([sf::sf] object) SF object to dissolve
 #' @param by (`character(N)`, default character(0)) Attributes to dissolve by
 #'
-#' @return Dissolved [sf][sf::sf] object
+#' @return Dissolved [sf::sf] object
 #'
 #' @importFrom sf st_drop_geometry
 #' @export

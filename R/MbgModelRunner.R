@@ -15,7 +15,7 @@ MbgModelRunner <- R6::R6Class(
 
     ## Fields set during initialization ------------------------------------------------->
 
-    #' @field input_data ([data.table][data.table::data.table])\cr
+    #' @field input_data ([data.table::data.table])\cr
     #' Table containing at least the following fields:\cr
     #'   * x (`numeric`) location longitude in decimal degrees\cr
     #'   * y (`numeric`) location latitude in decimal degrees\cr
@@ -23,17 +23,17 @@ MbgModelRunner <- R6::R6Class(
     #'   * samplesize (`integer`) The total population, denominator for `indicator`
     input_data = NULL,
 
-    #' @field id_raster ([terra][terra::rast])\cr
+    #' @field id_raster ([terra::SpatRaster])\cr
     #' raster showing the total area that will be predicted using this model.
     id_raster = NULL,
 
     #' @field covariate_rasters (`list()`)\cr
     #' A list containing all predictor covariates. Each covariate is a
-    #' [terra][terra::rast] object with the same extent and dimensions as
+    #' [terra::SpatRaster] object with the same extent and dimensions as
     #' `id_raster`.
     covariate_rasters = NULL,
 
-    #' @field aggregation_table ([data.table][data.table::data.table])\cr
+    #' @field aggregation_table ([data.table::data.table])\cr
     #' A table created by [build_aggregation_table], used to link each grid cell to
     #' higher-level administrative units.
     aggregation_table = NULL,
@@ -44,14 +44,14 @@ MbgModelRunner <- R6::R6Class(
     #' to be used for aggregation at that level.
     aggregation_levels = NULL,
 
-    #' @field population_raster ([terra][terra::rast])\cr
+    #' @field population_raster ([terra::SpatRaster])\cr
     #' A raster giving population for each grid cell, to be used for population-weighted
     #' aggregation from grid cells to polygon boundaries. Should have the same dimensions
     #' as `id_raster`. If no population raster is passed and the results are aggregated,
     #' aggregation will be by simple mean rather than population-weighted mean
     population_raster = NULL,
 
-    #' @field admin_bounds ([sf][sf::sf])\cr
+    #' @field admin_bounds ([sf::sf])\cr
     #'  Polygons showing the boundaries of administrative divisions within the study
     #'   region. Only required if `use_admin_effect` OR `stacking_use_admin_bounds` is
     #'   `TRUE`.
@@ -169,7 +169,7 @@ MbgModelRunner <- R6::R6Class(
     inverse_link = NULL,
 
     #' @field inla_family (character)\cr
-    #' GLM family to use. For more information, see [stats::family()].
+    #' GLM family to use. For more information, see [stats::family].
     inla_family = NULL,
 
     #' @field nugget_in_predict (`logical(1)`)\cr
@@ -210,28 +210,28 @@ MbgModelRunner <- R6::R6Class(
     #' @description
     #' Create a new MbgModelRunner object
     #'
-    #' @param input_data ([data.table][data.table::data.table]) Table containing at least
+    #' @param input_data ([data.table::data.table]) Table containing at least
     #'   the following fields:\cr
     #'   * x (`numeric`) location x position, in the same projection as the `id_raster`\cr
     #'   * y (`numeric`) location y position, in the same projection as the `id_raster`\cr
     #'   * indicator (`integer`) The number of events in the population\cr
     #'   * samplesize (`integer`) The total population, denominator for `indicator`\cr
-    #' @param id_raster ([terra][terra::rast]) raster showing the total area that
+    #' @param id_raster ([terra::SpatRaster]) raster showing the total area that
     #'   will be predicted using this model
     #' @param covariate_rasters (`list()`, default NULL) A list containing all predictor
-    #'   covariates. Each covariate is a [terra][terra::rast] object with the same extent
+    #'   covariates. Each covariate is a [terra::SpatRaster] object with the same extent
     #'   and dimensions as `id_raster`.
-    #' @param aggregation_table ([data.table][data.table::data.table]) A table created by
+    #' @param aggregation_table ([data.table::data.table]) A table created by
     #'   [build_aggregation_table], linking each grid cell to one or more polygons
     #' @param aggregation_levels (`list()`) A named list: for each named item, the name is
     #' the label for that aggregation level, and the value is a character vector of all
     #' fields in the original polygons to be used for aggregation at that level.
-    #' @param population_raster ([terra][terra::rast]) A raster giving population for each
+    #' @param population_raster ([terra::SpatRaster]) A raster giving population for each
     #' grid cell, to be used for population-weighted aggregation from grid cells to
     #' polygon boundaries. Should have the same dimensions as `id_raster`. If no
     #' population raster is passed and the results are aggregated, aggregation will be by
     #' simple mean rather than population-weighted mean
-    #' @param admin_bounds ([sf][sf::sf], default `NULL`) Polygons showing the boundaries
+    #' @param admin_bounds ([sf::sf], default `NULL`) Polygons showing the boundaries
     #'   of administrative divisions within the study region. Only required if
     #'   `use_admin_effect` OR `stacking_use_admin_bounds` is `TRUE`.
     #' @param admin_bounds_id (`character`, default `NULL`) Field containing unique
@@ -292,7 +292,7 @@ MbgModelRunner <- R6::R6Class(
     #'   complexity prior for all covariate effects except for the intercept, if an
     #'   intercept is included. The two named items are "threshold", the test threshold
     #'   for the size of each fixed effect, and "prob_above", the prior probability that
-    #'   the beta for each covariate will EXCEED that threshold. Only considered if
+    #'   the beta for each covariate will exceed that threshold. Only considered if
     #'   `use_covariates` is TRUE and `use_stacking` is FALSE.
     #' @param inla_link (`character(1)`, default 'logit') Link function for fitting the
     #'   INLA model, typically related to the GLM `family`.
@@ -380,8 +380,6 @@ MbgModelRunner <- R6::R6Class(
     },
 
     #' @description Prepare covariates for MBG model fitting
-    #'
-    #' @seealso [run_regression_submodels]
     prepare_covariates = function(){
       # Optionally run stacking
       if(self$use_covariates & self$use_stacking){
@@ -409,8 +407,6 @@ MbgModelRunner <- R6::R6Class(
     },
 
     #' @description Fit MBG model
-    #'
-    #' @seealso [prepare_inla_data_stack], [fit_inla_model]
     fit_mbg_model = function(){
       # Prepare data for MBG model run
       self$inla_inputs_list <- prepare_inla_data_stack(
@@ -455,8 +451,6 @@ MbgModelRunner <- R6::R6Class(
     #' @param ui_width (`numeric(1)`, default 0.95) Uncertainty interval width. This
     #'   method will create summary rasters for quantiles ((1 - ui_width)/2) and
     #'   (1 - (1 - ui_width)/2).
-    #'
-    #' @seealso [generate_cell_draws_and_summarize]
     generate_predictions = function(n_samples = 1e3, ui_width = 0.95){
       if(is.null(self$inla_fitted_model)){
         stop("Must fit geostatistical model before generating predictions")
@@ -484,8 +478,6 @@ MbgModelRunner <- R6::R6Class(
     #'
     #' @return List with the same names as `self$aggregation_levels`, aggregating by the
     #'   columns specified in `self$aggregation_levels`
-    #'
-    #' @seealso Must be run after [generate_predictions]
     aggregate_predictions = function(ui_width = 0.95){
       # Validate inputs
       if(is.null(self$grid_cell_predictions)){
@@ -571,14 +563,12 @@ MbgModelRunner <- R6::R6Class(
     #'   Watanabe-Aikake Information Criterion (WAIC, only returned for in-sample
     #'   predictive validity).
     #'
-    #' @seealso [rmse_raster_to_point] [log_posterior_density]
-    #'
     #' @param in_sample (`logical(1)`, default TRUE) Compare model predictions to
     #'   the data used to generate the model? If FALSE, does not return the WAIC, which
     #'   is only useful for in-sample predictive validity.
-    #' @param validation_data (`data.table`, default NULL) Observed data to compare
-    #'   against. Expected for out-of-sample model validation. Table containing at least
-    #'   the following fields:\cr
+    #' @param validation_data ([data.table::data.table], default NULL) Observed data to
+    #'   compare against. Expected for out-of-sample model validation. Table containing at
+    #'   least the following fields:\cr
     #'   * x (`numeric`) location x position, in the same projection as the `id_raster`\cr
     #'   * y (`numeric`) location y position, in the same projection as the `id_raster`\cr
     #'   * indicator (`integer`) The number of events in the population\cr
@@ -586,7 +576,7 @@ MbgModelRunner <- R6::R6Class(
     #' @param na.rm (`logical(1)`, default FALSE) Should NA values be dropped from the
     #'   RMSE and log predictive density calculations?
     #'
-    #' @return [data.table][data.table] Containing the following fields:\cr
+    #' @return [data.table::data.table] Containing the following fields:\cr
     #'   * 'rmse': Root mean squared error when compared against the mean estimates by
     #'     pixel. Lower RMSE is better.\cr
     #'   * 'lpd': Log posterior predictive density when compared against pixel-level

@@ -1,8 +1,8 @@
 #' Generate RMSE from an estimated raster surface and point data
 #'
-#' @param estimates ([terra][SpatRaster]) Raster surface containing point estimates. This
+#' @param estimates ([terra::SpatRaster]) Raster surface containing point estimates. This
 #'   could also be the mean surface of a Bayesian geostatistical model
-#' @field validation_data ([data.frame])\cr
+#' @field validation_data (`data.frame`)\cr
 #'   Table containing at least the following fields:\cr
 #'   * x (`numeric`) location x position, in the same projection as `estimates`\cr
 #'   * y (`numeric`) location y position, in the same projection as `estimates`\cr
@@ -42,16 +42,16 @@ rmse_raster_to_point <- function(
 #'
 #' @seealso https://shorturl.at/P5zBT
 #'
-#' @param draws ([matrix]) A predictive draw matrix, where each row corresponds to a
+#' @param draws (`matrix`) A predictive draw matrix, where each row corresponds to a
 #'   pixel in the `id_raster` and each column corresponds to one sampled estimate of the
 #'   outcome.
-#' @field validation_data ([data.frame]) Table containing at least the following
+#' @field validation_data (`data.frame`) Table containing at least the following
 #'  fields:\cr
 #'   * x (`numeric`) location x position, in the same projection as `id_raster`\cr
 #'   * y (`numeric`) location y position, in the same projection as `id_raster`\cr
 #'   * indicator (`integer`) The number of events in the population\cr
 #'   * samplesize (`integer`) The total population, denominator for `indicator`
-#' @param id_raster ([terra][terra::rast]) Raster showing the sample study area, created
+#' @param id_raster ([terra::SpatRaster]) Raster showing the sample study area, created
 #'   using [build_id_raster].
 #' @param na.rm (`logical(1)`, default FALSE) Should NA values be omitted from the LPD
 #'   calculation?
