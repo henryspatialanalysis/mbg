@@ -1,8 +1,8 @@
-url: ~
+url: https://henryspatialanalysis.com/testing/mbg_docs
 template:
   bootstrap: 5
-  bootswatch: flatly
-  theme: a11y-dark
+  bootswatch: simplex
+  theme: arrow-light
 
 # Define the top navigation bar
 navbar:
@@ -15,7 +15,7 @@ navbar:
       menu:
         - text: "Running spatial ML models"
           href: articles/spatial-ml-models.html
-        - text: "All model runner options"
+        - text: "All MBG model runner options"
           href: articles/all-model-options.html
         - text: "Model validation and comparison"
           href: articles/model-comparison.html
@@ -23,8 +23,7 @@ navbar:
     - text: "Function reference"
       href: reference/index.html
 
-
-# Organize the "Reference section"
+# Organize the function reference
 reference:
   - title: MBG Model Runner
     desc: Model runner class
@@ -50,4 +49,4 @@ reference:
   - title: Other
     desc: Miscellaneous helper functions
     contents:
-    - -has_concept(c("model_runner", "core_inputs", "model_fit", "prediction", "validation", "aggregation", "internal"))
+    - -has_concept(c("model_runner", "core_inputs", "model_fit", "prediction", "validation", "aggregation"))

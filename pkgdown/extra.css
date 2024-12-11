@@ -1,0 +1,24 @@
+body {
+    line-height: 140%;
+}
+.sourceCode {
+    line-height: 130%;
+}
+h1 {
+    margin-top:40px;
+}
+h2 {
+    margin-top:30px;
+}
+h3 {
+    margin-top:24px;
+}
+
+li {
+    padding: 5px 0;
+}
+.page-header {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
