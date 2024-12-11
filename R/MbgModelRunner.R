@@ -325,7 +325,6 @@ MbgModelRunner <- R6::R6Class(
         repeats = 5
       ),
       stacking_model_settings = list(
-        gam = NULL,
         gbm = NULL,
         treebag = NULL,
         rf = NULL
