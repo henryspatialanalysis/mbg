@@ -20,7 +20,11 @@ After loading the package, you can access package documentation by running `help
 
 ## Package workflow
 
-To run a simple workflow, see the [**introductory vignette**](https://henryspatialanalysis.com/testing/mbg_docs/articles/mbg.html).
+The package documentation is currently hosted on a private server, and will be migrated to Github Pages once the repository is made public. You can build the documentation yourself with the following steps:
+
+1. Clone this repository
+2. From the top level of the repository, call `devtools::document()` to build the packagedown articles. This will create a subfolder called `docs/`
+3. From `docs/`, open `index.html` or run the command-line tool `live-server`
 
 The general MBG workflow using this package is as follows:
 
