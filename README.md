@@ -2,11 +2,13 @@
 
 `mbg` is an R package for modern model-based geostatistics. It combines features from the [`sf`](https://r-spatial.github.io/sf/), [`terra`](https://rspatial.github.io/terra/), and [`data.table`](https://cran.r-project.org/web/packages/data.table/) packages for spatial data processing, [`caret`](https://topepo.github.io/caret/) for spatial ML models, and [`R-INLA`](http://r-inla.org/) for geostatistical models.
 
+The package documentation is hosted on [Github Pages](https://henryspatialanalysis.github.io/mbg/), and you can read the source code [on Github](https://github.com/henryspatialanalysis/mbg)
+
 ---
 
 ## Using the package
 
-You can install the R package from Github (this is the preferred option until the package is uploaded to CRAN):
+You can install the R package from Github:
 
 ```devtools::install_github("henryspatialanalysis/mbg")```
 
@@ -20,12 +22,6 @@ After loading the package, you can access package documentation by running `help
 
 ## Package workflow
 
-The package documentation is currently hosted on a private server, and will be migrated to Github Pages once the repository is made public. You can build the documentation yourself with the following steps:
-
-1. Clone this repository
-2. From the top level of the repository, call `devtools::document()` to build the packagedown articles. This will create a subfolder called `docs/`
-3. From `docs/`, open `index.html` or run the command-line tool `live-server`
-
 The general MBG workflow using this package is as follows:
 
 1. Load point data on outcomes, raster covariate surfaces, and a raster population surface
@@ -35,3 +31,5 @@ The general MBG workflow using this package is as follows:
 5. Using the model fit, predict results across the entire study area. Uncertainty is captured by generating 250 posterior predictive draws at each pixel location.
 6. Summarize draws as raster surfaces by taking the mean, median, and 95% uncertainty interval bounds of draws at each pixel location
 7. _(Optional):_ Aggregate from pixels to administrative boundaries, preserving uncertainty
+
+For example workflows, see the [introductory vignette](https://henryspatialanalysis.github.io/mbg/articles/mbg.html).

@@ -43,6 +43,5 @@ reference:
   contents: has_concept("aggregation")
 - title: Other
   desc: Miscellaneous helper functions
-  contents: -has_concept(c("model_runner", "core_inputs", "model_fit", "prediction",
+  contents: lacks_concepts(c("model_runner", "core_inputs", "model_fit", "prediction",
     "validation", "aggregation"))
-
