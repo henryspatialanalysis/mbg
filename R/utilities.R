@@ -30,9 +30,7 @@ make_time_stamp <- function(suffix = NULL, milliseconds = T){
 #'
 #' @description Dissolve an SF object by attribute
 #'
-#' @details Inspired by "sf_dissolve" from the
-#'   \url{https://cran.r-project.org/web/packages/spatialEco/index.html}{spatialEco}
-#'   package.
+#' @details Inspired by [spatialEco::sf_dissolve]
 #'
 #' @param x ([sf::sf] object) SF object to dissolve
 #' @param by (`character(N)`, default character(0)) Attributes to dissolve by

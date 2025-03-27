@@ -18,7 +18,5 @@ Dissolved \link[sf:sf]{sf::sf} object
 Dissolve an SF object by attribute
 }
 \details{
-Inspired by "sf_dissolve" from the
-\url{https://cran.r-project.org/web/packages/spatialEco/index.html}{spatialEco}
-package.
+Inspired by \link[spatialEco:sf_dissolve]{spatialEco::sf_dissolve}
 }

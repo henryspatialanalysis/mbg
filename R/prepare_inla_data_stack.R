@@ -2,7 +2,7 @@
 #'
 #' @details Creates the formatted input data to be used by the INLA model. For more
 #'   information about penalized complexity priors, see Daniel Simpson's
-#'   \href{https://doi.org/10.1214/16-STS576}{paper} on the subject.
+#'   paper on the subject: \doi{doi:10.1214/16-STS576}
 #'
 #' @seealso [mbg::fit_inla_model()]
 #'
