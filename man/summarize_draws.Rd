@@ -31,7 +31,7 @@ calculating the upper and lower summary rasters}
 summaries across draws?}
 }
 \value{
-A \link{data.table:;data.table} containing at least the following fields:
+A \link[data.table:data.table]{data.table::data.table} containing at least the following fields:
 \itemize{
 \item The \code{id_fields}, if passed
 \item "mean": Mean across predictive draws

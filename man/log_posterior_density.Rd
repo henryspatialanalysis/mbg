@@ -11,6 +11,15 @@ log_posterior_density(draws, validation_data, id_raster, na.rm = FALSE)
 pixel in the \code{id_raster} and each column corresponds to one sampled estimate of the
 outcome.}
 
+\item{validation_data}{(\code{data.frame}) Table containing at least the following
+fields:\cr
+\itemize{
+\item x (\code{numeric}) location x position, in the same projection as \code{id_raster}\cr
+\item y (\code{numeric}) location y position, in the same projection as \code{id_raster}\cr
+\item indicator (\code{integer}) The number of events in the population\cr
+\item samplesize (\code{integer}) The total population, denominator for \code{indicator}
+}}
+
 \item{id_raster}{(\link[terra:SpatRaster-class]{terra::SpatRaster}) Raster showing the sample study area, created
 using \link{build_id_raster}.}
 
@@ -28,19 +37,6 @@ Generate log posterior predictive density from a geostatistical surface onto poi
 Calculated across draws. Requires an ID raster to match each point observation
 to a set of draws. Assumes binomial data.
 }
-\section{Fields}{
-
-\describe{
-\item{\code{validation_data}}{(\code{data.frame}) Table containing at least the following
-fields:\cr
-\itemize{
-\item x (\code{numeric}) location x position, in the same projection as \code{id_raster}\cr
-\item y (\code{numeric}) location y position, in the same projection as \code{id_raster}\cr
-\item indicator (\code{integer}) The number of events in the population\cr
-\item samplesize (\code{integer}) The total population, denominator for \code{indicator}
-}}
-}}
-
 \seealso{
 https://shorturl.at/P5zBT
 }

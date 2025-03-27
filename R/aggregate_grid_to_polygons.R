@@ -33,6 +33,9 @@ aggregate_raster_to_polygons_validation <- function(
   data_raster, aggregation_table, aggregation_cols, method, aggregated_field, z_dimension,
   z_dimension_name, weighting_raster, na.rm
 ){
+  # Overload a data.table variable to pass R CMD check
+  pixel_id <- NULL
+
   # Checks on the aggregation table
   assertthat::assert_that(inherits(aggregation_table, 'data.table'))
   assertthat::assert_that(assertthat::has_name(aggregation_table, aggregation_cols))
@@ -143,6 +146,9 @@ aggregate_raster_to_polygons <- function(
   aggregated_field = 'data', z_dimension = NULL, z_dimension_name = 'z',
   weighting_raster = NULL, na.rm = TRUE
 ){
+  # Overload some data.table variables to pass R CMD check
+  . <- area_fraction <- w__ <- val__ <- z__ <- NULL
+
   ## Data preparation
   # Validate function inputs
   aggregate_raster_to_polygons_validation(
@@ -372,6 +378,10 @@ aggregate_draws_to_polygons <- function(
   draws_matrix, aggregation_table, aggregation_cols = 'polygon_id', method = 'mean',
   z_dimension = NULL, z_dimension_name = 'z', weighting_raster = NULL, na.rm = TRUE
 ){
+  # Overload some data.table variables to pass R CMD check
+  . <- pixel_id <- masked_pixel_id <- i.masked_pixel_id <- w__ <- i.w__ <-
+    area_fraction <- z__ <- NULL
+
   ## Data preparation
   # Validate function inputs
   aggregate_draws_to_polygons_validation(

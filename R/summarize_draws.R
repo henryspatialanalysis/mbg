@@ -15,7 +15,7 @@
 #' @param na.rm (`logical`, default TRUE) Should NA values be removed when calculating
 #'   summaries across draws?
 #'
-#' @return A [data.table:;data.table] containing at least the following fields:
+#' @return A [data.table::data.table] containing at least the following fields:
 #'   - The `id_fields`, if passed
 #'   - "mean": Mean across predictive draws
 #'   - "lower": Lower bound of the (X%) uncertainty interval

@@ -10,6 +10,14 @@ rmse_raster_to_point(estimates, validation_data, outcome_field, na.rm = FALSE)
 \item{estimates}{(\link[terra:SpatRaster-class]{terra::SpatRaster}) Raster surface containing point estimates. This
 could also be the mean surface of a Bayesian geostatistical model}
 
+\item{validation_data}{(\code{data.frame})\cr
+Table containing at least the following fields:\cr
+\itemize{
+\item x (\code{numeric}) location x position, in the same projection as \code{estimates}\cr
+\item y (\code{numeric}) location y position, in the same projection as \code{estimates}\cr
+\item (Outcome field) See below
+}}
+
 \item{outcome_field}{(\code{character(1)}) Column in \code{validation_data} containing the values
 that should be compared against the \code{estimates} raster surface.}
 
@@ -22,16 +30,4 @@ A single number giving RMSE between the point data and estimates raster.
 \description{
 Generate RMSE from an estimated raster surface and point data
 }
-\section{Fields}{
-
-\describe{
-\item{\code{validation_data}}{(\code{data.frame})\cr
-Table containing at least the following fields:\cr
-\itemize{
-\item x (\code{numeric}) location x position, in the same projection as \code{estimates}\cr
-\item y (\code{numeric}) location y position, in the same projection as \code{estimates}\cr
-\item (Outcome field) See below
-}}
-}}
-
 \concept{validation}

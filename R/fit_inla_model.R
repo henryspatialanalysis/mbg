@@ -29,7 +29,6 @@
 #'
 #' @concept model_fit
 #'
-#' @importFrom INLA inla inla.stack.data inla.stack.A
 #' @importFrom stats as.formula
 #' @export
 fit_inla_model <- function(

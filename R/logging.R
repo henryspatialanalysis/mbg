@@ -86,6 +86,9 @@ logging_stop_timer <- function(echo = TRUE){
 #' @import data.table
 #' @export
 logging_get_timer_log <- function(clear_log = FALSE, deindent = TRUE){
+  # Overload some data.table variables to pass R CMD check
+  elapsed <- msg <- callback_msg <- NULL
+
   timer_log <- tictoc::tic.log(format = FALSE) |>
     lapply(data.table::as.data.table) |>
     data.table::rbindlist(fill = T, use.names = T)

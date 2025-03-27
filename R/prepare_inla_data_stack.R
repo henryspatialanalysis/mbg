@@ -64,7 +64,6 @@
 #'
 #' @concept model_fit
 #'
-#' @importFrom INLA inla.mesh.2d inla.spde2.pcmatern inla.spde.make.A inla.stack
 #' @importFrom data.table as.data.table
 #' @importFrom sf st_sf st_join st_nearest_feature
 #' @importFrom stats qlogis

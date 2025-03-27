@@ -128,6 +128,10 @@ build_aggregation_table_validation <- function(
 build_aggregation_table <- function(
   polygons, id_raster, polygon_id_field, verbose = FALSE
 ){
+  # Overload some data.table variables to pass R CMD check
+  . <- pixel_id <- masked_pixel_id <- i.masked_pixel_id <- polygon_id <- ..keep_cols <-
+    area_fraction <- NULL
+
   # If polygons inherit sf, convert to SpatVector
   if(inherits(polygons, 'sf')) polygons <- terra::vect(polygons)
   # Input data validation

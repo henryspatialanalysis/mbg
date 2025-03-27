@@ -45,7 +45,6 @@
 #'
 #' @import data.table
 #' @importFrom assertthat assert_that
-#' @importFrom INLA inla.posterior.sample inla.spde.make.A
 #' @importFrom Matrix rowMeans
 #' @importFrom matrixStats rowQuantiles
 #' @importFrom purrr map map_dbl

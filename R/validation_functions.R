@@ -2,7 +2,7 @@
 #'
 #' @param estimates ([terra::SpatRaster]) Raster surface containing point estimates. This
 #'   could also be the mean surface of a Bayesian geostatistical model
-#' @field validation_data (`data.frame`)\cr
+#' @param validation_data (`data.frame`)\cr
 #'   Table containing at least the following fields:\cr
 #'   * x (`numeric`) location x position, in the same projection as `estimates`\cr
 #'   * y (`numeric`) location y position, in the same projection as `estimates`\cr
@@ -45,7 +45,7 @@ rmse_raster_to_point <- function(
 #' @param draws (`matrix`) A predictive draw matrix, where each row corresponds to a
 #'   pixel in the `id_raster` and each column corresponds to one sampled estimate of the
 #'   outcome.
-#' @field validation_data (`data.frame`) Table containing at least the following
+#' @param validation_data (`data.frame`) Table containing at least the following
 #'  fields:\cr
 #'   * x (`numeric`) location x position, in the same projection as `id_raster`\cr
 #'   * y (`numeric`) location y position, in the same projection as `id_raster`\cr
@@ -63,8 +63,12 @@ rmse_raster_to_point <- function(
 #'
 #' @import data.table
 #' @importFrom terra extract
+#' @importFrom stats dbinom
 #' @export
 log_posterior_density <- function(draws, validation_data, id_raster, na.rm = FALSE){
+  # Overload some data.table variables to pass R CMD check
+  draws_row <- i.draws_row <- NULL
+
   # Get the row of predictive draws corresponding to each data point
   pixel_ids <- terra::extract(
     x = id_raster,
@@ -85,7 +89,7 @@ log_posterior_density <- function(draws, validation_data, id_raster, na.rm = FAL
   pixel_ids[row_lookup, draws_row := i.draws_row, on = 'pixel_id']
   # Get log density at each data point
   log_density_by_observation <- sapply(seq_len(nrow(validation_data)), function(row_ii){
-    dbinom(
+    stats::dbinom(
       x = validation_data$indicator[row_ii],
       size = validation_data$samplesize[row_ii],
       prob = draws[pixel_ids$draws_row[row_ii], ]
