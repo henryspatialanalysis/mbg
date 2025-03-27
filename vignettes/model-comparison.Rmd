@@ -145,7 +145,7 @@ In this tutorial, we will continue to use example data on child stunting
 from Benin. We will compare the default `mbg` model, as described in the
 [introductory vignette](mbg.html), to a stacked ensemble model with
 department-level fixed effects, as described in the [spatial ML models
-article](model_comparison.html).
+article](model-comparison.html).
 
 Start this tutorial by loading the example data and preparing the ID
 raster:
@@ -233,8 +233,8 @@ metrics_in_sample <- rbind(
 metrics_in_sample
 #>      rmse_is    lpd_is  waic_is       model_type
 #>        <num>     <num>    <num>           <char>
-#> 1: 0.1285016 -1206.078 2397.115         Standard
-#> 2: 0.1173281 -1161.453 2310.004 Stacked ensemble
+#> 1: 0.1285057 -1206.084 2397.115         Standard
+#> 2: 0.1163582 -1156.990 2304.211 Stacked ensemble
 ```
 
 The stacked ensemble model has a slightly lower RMSE and a higher (less
@@ -272,9 +272,9 @@ submodel_rmse <- data.table::data.table(
 submodel_rmse
 #>      rmse_is                model_type
 #>        <num>                    <char>
-#> 1: 0.1337504               Elastic net
-#> 2: 0.1265685 Gradient boosted machines
-#> 3: 0.1161694   Bagged regression trees
+#> 1: 0.1357682               Elastic net
+#> 2: 0.1268371 Gradient boosted machines
+#> 3: 0.1157924   Bagged regression trees
 ```
 
 # Out-of-sample model comparison
@@ -344,26 +344,26 @@ metrics_by_holdout <- lapply(seq_len(n_holdouts), function(holdout){
 
 | rmse\_oos |   lpd\_oos | model\_type      | holdout\_id |
 | --------: | ---------: | :--------------- | ----------: |
-| 0.1181227 | \-118.7762 | Standard         |           1 |
-| 0.1252693 | \-120.7670 | Stacked ensemble |           1 |
-| 0.1290111 | \-120.6368 | Standard         |           2 |
-| 0.1192613 | \-117.7395 | Stacked ensemble |           2 |
-| 0.1497597 | \-126.6321 | Standard         |           3 |
-| 0.1503554 | \-128.1359 | Stacked ensemble |           3 |
-| 0.1413851 | \-125.7261 | Standard         |           4 |
-| 0.1419081 | \-128.7285 | Stacked ensemble |           4 |
-| 0.1360917 | \-131.3189 | Standard         |           5 |
-| 0.1387924 | \-136.8416 | Stacked ensemble |           5 |
-| 0.1392353 | \-123.4548 | Standard         |           6 |
-| 0.1344768 | \-121.3066 | Stacked ensemble |           6 |
-| 0.1386249 | \-118.8217 | Standard         |           7 |
-| 0.1415001 | \-121.4032 | Stacked ensemble |           7 |
-| 0.1255616 | \-122.7545 | Standard         |           8 |
-| 0.1267633 | \-124.6432 | Stacked ensemble |           8 |
-| 0.1463734 | \-126.9334 | Standard         |           9 |
-| 0.1383586 | \-124.1185 | Stacked ensemble |           9 |
-| 0.1378106 | \-123.0726 | Standard         |          10 |
-| 0.1484380 | \-129.2247 | Stacked ensemble |          10 |
+| 0.1179354 | \-118.7490 | Standard         |           1 |
+| 0.1252479 | \-120.7753 | Stacked ensemble |           1 |
+| 0.1291436 | \-120.6255 | Standard         |           2 |
+| 0.1192507 | \-117.7843 | Stacked ensemble |           2 |
+| 0.1496129 | \-126.8926 | Standard         |           3 |
+| 0.1504705 | \-128.2862 | Stacked ensemble |           3 |
+| 0.1414287 | \-125.6910 | Standard         |           4 |
+| 0.1419527 | \-128.7975 | Stacked ensemble |           4 |
+| 0.1363021 | \-131.5173 | Standard         |           5 |
+| 0.1386044 | \-136.6189 | Stacked ensemble |           5 |
+| 0.1391739 | \-123.5967 | Standard         |           6 |
+| 0.1345811 | \-121.4608 | Stacked ensemble |           6 |
+| 0.1388889 | \-118.9464 | Standard         |           7 |
+| 0.1414557 | \-121.3938 | Stacked ensemble |           7 |
+| 0.1252319 | \-122.7438 | Standard         |           8 |
+| 0.1268031 | \-124.5918 | Stacked ensemble |           8 |
+| 0.1466681 | \-127.1125 | Standard         |           9 |
+| 0.1383814 | \-124.0828 | Stacked ensemble |           9 |
+| 0.1374990 | \-123.0405 | Standard         |          10 |
+| 0.1483755 | \-129.3895 | Stacked ensemble |          10 |
 
 The models trade off for better performance across the ten holdout
 folds. To get an overall comparison of out-of-sample predictive
@@ -378,8 +378,8 @@ out_of_sample_overall <- metrics_by_holdout[
 
 | model\_type      | rmse\_oos |   lpd\_oos |
 | :--------------- | --------: | ---------: |
-| Standard         | 0.1361976 | \-1238.127 |
-| Stacked ensemble | 0.1365123 | \-1252.909 |
+| Standard         | 0.1361885 | \-1238.915 |
+| Stacked ensemble | 0.1365123 | \-1253.181 |
 
 In this case, the standard model has better out-of-sample LPD and RMSE,
 suggesting that it is the superior model for predicting new child

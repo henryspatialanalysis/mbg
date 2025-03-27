@@ -84,7 +84,7 @@ In this tutorial, we will calculate all three of our standard metrics for the fu
 
 # Setup
 
-In this tutorial, we will continue to use example data on child stunting from Benin. We will compare the default `mbg` model, as described in the [introductory vignette](mbg.html), to a stacked ensemble model with department-level fixed effects, as described in the [spatial ML models article](model_comparison.html).
+In this tutorial, we will continue to use example data on child stunting from Benin. We will compare the default `mbg` model, as described in the [introductory vignette](mbg.html), to a stacked ensemble model with department-level fixed effects, as described in the [spatial ML models article](model-comparison.html).
 
 Start this tutorial by loading the example data and preparing the ID raster:
 

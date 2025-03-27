@@ -225,15 +225,15 @@ model_runner <- MbgModelRunner$new(
 )
 model_runner$run_mbg_pipeline()
 #> MBG model fitting
-#> MBG model fitting: 12.689 sec elapsed
+#> MBG model fitting: 13.857 sec elapsed
 #> Generating model predictions
 #>   Parameter posterior samples
-#>   Parameter posterior samples: 5.91 sec elapsed
+#>   Parameter posterior samples: 6.415 sec elapsed
 #>   Cell draws
-#>   Cell draws: 2.036 sec elapsed
+#>   Cell draws: 2.123 sec elapsed
 #>   Summarize draws
-#>   Summarize draws: 0.845 sec elapsed
-#> Generating model predictions: 8.794 sec elapsed
+#>   Summarize draws: 0.817 sec elapsed
+#> Generating model predictions: 9.357 sec elapsed
 #> Running population-weighted aggregation from grid cells to polygons
 ```
 

@@ -195,5 +195,5 @@ Freeman, M. (2017). _An introduction to hierarchical modeling_. http://mfviz.com
 
 Moraga, Paula. (2019). Geospatial Health Data: Modeling and Visualization with R-INLA and Shiny. Chapman & Hall/CRC Biostatistics Series. ISBN 9780367357955. https://www.paulamoraga.com/book-geospatial/index.html
 
-Opitz, T. (2017). _Latent Gaussian modeling and INLA: A review with focus on space-time applications._ Journal de la société française de statistique, 158(3), 62-85. http://www.numdam.org/article/JSFS_2017__158_3_62_0.pdf
+Opitz, T. (2017). _Latent Gaussian modeling and INLA: A review with focus on space-time applications._ Journal de la société française de statistique, 158(3), 62-85. https://www.numdam.org/article/JSFS_2017__158_3_62_0.pdf
 
