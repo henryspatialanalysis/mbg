@@ -1,14 +1,16 @@
 Package: mbg
 Title: Model-Based Geostatistics
-Version: 0.9.1
+Version: 1.0.0
 Authors@R: c(
     person("Nathaniel", "Henry", email = "nat@henryspatialanalysis.com",
         role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8150-4988")),
     person("Benjamin", "Mayala", role = c("aut")))
 Description:
-    Modern model-based geostatistics for point-referenced data. This package
-    combines sf, terra, and data.table functions for spatial data processing, caret for
-    spatial ML models, and R-INLA for geostatistical models.
+    Modern model-based geostatistics for point-referenced data. This package provides a
+    simple interface to run spatial machine learning models and geostatistical models
+    that estimate a continuous (raster) surface from point-referenced outcomes and,
+    optionally, a set of raster covariates. The package also includes functions to
+    summarize raster outcomes by (polygon) region while preserving uncertainty.
 License: MIT + file LICENSE
 Depends:
     R (>= 4.1.0)
