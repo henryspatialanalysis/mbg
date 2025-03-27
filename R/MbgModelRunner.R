@@ -509,9 +509,9 @@ MbgModelRunner <- R6::R6Class(
         )
         # Summarize using mean and boundaries of the uncertainty interval
         draw_fields <- setdiff(colnames(aggregated_draws), cols)
-        agg_draws_matrix <- as.matrix(aggregated_draws[, ..draw_fields])
+        agg_draws_matrix <- as.matrix(aggregated_draws[, draw_fields, with = FALSE])
         alpha <- (1 - ui_width) / 2
-        aggregated_summary <- data.table::copy(aggregated_draws[, ..cols])
+        aggregated_summary <- data.table::copy(aggregated_draws[, cols, with = FALSE])
         aggregated_summary$mean <- rowMeans(agg_draws_matrix, na.rm = TRUE)
         aggregated_summary$lower <- matrixStats::rowQuantiles(
           agg_draws_matrix,

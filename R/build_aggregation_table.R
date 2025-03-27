@@ -129,7 +129,7 @@ build_aggregation_table <- function(
   polygons, id_raster, polygon_id_field, verbose = FALSE
 ){
   # Overload some data.table variables to pass R CMD check
-  . <- pixel_id <- masked_pixel_id <- i.masked_pixel_id <- polygon_id <- ..keep_cols <-
+  . <- pixel_id <- masked_pixel_id <- i.masked_pixel_id <- polygon_id  <-
     area_fraction <- NULL
 
   # If polygons inherit sf, convert to SpatVector
@@ -182,7 +182,7 @@ build_aggregation_table <- function(
     x = colnames(polys_dt),
     y = c('pixel_id', 'masked_pixel_id', 'area_fraction')
   )
-  polys_dt_sub <- polys_dt[, ..keep_cols]
+  polys_dt_sub <- polys_dt[, keep_cols, with = FALSE]
   agg_table_full <- merge(
     x = agg_table[, .(polygon_id, pixel_id, masked_pixel_id, area_fraction)],
     y = polys_dt_sub,
