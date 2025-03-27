@@ -56,11 +56,12 @@
 <div class="page-header"><h1 id="model-based-geostatistics">Model-Based Geostatistics<a class="anchor" aria-label="anchor" href="#model-based-geostatistics"></a>
 </h1></div>
 <p><code>mbg</code> is an R package for modern model-based geostatistics. It combines features from the <a href="https://r-spatial.github.io/sf/" class="external-link"><code>sf</code></a>, <a href="https://rspatial.github.io/terra/" class="external-link"><code>terra</code></a>, and <a href="https://cran.r-project.org/web/packages/data.table/" class="external-link"><code>data.table</code></a> packages for spatial data processing, <a href="https://topepo.github.io/caret/" class="external-link"><code>caret</code></a> for spatial ML models, and <a href="http://r-inla.org/" class="external-link"><code>R-INLA</code></a> for geostatistical models.</p>
+<p>The package documentation is hosted on <a href="https://henryspatialanalysis.github.io/mbg/">Github Pages</a>, and you can read the source code <a href="https://github.com/henryspatialanalysis/mbg" class="external-link">on Github</a></p>
 <hr>
 <div class="section level2">
 <h2 id="using-the-package">Using the package<a class="anchor" aria-label="anchor" href="#using-the-package"></a>
 </h2>
-<p>You can install the R package from Github (this is the preferred option until the package is uploaded to CRAN):</p>
+<p>You can install the R package from Github:</p>
 <p><code>devtools::install_github("henryspatialanalysis/mbg")</code></p>
 <p>Or clone the package to your computer and load it dynamically:</p>
 <p><code>devtools::load_all("/local/path/to/mbg/")</code></p>
@@ -70,14 +71,6 @@
 <div class="section level2">
 <h2 id="package-workflow">Package workflow<a class="anchor" aria-label="anchor" href="#package-workflow"></a>
 </h2>
-<p>The package documentation is currently hosted on a private server, and will be migrated to Github Pages once the repository is made public. You can build the documentation yourself with the following steps:</p>
-<ol style="list-style-type: decimal">
-<li>Clone this repository</li>
-<li>From the top level of the repository, call <code><a href="https://devtools.r-lib.org/reference/document.html" class="external-link">devtools::document()</a></code> to build the packagedown articles. This will create a subfolder called <code>docs/</code>
-</li>
-<li>From <code>docs/</code>, open <code>index.html</code> or run the command-line tool <code>live-server</code>
-</li>
-</ol>
 <p>The general MBG workflow using this package is as follows:</p>
 <ol style="list-style-type: decimal">
 <li>Load point data on outcomes, raster covariate surfaces, and a raster population surface</li>
@@ -90,6 +83,7 @@
 <li>
 <em>(Optional):</em> Aggregate from pixels to administrative boundaries, preserving uncertainty</li>
 </ol>
+<p>For example workflows, see the <a href="https://henryspatialanalysis.github.io/mbg/articles/mbg.html">introductory vignette</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -112,6 +106,7 @@
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Nathaniel Henry <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-8150-4988" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Benjamin Mayala <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
@@ -122,7 +117,7 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Nathaniel Henry.</p>
+  <p>Developed by Nathaniel Henry, Benjamin Mayala.</p>
 </div>
 
 <div class="pkgdown-footer-right">
