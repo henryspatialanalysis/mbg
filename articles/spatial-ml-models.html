@@ -170,12 +170,12 @@ bagged regression trees. We then plot the results across Benin:</p>
 <span><span class="co">#&gt;   Candidate model:  enet</span></span>
 <span><span class="co">#&gt; Loading required package: ggplot2</span></span>
 <span><span class="co">#&gt; Loading required package: lattice</span></span>
-<span><span class="co">#&gt;   Candidate model:  enet: 0.82 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  enet: 0.932 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  gbm</span></span>
-<span><span class="co">#&gt;   Candidate model:  gbm: 1.505 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  gbm: 1.825 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  treebag</span></span>
-<span><span class="co">#&gt;   Candidate model:  treebag: 2.395 sec elapsed</span></span>
-<span><span class="co">#&gt; Fitting 3 regression models: 4.829 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt;   Candidate model:  treebag: 2.508 sec elapsed</span></span>
+<span><span class="co">#&gt; Fitting 3 regression models: 5.377 sec elapsed</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">submodels</span><span class="op">$</span><span class="va">predictions</span><span class="op">)</span>,</span>
@@ -205,12 +205,12 @@ identifiers to the predictors:</p>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fitting 3 regression models</span></span>
 <span><span class="co">#&gt;   Candidate model:  enet</span></span>
-<span><span class="co">#&gt;   Candidate model:  enet: 1.385 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  enet: 1.055 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  gbm</span></span>
-<span><span class="co">#&gt;   Candidate model:  gbm: 2.453 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  gbm: 2.548 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  treebag</span></span>
-<span><span class="co">#&gt;   Candidate model:  treebag: 3.346 sec elapsed</span></span>
-<span><span class="co">#&gt; Fitting 3 regression models: 7.291 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt;   Candidate model:  treebag: 3.82 sec elapsed</span></span>
+<span><span class="co">#&gt; Fitting 3 regression models: 7.529 sec elapsed</span></span></code></pre></div>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rspatial.github.io/terra/reference/plot.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/rast.html" class="external-link">rast</a></span><span class="op">(</span><span class="va">submodels_with_department_effects</span><span class="op">$</span><span class="va">predictions</span><span class="op">)</span>,</span>
@@ -228,11 +228,11 @@ estimate the outcome based on many different types of regression models
 which may not make similar predictions across the study area. How can we
 combine estimates from these models while also incorporating some of the
 geostatistical principles used in the baseline <code>mbg</code> model?
-One option is to use <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6089257/" class="external-link">stacked
+One option is to use <a href="https://doi.org/10.1007/s10654-018-0390-z" class="external-link">stacked
 generalization</a>, which combines model predictions to create a “super
-learner” with better performance than any individual model. <a href="https://royalsocietypublishing.org/doi/full/10.1098/rsif.2017.0520" class="external-link">Previous
-studies</a> indicate that this “super learner” ensemble can replace the
-covariate term in a standard geostatistical model to improve prediction
+learner” with better performance than any individual model. <a href="https://doi.org/10.1098/rsif.2017.0520" class="external-link">Previous studies</a>
+indicate that this “super learner” ensemble can replace the covariate
+term in a standard geostatistical model to improve prediction
 accuracy.</p>
 <p>To run a geostatistical model with stacked generalization, create a
 <code>MbgModelRunner</code> object where
@@ -271,22 +271,22 @@ submodels</li>
 <span><span class="va">model_runner</span><span class="op">$</span><span class="fu">run_mbg_pipeline</span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Fitting 3 regression models</span></span>
 <span><span class="co">#&gt;   Candidate model:  enet</span></span>
-<span><span class="co">#&gt;   Candidate model:  enet: 1.017 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  enet: 1.219 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  gbm</span></span>
-<span><span class="co">#&gt;   Candidate model:  gbm: 2.428 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  gbm: 2.403 sec elapsed</span></span>
 <span><span class="co">#&gt;   Candidate model:  treebag</span></span>
-<span><span class="co">#&gt;   Candidate model:  treebag: 3.633 sec elapsed</span></span>
-<span><span class="co">#&gt; Fitting 3 regression models: 7.231 sec elapsed</span></span>
+<span><span class="co">#&gt;   Candidate model:  treebag: 3.434 sec elapsed</span></span>
+<span><span class="co">#&gt; Fitting 3 regression models: 7.2 sec elapsed</span></span>
 <span><span class="co">#&gt; MBG model fitting</span></span>
-<span><span class="co">#&gt; MBG model fitting: 10.067 sec elapsed</span></span>
+<span><span class="co">#&gt; MBG model fitting: 12.556 sec elapsed</span></span>
 <span><span class="co">#&gt; Generating model predictions</span></span>
 <span><span class="co">#&gt;   Parameter posterior samples</span></span>
-<span><span class="co">#&gt;   Parameter posterior samples: 5.489 sec elapsed</span></span>
+<span><span class="co">#&gt;   Parameter posterior samples: 5.23 sec elapsed</span></span>
 <span><span class="co">#&gt;   Cell draws</span></span>
-<span><span class="co">#&gt;   Cell draws: 2.167 sec elapsed</span></span>
+<span><span class="co">#&gt;   Cell draws: 2.128 sec elapsed</span></span>
 <span><span class="co">#&gt;   Summarize draws</span></span>
-<span><span class="co">#&gt;   Summarize draws: 1.479 sec elapsed</span></span>
-<span><span class="co">#&gt; Generating model predictions: 9.137 sec elapsed</span></span></code></pre></div>
+<span><span class="co">#&gt;   Summarize draws: 1.447 sec elapsed</span></span>
+<span><span class="co">#&gt; Generating model predictions: 8.807 sec elapsed</span></span></code></pre></div>
 <p>When <code>use_stacking = TRUE</code>, the submodel predictions are
 saved in the <code>MbgModelRunner$model_covariates</code> attribute.
 These can be pulled and plotted:</p>

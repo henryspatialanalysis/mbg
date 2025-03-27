@@ -213,7 +213,7 @@ using 10-fold cross validation.</p>
 stunting from Benin. We will compare the default <code>mbg</code> model,
 as described in the <a href="mbg.html">introductory vignette</a>, to a
 stacked ensemble model with department-level fixed effects, as described
-in the <a href="model_comparison.html">spatial ML models
+in the <a href="model-comparison.html">spatial ML models
 article</a>.</p>
 <p>Start this tutorial by loading the example data and preparing the ID
 raster:</p>
@@ -296,8 +296,8 @@ to calculate in-sample LPD, WAIC, and RMSE for each model:</p>
 <span><span class="va">metrics_in_sample</span></span>
 <span><span class="co">#&gt;      rmse_is    lpd_is  waic_is       model_type</span></span>
 <span><span class="co">#&gt;        &lt;num&gt;     &lt;num&gt;    &lt;num&gt;           &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: 0.1285016 -1206.078 2397.115         Standard</span></span>
-<span><span class="co">#&gt; 2: 0.1173281 -1161.453 2310.004 Stacked ensemble</span></span></code></pre></div>
+<span><span class="co">#&gt; 1: 0.1285057 -1206.084 2397.115         Standard</span></span>
+<span><span class="co">#&gt; 2: 0.1163582 -1156.990 2304.211 Stacked ensemble</span></span></code></pre></div>
 <p>The stacked ensemble model has a slightly lower RMSE and a higher
 (less negative) LPD, indicating a closer fit to the observed data.
 However, this may just indicate a more flexible model fit—overfitting
@@ -332,9 +332,9 @@ from the stacked ensemble model:</p>
 <span><span class="va">submodel_rmse</span></span>
 <span><span class="co">#&gt;      rmse_is                model_type</span></span>
 <span><span class="co">#&gt;        &lt;num&gt;                    &lt;char&gt;</span></span>
-<span><span class="co">#&gt; 1: 0.1337504               Elastic net</span></span>
-<span><span class="co">#&gt; 2: 0.1265685 Gradient boosted machines</span></span>
-<span><span class="co">#&gt; 3: 0.1161694   Bagged regression trees</span></span></code></pre></div>
+<span><span class="co">#&gt; 1: 0.1357682               Elastic net</span></span>
+<span><span class="co">#&gt; 2: 0.1268371 Gradient boosted machines</span></span>
+<span><span class="co">#&gt; 3: 0.1157924   Bagged regression trees</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="out-of-sample-model-comparison">Out-of-sample model comparison<a class="anchor" aria-label="anchor" href="#out-of-sample-model-comparison"></a>
@@ -408,122 +408,122 @@ runs.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="right">0.1181227</td>
-<td align="right">-118.7762</td>
+<td align="right">0.1179354</td>
+<td align="right">-118.7490</td>
 <td align="left">Standard</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="right">0.1252693</td>
-<td align="right">-120.7670</td>
+<td align="right">0.1252479</td>
+<td align="right">-120.7753</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1290111</td>
-<td align="right">-120.6368</td>
+<td align="right">0.1291436</td>
+<td align="right">-120.6255</td>
 <td align="left">Standard</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
-<td align="right">0.1192613</td>
-<td align="right">-117.7395</td>
+<td align="right">0.1192507</td>
+<td align="right">-117.7843</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1497597</td>
-<td align="right">-126.6321</td>
+<td align="right">0.1496129</td>
+<td align="right">-126.8926</td>
 <td align="left">Standard</td>
 <td align="right">3</td>
 </tr>
 <tr class="even">
-<td align="right">0.1503554</td>
-<td align="right">-128.1359</td>
+<td align="right">0.1504705</td>
+<td align="right">-128.2862</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">3</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1413851</td>
-<td align="right">-125.7261</td>
+<td align="right">0.1414287</td>
+<td align="right">-125.6910</td>
 <td align="left">Standard</td>
 <td align="right">4</td>
 </tr>
 <tr class="even">
-<td align="right">0.1419081</td>
-<td align="right">-128.7285</td>
+<td align="right">0.1419527</td>
+<td align="right">-128.7975</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">4</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1360917</td>
-<td align="right">-131.3189</td>
+<td align="right">0.1363021</td>
+<td align="right">-131.5173</td>
 <td align="left">Standard</td>
 <td align="right">5</td>
 </tr>
 <tr class="even">
-<td align="right">0.1387924</td>
-<td align="right">-136.8416</td>
+<td align="right">0.1386044</td>
+<td align="right">-136.6189</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">5</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1392353</td>
-<td align="right">-123.4548</td>
+<td align="right">0.1391739</td>
+<td align="right">-123.5967</td>
 <td align="left">Standard</td>
 <td align="right">6</td>
 </tr>
 <tr class="even">
-<td align="right">0.1344768</td>
-<td align="right">-121.3066</td>
+<td align="right">0.1345811</td>
+<td align="right">-121.4608</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">6</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1386249</td>
-<td align="right">-118.8217</td>
+<td align="right">0.1388889</td>
+<td align="right">-118.9464</td>
 <td align="left">Standard</td>
 <td align="right">7</td>
 </tr>
 <tr class="even">
-<td align="right">0.1415001</td>
-<td align="right">-121.4032</td>
+<td align="right">0.1414557</td>
+<td align="right">-121.3938</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">7</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1255616</td>
-<td align="right">-122.7545</td>
+<td align="right">0.1252319</td>
+<td align="right">-122.7438</td>
 <td align="left">Standard</td>
 <td align="right">8</td>
 </tr>
 <tr class="even">
-<td align="right">0.1267633</td>
-<td align="right">-124.6432</td>
+<td align="right">0.1268031</td>
+<td align="right">-124.5918</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">8</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1463734</td>
-<td align="right">-126.9334</td>
+<td align="right">0.1466681</td>
+<td align="right">-127.1125</td>
 <td align="left">Standard</td>
 <td align="right">9</td>
 </tr>
 <tr class="even">
-<td align="right">0.1383586</td>
-<td align="right">-124.1185</td>
+<td align="right">0.1383814</td>
+<td align="right">-124.0828</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">9</td>
 </tr>
 <tr class="odd">
-<td align="right">0.1378106</td>
-<td align="right">-123.0726</td>
+<td align="right">0.1374990</td>
+<td align="right">-123.0405</td>
 <td align="left">Standard</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
-<td align="right">0.1484380</td>
-<td align="right">-129.2247</td>
+<td align="right">0.1483755</td>
+<td align="right">-129.3895</td>
 <td align="left">Stacked ensemble</td>
 <td align="right">10</td>
 </tr>
@@ -546,13 +546,13 @@ validity, we combine these metrics across holdouts:</p>
 <tbody>
 <tr class="odd">
 <td align="left">Standard</td>
-<td align="right">0.1361976</td>
-<td align="right">-1238.127</td>
+<td align="right">0.1361885</td>
+<td align="right">-1238.915</td>
 </tr>
 <tr class="even">
 <td align="left">Stacked ensemble</td>
 <td align="right">0.1365123</td>
-<td align="right">-1252.909</td>
+<td align="right">-1253.181</td>
 </tr>
 </tbody>
 </table>
