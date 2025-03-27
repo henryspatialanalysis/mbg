@@ -12,8 +12,8 @@
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="Model-Based Geostatistics">
-<meta name="description" content="Modern model-based geostatistics for point-referenced data. This package combines sf, terra, and data.table functions for spatial data processing, caret for spatial ML models, and R-INLA for geostatistical models.">
-<meta property="og:description" content="Modern model-based geostatistics for point-referenced data. This package combines sf, terra, and data.table functions for spatial data processing, caret for spatial ML models, and R-INLA for geostatistical models.">
+<meta name="description" content="Modern model-based geostatistics for point-referenced data. This package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.">
+<meta property="og:description" content="Modern model-based geostatistics for point-referenced data. This package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">mbg</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,8 +55,8 @@
   <main id="main" class="col-md-9"><div class="section level1">
 <div class="page-header"><h1 id="model-based-geostatistics">Model-Based Geostatistics<a class="anchor" aria-label="anchor" href="#model-based-geostatistics"></a>
 </h1></div>
-<p><code>mbg</code> is an R package for modern model-based geostatistics. It combines features from the <a href="https://r-spatial.github.io/sf/" class="external-link"><code>sf</code></a>, <a href="https://rspatial.github.io/terra/" class="external-link"><code>terra</code></a>, and <a href="https://cran.r-project.org/web/packages/data.table/" class="external-link"><code>data.table</code></a> packages for spatial data processing, <a href="https://topepo.github.io/caret/" class="external-link"><code>caret</code></a> for spatial ML models, and <a href="http://r-inla.org/" class="external-link"><code>R-INLA</code></a> for geostatistical models.</p>
-<p>The package documentation is hosted on <a href="https://henryspatialanalysis.github.io/mbg/">Github Pages</a>, and you can read the source code <a href="https://github.com/henryspatialanalysis/mbg" class="external-link">on Github</a></p>
+<p><code>mbg</code> is an R package for modern model-based geostatistics. <code>mbg</code> provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.</p>
+<p>The <code>mbg</code> package combines features from the <a href="https://r-spatial.github.io/sf/" class="external-link"><code>sf</code></a>, <a href="https://rspatial.github.io/terra/" class="external-link"><code>terra</code></a>, and <a href="https://cran.r-project.org/web/packages/data.table/" class="external-link"><code>data.table</code></a> packages for spatial data processing; <a href="https://topepo.github.io/caret/" class="external-link"><code>caret</code></a> for spatial ML models; and <a href="http://r-inla.org/" class="external-link"><code>R-INLA</code></a> for geostatistical models.</p>
 <hr>
 <div class="section level2">
 <h2 id="using-the-package">Using the package<a class="anchor" aria-label="anchor" href="#using-the-package"></a>
@@ -77,7 +77,7 @@
 <li>
 <em>(Optional):</em> Run machine learning models relating the input covariate surfaces to the outcome, producing predictive raster surfaces from a variety of methods</li>
 <li>Prepare geostatistical model inputs. This includes the outcomes point data, model specifications, a spatial 2-D mesh, and either the input covariate surfaces or the ML predictive surfaces</li>
-<li>Run the geostatistical model using <code>R-INLA</code>. This model predicts the outcome as a linear combination of the raster surfaces and a SPDE approximation to a Gaussian process over space.</li>
+<li>Run the geostatistical model. This model predicts the outcome as a linear combination of the raster surfaces and a SPDE approximation to a Gaussian process over space.</li>
 <li>Using the model fit, predict results across the entire study area. Uncertainty is captured by generating 250 posterior predictive draws at each pixel location.</li>
 <li>Summarize draws as raster surfaces by taking the mean, median, and 95% uncertainty interval bounds of draws at each pixel location</li>
 <li>
