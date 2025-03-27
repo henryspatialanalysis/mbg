@@ -29,7 +29,8 @@ Suggests:
     knitr,
     rmarkdown,
     ggplot2,
-    scales
+    scales,
+    testthat (>= 3.0.0)
 Additional_repositories: https://inla.r-inla-download.org/R/stable/
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, r6 = TRUE)
@@ -37,3 +38,4 @@ RoxygenNote: 7.2.3
 VignetteBuilder: knitr
 URL: https://henryspatialanalysis.github.io/mbg/
 BugReports: https://github.com/henryspatialanalysis/mbg/issues
+Config/testthat/edition: 3
