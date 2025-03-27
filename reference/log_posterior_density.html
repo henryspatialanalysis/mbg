@@ -56,6 +56,15 @@ pixel in the <code>id_raster</code> and each column corresponds to one sampled e
 outcome.</p></dd>
 
 
+<dt id="arg-validation-data">validation_data<a class="anchor" aria-label="anchor" href="#arg-validation-data"></a></dt>
+<dd><p>(<code>data.frame</code>) Table containing at least the following
+fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as <code>id_raster</code><br></p></li>
+<li><p>y (<code>numeric</code>) location y position, in the same projection as <code>id_raster</code><br></p></li>
+<li><p>indicator (<code>integer</code>) The number of events in the population<br></p></li>
+<li><p>samplesize (<code>integer</code>) The total population, denominator for <code>indicator</code></p></li>
+</ul></dd>
+
+
 <dt id="arg-id-raster">id_raster<a class="anchor" aria-label="anchor" href="#arg-id-raster"></a></dt>
 <dd><p>(<a href="https://rspatial.github.io/terra/reference/SpatRaster-class.html" class="external-link">terra::SpatRaster</a>) Raster showing the sample study area, created
 using <a href="build_id_raster.html">build_id_raster</a>.</p></dd>
@@ -76,20 +85,6 @@ estimates.</p>
     <p>Calculated across draws. Requires an ID raster to match each point observation
 to a set of draws. Assumes binomial data.</p>
     </div>
-    <div class="section level2">
-    <h2 id="fields">Fields<a class="anchor" aria-label="anchor" href="#fields"></a></h2>
-
-
-<dl><dt><code>validation_data</code></dt>
-<dd><p>(<code>data.frame</code>) Table containing at least the following
-fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as <code>id_raster</code><br></p></li>
-<li><p>y (<code>numeric</code>) location y position, in the same projection as <code>id_raster</code><br></p></li>
-<li><p>indicator (<code>integer</code>) The number of events in the population<br></p></li>
-<li><p>samplesize (<code>integer</code>) The total population, denominator for <code>indicator</code></p></li>
-</ul></dd>
-
-
-</dl></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>https://shorturl.at/P5zBT</p></div>

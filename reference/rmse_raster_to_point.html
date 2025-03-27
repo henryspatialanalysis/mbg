@@ -55,6 +55,14 @@
 could also be the mean surface of a Bayesian geostatistical model</p></dd>
 
 
+<dt id="arg-validation-data">validation_data<a class="anchor" aria-label="anchor" href="#arg-validation-data"></a></dt>
+<dd><p>(<code>data.frame</code>)<br>
+Table containing at least the following fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as <code>estimates</code><br></p></li>
+<li><p>y (<code>numeric</code>) location y position, in the same projection as <code>estimates</code><br></p></li>
+<li><p>(Outcome field) See below</p></li>
+</ul></dd>
+
+
 <dt id="arg-outcome-field">outcome_field<a class="anchor" aria-label="anchor" href="#arg-outcome-field"></a></dt>
 <dd><p>(<code>character(1)</code>) Column in <code>validation_data</code> containing the values
 that should be compared against the <code>estimates</code> raster surface.</p></dd>
@@ -69,19 +77,6 @@ calculation?</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A single number giving RMSE between the point data and estimates raster.</p>
     </div>
-    <div class="section level2">
-    <h2 id="fields">Fields<a class="anchor" aria-label="anchor" href="#fields"></a></h2>
-
-
-<dl><dt><code>validation_data</code></dt>
-<dd><p>(<code>data.frame</code>)<br>
-Table containing at least the following fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as <code>estimates</code><br></p></li>
-<li><p>y (<code>numeric</code>) location y position, in the same projection as <code>estimates</code><br></p></li>
-<li><p>(Outcome field) See below</p></li>
-</ul></dd>
-
-
-</dl></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
