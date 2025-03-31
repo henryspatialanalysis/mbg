@@ -23,4 +23,10 @@ Build an ID raster matching the extent of a vector dataset
 The ID raster will be used to build the aggregation table. Each pixel has a
 unique integer value from 1 to the number of pixels in the ID raster.
 }
+\examples{
+\dontrun{
+  polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+  build_id_raster(polygons)
+}
+}
 \concept{core_inputs}

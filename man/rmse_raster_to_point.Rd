@@ -30,4 +30,7 @@ A single number giving RMSE between the point data and estimates raster.
 \description{
 Generate RMSE from an estimated raster surface and point data
 }
+\details{
+For examples, see \code{vignette('model-comparison', package = 'mbg')}
+}
 \concept{validation}

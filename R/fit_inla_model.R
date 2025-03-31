@@ -29,6 +29,8 @@
 #'
 #' @concept model_fit
 #'
+#' @seealso [mbg::MbgModelRunner]
+#'
 #' @importFrom stats as.formula
 #' @export
 fit_inla_model <- function(

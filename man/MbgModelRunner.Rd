@@ -6,6 +6,9 @@
 \description{
 R6 class to run a full MBG model and make predictions.
 }
+\details{
+To see examples of this object, run \code{vignette('mbg')}
+}
 \concept{model_runner}
 \section{Public fields}{
 \if{html}{\out{<div class="r6-fields">}}

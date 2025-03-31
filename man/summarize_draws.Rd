@@ -43,4 +43,18 @@ A \link[data.table:data.table]{data.table::data.table} containing at least the f
 \description{
 Helper function to summarize a matrix or data.frame of predictive draws
 }
+\examples{
+# Summarize a draws matrix
+draws_matrix <- matrix(rnorm(200), nrow = 10)
+summary_table_a <- summarize_draws(draws_matrix)
+head(summary_table_a)
+
+# Summarize a draws data.table with location IDs
+draws_table <- matrix(c(1:10, rnorm(200)), nrow = 10) |>
+  data.table::as.data.table() |>
+  data.table::setnames(c('location_id', paste0('draw_', 1:20)))
+summary_table_b <- summarize_draws(draws_table, id_fields = 'location_id')
+head(summary_table_b)
+
+}
 \concept{prediction}

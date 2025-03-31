@@ -1,5 +1,7 @@
 #' Generate RMSE from an estimated raster surface and point data
 #'
+#' @details For examples, see \code{vignette('model-comparison', package = 'mbg')}
+#'
 #' @param estimates ([terra::SpatRaster]) Raster surface containing point estimates. This
 #'   could also be the mean surface of a Bayesian geostatistical model
 #' @param validation_data (`data.frame`)\cr
@@ -40,7 +42,7 @@ rmse_raster_to_point <- function(
 #' @details Calculated across draws. Requires an ID raster to match each point observation
 #'   to a set of draws. Assumes binomial data.
 #'
-#' @seealso https://shorturl.at/P5zBT
+#' @details For examples, see \code{vignette('model-comparison', package = 'mbg')}
 #'
 #' @param draws (`matrix`) A predictive draw matrix, where each row corresponds to a
 #'   pixel in the `id_raster` and each column corresponds to one sampled estimate of the

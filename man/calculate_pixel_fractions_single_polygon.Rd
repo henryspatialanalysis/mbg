@@ -30,4 +30,18 @@ polygon
 \details{
 This is a helper function called by \code{build_aggregation_table()}.
 }
+\examples{
+\dontrun{
+  polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+  id_raster <- build_id_raster(polygons)
+  pixel_fractions <- calculate_pixel_fractions_single_polygon(
+    polygon = polygons[1, ], id_raster
+  )
+  head(pixel_fractions)
+}
+
+}
+\seealso{
+build_aggregation_table
+}
 \concept{aggregation}

@@ -38,6 +38,11 @@ make_world_template_raster <- function(){
 #'
 #' @return ID raster. A [terra::SpatRaster] object that minimally encloses the polygons
 #'
+#' @examples
+#' \dontrun{
+#'   polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+#'   build_id_raster(polygons)
+#' }
 #' @concept core_inputs
 #'
 #' @importFrom terra vect same.crs crop values
@@ -85,6 +90,16 @@ build_id_raster <- function(polygons, template_raster = NULL){
 #'
 #' @return SpatRaster with the same outline as the ID raster and (# values / # non-NA
 #'   pixels in the ID raster) layers.
+#'
+#' @examples
+#' # Example ID raster with 10 rows and 10 columns, and 99 valid pixels
+#' example_id_raster <- terra::rast(matrix(c(seq_len(99), NA), nrow = 10))
+#' # Inserting 99 values yields a spatRaster with 1 layer
+#' mbg::values_to_raster(stats::rnorm(99), example_id_raster)
+#' # Inserting 99 * 3 values yields a spatRaster with 3 layers
+#' mbg::values_to_raster(seq_len(99 * 3), example_id_raster)
+#' # Trying to insert values with length not divisible by 99 yields an error
+#' try(mbg::values_to_raster(seq_len(100), example_id_raster))
 #'
 #' @seealso [build_id_raster()]
 #'

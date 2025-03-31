@@ -17,3 +17,11 @@ the beginning of the message for each layer of indentation}
 \description{
 Start a nested timer with an optional message
 }
+\examples{
+mbg::logging_start_timer(msg = 'Test logging')
+Sys.sleep(0.1)
+mbg::logging_stop_timer()
+log_results <- mbg::logging_get_timer_log()
+print(log_results)
+
+}

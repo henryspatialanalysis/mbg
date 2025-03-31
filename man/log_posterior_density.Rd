@@ -36,8 +36,7 @@ Generate log posterior predictive density from a geostatistical surface onto poi
 \details{
 Calculated across draws. Requires an ID raster to match each point observation
 to a set of draws. Assumes binomial data.
-}
-\seealso{
-https://shorturl.at/P5zBT
+
+For examples, see \code{vignette('model-comparison', package = 'mbg')}
 }
 \concept{validation}

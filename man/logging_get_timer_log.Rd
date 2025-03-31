@@ -15,3 +15,11 @@ timer messages?}
 \description{
 Return a log of all timed events as a data.table
 }
+\examples{
+mbg::logging_start_timer(msg = 'Test logging')
+Sys.sleep(0.1)
+mbg::logging_stop_timer()
+log_results <- mbg::logging_get_timer_log()
+print(log_results)
+
+}

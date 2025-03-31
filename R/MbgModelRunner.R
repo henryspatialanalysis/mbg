@@ -3,6 +3,8 @@
 #' @description
 #' R6 class to run a full MBG model and make predictions.
 #'
+#' @details To see examples of this object, run \code{vignette('mbg')}
+#'
 #' @concept model_runner
 #'
 #' @import data.table

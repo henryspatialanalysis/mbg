@@ -4,7 +4,7 @@
 #'   information about penalized complexity priors, see Daniel Simpson's
 #'   paper on the subject: \doi{doi:10.1214/16-STS576}
 #'
-#' @seealso [mbg::fit_inla_model()]
+#' @seealso [mbg::fit_inla_model()] [mbg::MbgModelRunner]
 #'
 #' @param input_data A data.frame with at least the following columns:
 #'   - 'indicator': number of "hits' per site, e.g. tested positive for malaria

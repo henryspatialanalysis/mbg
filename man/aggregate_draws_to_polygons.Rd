@@ -75,6 +75,28 @@ statistics functions. Features include:
 \item Optionally aggregate multiple years of raster data at once
 }
 }
+\examples{
+\dontrun{
+  polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+  id_raster <- build_id_raster(polygons)
+  n_data_pixels <- sum(!is.na(terra::values(id_raster)))
+  # Example grid-level draws from e.g. mbg::generate_cell_draws_and_summarize()
+  draws_matrix <- matrix(rnorm(n_data_pixels * 5), nrow = n_data_pixels)
+  # Build aggregation table, which can be used across many aggregations
+  aggregation_table <- build_aggregation_table(
+    polygons, id_raster, polygon_id_field = 'commune_code'
+  )
+  # Aggregate the grid-level draws to polygon-level draws
+  aggregated <- aggregate_draws_to_polygons(
+    draws_matrix = draws_matrix,
+    aggregation_table = aggregation_table,
+    aggregation_cols = 'commune_code',
+    method = 'mean'
+  )
+  head(aggregated)
+}
+
+}
 \seealso{
 build_aggregation_table
 }

@@ -133,6 +133,28 @@ aggregate_raster_to_polygons_validation <- function(
 #' @return data.table containing polygon identifiers, (optionally) layer identifiers in
 #'   the `z_dimension_name` column, and data values aggregated by polygon.
 #'
+#' @examples
+#' \dontrun{
+#'   polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+#'   id_raster <- build_id_raster(polygons)
+#'   n_data_pixels <- sum(!is.na(terra::values(id_raster)))
+#'   # Example ID raster filled with data
+#'   # This is an example of pixel-level covariate data or model estimates
+#'   data_raster <- mbg::values_to_raster(stats::rnorm(n_data_pixels), id_raster)
+#'   # Build aggregation table, which can be used across many aggregations
+#'   aggregation_table <- build_aggregation_table(
+#'     polygons, id_raster, polygon_id_field = 'commune_code'
+#'   )
+#'   # Aggregate the raster to the polygons
+#'    aggregated <- aggregate_raster_to_polygons(
+#'      data_raster = data_raster,
+#'      aggregation_table = aggregation_table,
+#'      aggregation_cols = 'commune_code',
+#'      method = 'mean'
+#'    )
+#'    head(aggregated)
+#' }
+#'
 #' @seealso build_aggregation_table
 #'
 #' @concept aggregation
@@ -365,6 +387,27 @@ aggregate_draws_to_polygons_validation <- function(
 #'
 #' @return [data.table::data.table] containing polygon identifiers, (optionally) layer
 #'   identifiers in the `z_dimension_name` column, and data values aggregated by polygon.
+#'
+#' @examples
+#' \dontrun{
+#'   polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+#'   id_raster <- build_id_raster(polygons)
+#'   n_data_pixels <- sum(!is.na(terra::values(id_raster)))
+#'   # Example grid-level draws from e.g. mbg::generate_cell_draws_and_summarize()
+#'   draws_matrix <- matrix(rnorm(n_data_pixels * 5), nrow = n_data_pixels)
+#'   # Build aggregation table, which can be used across many aggregations
+#'   aggregation_table <- build_aggregation_table(
+#'     polygons, id_raster, polygon_id_field = 'commune_code'
+#'   )
+#'   # Aggregate the grid-level draws to polygon-level draws
+#'   aggregated <- aggregate_draws_to_polygons(
+#'     draws_matrix = draws_matrix,
+#'     aggregation_table = aggregation_table,
+#'     aggregation_cols = 'commune_code',
+#'     method = 'mean'
+#'   )
+#'   head(aggregated)
+#' }
 #'
 #' @concept aggregation
 #'

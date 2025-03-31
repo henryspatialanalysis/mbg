@@ -16,7 +16,19 @@
 #'   * area_fraction: fraction of the pixel area falling within this polygon
 #'   * polygon_id (optional): If `polygon_id` was defined, it is added to the table
 #'
+#' @examples
+#' \dontrun{
+#'   polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+#'   id_raster <- build_id_raster(polygons)
+#'   pixel_fractions <- calculate_pixel_fractions_single_polygon(
+#'     polygon = polygons[1, ], id_raster
+#'   )
+#'   head(pixel_fractions)
+#' }
+#'
 #' @concept aggregation
+#'
+#' @seealso build_aggregation_table
 #'
 #' @importFrom assertthat assert_that is.scalar
 #' @importFrom data.table data.table
@@ -117,6 +129,15 @@ build_aggregation_table_validation <- function(
 #'   * masked_pixel_id: Index counting only non-NA pixels from the ID raster
 #'   * area_fraction: fraction of the pixel area falling within this polygon
 #'   * Merged fields from the table of polygons
+#'
+#' @examples
+#' \dontrun{
+#'   polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+#'   id_raster <- build_id_raster(polygons)
+#'   aggregation_table <- build_aggregation_table(
+#'     polygons, id_raster, polygon_id_field = 'commune_code'
+#'   )
+#' }
 #'
 #' @seealso calculate_pixel_fractions_single_polygon()
 #'

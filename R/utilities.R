@@ -37,9 +37,30 @@ make_time_stamp <- function(suffix = NULL, milliseconds = TRUE){
 #'
 #' @return Dissolved [sf::sf] object
 #'
+#' @examples
+#' \dontrun{
+#'   communes_sf <- sf::st_read(system.file("extdata/Benin_communes.gpkg", package = "mbg"))
+#'   departments_sf <- mbg::dissolve_sf_by_attribute(
+#'     x = communes_sf,
+#'     by = c('department', 'department_code')
+#'   )
+#' }
+#'
 #' @importFrom sf st_drop_geometry
 #' @export
 dissolve_sf_by_attribute <- function(x, by = character(0)){
+  # Input data validation
+  if(!inherits(x, 'sf')) stop("x must be an sf object")
+  # Check that all 'by' attributes are present in the data
+  missing_by <- setdiff(by, colnames(x))
+  if(length(missing_by) > 0){
+    msg <- paste0(
+      "The following attributes are not present in the sf object: ",
+      paste(missing_by, collapse = ', ')
+    )
+    stop(msg)
+  }
+  # Dissolve
   if(length(by) == 0){
     # Dissolve all
     dissolved <- x |> sf::st_union() |> sf::st_as_sf()

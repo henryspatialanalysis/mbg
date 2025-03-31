@@ -12,3 +12,11 @@ logging_stop_timer(echo = TRUE)
 \description{
 End a nested timer
 }
+\examples{
+mbg::logging_start_timer(msg = 'Test logging')
+Sys.sleep(0.1)
+mbg::logging_stop_timer()
+log_results <- mbg::logging_get_timer_log()
+print(log_results)
+
+}

@@ -40,6 +40,13 @@ logging_drop_indent <- function(){
 #' @param indentation_text (`character(1)`, default "  ") Text that will be repeated at
 #'   the beginning of the message for each layer of indentation
 #'
+#' @examples
+#' mbg::logging_start_timer(msg = 'Test logging')
+#' Sys.sleep(0.1)
+#' mbg::logging_stop_timer()
+#' log_results <- mbg::logging_get_timer_log()
+#' print(log_results)
+#'
 #' @importFrom tictoc tic
 #' @export
 logging_start_timer <- function(msg, echo = TRUE, indentation_text = '  '){
@@ -64,6 +71,13 @@ logging_start_timer <- function(msg, echo = TRUE, indentation_text = '  '){
 #'
 #' @param echo (`logical(1)`, default = TRUE) Should the message be written to screen?
 #'
+#' @examples
+#' mbg::logging_start_timer(msg = 'Test logging')
+#' Sys.sleep(0.1)
+#' mbg::logging_stop_timer()
+#' log_results <- mbg::logging_get_timer_log()
+#' print(log_results)
+#'
 #' @importFrom tictoc toc
 #' @export
 logging_stop_timer <- function(echo = TRUE){
@@ -81,6 +95,13 @@ logging_stop_timer <- function(echo = TRUE){
 #' @param clear_log (`logical(1)`, default FALSE) Should the log be cleared afterwards?
 #' @param deindent (`logical(1)`, default TRUE) Should leading whitespace be removed from
 #'   timer messages?
+#'
+#' @examples
+#' mbg::logging_start_timer(msg = 'Test logging')
+#' Sys.sleep(0.1)
+#' mbg::logging_stop_timer()
+#' log_results <- mbg::logging_get_timer_log()
+#' print(log_results)
 #'
 #' @importFrom tictoc tic.log tic.clearlog
 #' @import data.table

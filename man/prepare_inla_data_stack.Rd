@@ -111,6 +111,6 @@ information about penalized complexity priors, see Daniel Simpson's
 paper on the subject: \doi{doi:10.1214/16-STS576}
 }
 \seealso{
-\code{\link[=fit_inla_model]{fit_inla_model()}}
+\code{\link[=fit_inla_model]{fit_inla_model()}} \link{MbgModelRunner}
 }
 \concept{model_fit}

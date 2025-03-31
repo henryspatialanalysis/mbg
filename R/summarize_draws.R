@@ -22,6 +22,19 @@
 #'   - "upper": Upper bound of the (X%) uncertainty interval
 #'   - "ui_width": "upper" - "lower"
 #'
+#' @examples
+#' # Summarize a draws matrix
+#' draws_matrix <- matrix(rnorm(200), nrow = 10)
+#' summary_table_a <- summarize_draws(draws_matrix)
+#' head(summary_table_a)
+#'
+#' # Summarize a draws data.table with location IDs
+#' draws_table <- matrix(c(1:10, rnorm(200)), nrow = 10) |>
+#'   data.table::as.data.table() |>
+#'   data.table::setnames(c('location_id', paste0('draw_', 1:20)))
+#' summary_table_b <- summarize_draws(draws_table, id_fields = 'location_id')
+#' head(summary_table_b)
+#'
 #' @concept prediction
 #'
 #' @import data.table
@@ -32,7 +45,7 @@ summarize_draws <- function(
   draws, id_fields = NULL, draw_fields = NULL, ui_width = 0.95, na.rm = TRUE
 ){
   if(inherits(draws, 'data.frame')){
-    draws <- as.data.table(draws)
+    draws <- data.table::as.data.table(draws)
     if(is.null(draw_fields)) draw_fields <- setdiff(colnames(draws), id_fields)
     if(!is.null(id_fields)){
       ids_table <- draws[, id_fields, with = F]
@@ -45,10 +58,11 @@ summarize_draws <- function(
     ids_table <- NULL
   }
   # Summarize as a table
+  alpha <- (1 - ui_width) / 2
   summary_table <- data.table::data.table(
     mean = Matrix::rowMeans(draws_mat, na.rm = na.rm),
-    lower = matrixStats::rowQuantiles(draws_mat, probs = (1 - ui_width)/2, na.rm = na.rm),
-    upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - (1 - ui_width)/2, na.rm = na.rm)
+    lower = matrixStats::rowQuantiles(draws_mat, probs = alpha, na.rm = na.rm),
+    upper = matrixStats::rowQuantiles(draws_mat, probs = 1 - alpha, na.rm = na.rm)
   )
   summary_table$ui_width <- summary_table$upper - summary_table$lower
   if(!is.null(ids_table)) summary_table <- cbind(ids_table, summary_table)

@@ -31,6 +31,16 @@ data.table with fields:
 \description{
 Build a table to quickly aggregate from pixels to polygons
 }
+\examples{
+\dontrun{
+  polygons <- sf::st_read(system.file('extdata/Benin_communes.gpkg', package = 'mbg'))
+  id_raster <- build_id_raster(polygons)
+  aggregation_table <- build_aggregation_table(
+    polygons, id_raster, polygon_id_field = 'commune_code'
+  )
+}
+
+}
 \seealso{
 calculate_pixel_fractions_single_polygon()
 }

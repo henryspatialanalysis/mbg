@@ -29,6 +29,17 @@ The length of the vector or matrix must be a multiple of the number of non-NA
 pixels in the ID raster. Values from the vector/matrix are then inserted into the
 non-NA pixels of the spatRaster.
 }
+\examples{
+# Example ID raster with 10 rows and 10 columns, and 99 valid pixels
+example_id_raster <- terra::rast(matrix(c(seq_len(99), NA), nrow = 10))
+# Inserting 99 values yields a spatRaster with 1 layer
+mbg::values_to_raster(stats::rnorm(99), example_id_raster)
+# Inserting 99 * 3 values yields a spatRaster with 3 layers
+mbg::values_to_raster(seq_len(99 * 3), example_id_raster)
+# Trying to insert values with length not divisible by 99 yields an error
+try(mbg::values_to_raster(seq_len(100), example_id_raster))
+
+}
 \seealso{
 \code{\link[=build_id_raster]{build_id_raster()}}
 }

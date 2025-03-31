@@ -20,3 +20,13 @@ Dissolve an SF object by attribute
 \details{
 Inspired by \link[spatialEco:sf_dissolve]{spatialEco::sf_dissolve}
 }
+\examples{
+\dontrun{
+  communes_sf <- sf::st_read(system.file("extdata/Benin_communes.gpkg", package = "mbg"))
+  departments_sf <- mbg::dissolve_sf_by_attribute(
+    x = communes_sf,
+    by = c('department', 'department_code')
+  )
+}
+
+}
