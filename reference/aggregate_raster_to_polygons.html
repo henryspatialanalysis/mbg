@@ -130,6 +130,31 @@ statistics functions. Features include:</p><ul><li><p>Always fractionally aggreg
     <div class="dont-index"><p>build_aggregation_table</p></div>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span>  <span class="va">polygons</span> <span class="op">&lt;-</span> <span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_read.html" class="external-link">st_read</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/Benin_communes.gpkg'</span>, package <span class="op">=</span> <span class="st">'mbg'</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">id_raster</span> <span class="op">&lt;-</span> <span class="fu"><a href="build_id_raster.html">build_id_raster</a></span><span class="op">(</span><span class="va">polygons</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">n_data_pixels</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html" class="external-link">sum</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="fu">terra</span><span class="fu">::</span><span class="fu"><a href="https://rspatial.github.io/terra/reference/values.html" class="external-link">values</a></span><span class="op">(</span><span class="va">id_raster</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Example ID raster filled with data</span></span></span>
+<span class="r-in"><span>  <span class="co"># This is an example of pixel-level covariate data or model estimates</span></span></span>
+<span class="r-in"><span>  <span class="va">data_raster</span> <span class="op">&lt;-</span> <span class="fu">mbg</span><span class="fu">::</span><span class="fu"><a href="values_to_raster.html">values_to_raster</a></span><span class="op">(</span><span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_data_pixels</span><span class="op">)</span>, <span class="va">id_raster</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Build aggregation table, which can be used across many aggregations</span></span></span>
+<span class="r-in"><span>  <span class="va">aggregation_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="build_aggregation_table.html">build_aggregation_table</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">polygons</span>, <span class="va">id_raster</span>, polygon_id_field <span class="op">=</span> <span class="st">'commune_code'</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="co"># Aggregate the raster to the polygons</span></span></span>
+<span class="r-in"><span>   <span class="va">aggregated</span> <span class="op">&lt;-</span> <span class="fu">aggregate_raster_to_polygons</span><span class="op">(</span></span></span>
+<span class="r-in"><span>     data_raster <span class="op">=</span> <span class="va">data_raster</span>,</span></span>
+<span class="r-in"><span>     aggregation_table <span class="op">=</span> <span class="va">aggregation_table</span>,</span></span>
+<span class="r-in"><span>     aggregation_cols <span class="op">=</span> <span class="st">'commune_code'</span>,</span></span>
+<span class="r-in"><span>     method <span class="op">=</span> <span class="st">'mean'</span></span></span>
+<span class="r-in"><span>   <span class="op">)</span></span></span>
+<span class="r-in"><span>   <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">aggregated</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

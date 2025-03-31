@@ -64,6 +64,22 @@ the beginning of the message for each layer of indentation</p></dd>
 
 </dl></div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">mbg</span><span class="fu">::</span><span class="fu">logging_start_timer</span><span class="op">(</span>msg <span class="op">=</span> <span class="st">'Test logging'</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Test logging</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html" class="external-link">Sys.sleep</a></span><span class="op">(</span><span class="fl">0.1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">mbg</span><span class="fu">::</span><span class="fu"><a href="logging_stop_timer.html">logging_stop_timer</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Test logging: 0.102 sec elapsed</span>
+<span class="r-in"><span><span class="va">log_results</span> <span class="op">&lt;-</span> <span class="fu">mbg</span><span class="fu">::</span><span class="fu"><a href="logging_get_timer_log.html">logging_get_timer_log</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">log_results</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       tic    toc          msg                    callback_msg elapsed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     &lt;num&gt;  &lt;num&gt;       &lt;char&gt;                          &lt;char&gt;   &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 15.490 15.591 Test logging Test logging: 0.101 sec elapsed   0.101</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 15.737 15.839 Test logging Test logging: 0.102 sec elapsed   0.102</span>
+<span class="r-in"><span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 
