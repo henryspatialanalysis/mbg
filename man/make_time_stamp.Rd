@@ -4,7 +4,7 @@
 \alias{make_time_stamp}
 \title{Make time stamp}
 \usage{
-make_time_stamp(suffix = NULL, milliseconds = T)
+make_time_stamp(suffix = NULL, milliseconds = TRUE)
 }
 \arguments{
 \item{suffix}{(\code{character(1)}, default NULL) suffix to append to the time stamp. Useful

@@ -117,8 +117,8 @@ load_covariates <- function(
     # Optionally normalize the covariate
     if(cov_settings$normalize){
       this_cov <- (
-        (this_cov - terra::global(this_cov, mean, na.rm = T)[1, 1]) /
-        terra::global(this_cov, sd, na.rm = T)[1, 1]
+        (this_cov - terra::global(this_cov, mean, na.rm = TRUE)[1, 1]) /
+        terra::global(this_cov, sd, na.rm = TRUE)[1, 1]
       )
     }
     # If the covariate loads successfully and passes all checks, add it to the list

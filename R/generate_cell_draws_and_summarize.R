@@ -78,7 +78,8 @@ generate_cell_draws_and_summarize <- function(
 
   # Create the template for predictions, dimensions = N grid cells (by) N samples
   xy_fields <- c('x','y')
-  id_raster_table <- data.table::as.data.table(id_raster, xy = T) |> na.omit()
+  id_raster_table <- data.table::as.data.table(id_raster, xy = TRUE) |>
+    na.omit()
   transformed_cell_draws <- matrix(0, nrow = nrow(id_raster_table), ncol = n_samples)
 
   ## Optionally add covariate effects
@@ -100,7 +101,7 @@ generate_cell_draws_and_summarize <- function(
     fe_draws <- as.matrix(id_raster_table[, cov_names, with = F]) %*% fe_coefficients
   } else {
     fe_draws <- latent_matrix[param_names == '(Intercept)', ] |>
-      matrix(ncol = n_samples, nrow = nrow(transformed_cell_draws), byrow = T)
+      matrix(ncol = n_samples, nrow = nrow(transformed_cell_draws), byrow = TRUE)
   }
   transformed_cell_draws <- transformed_cell_draws + fe_draws
 

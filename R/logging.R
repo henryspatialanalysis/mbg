@@ -91,7 +91,7 @@ logging_get_timer_log <- function(clear_log = FALSE, deindent = TRUE){
 
   timer_log <- tictoc::tic.log(format = FALSE) |>
     lapply(data.table::as.data.table) |>
-    data.table::rbindlist(fill = T, use.names = T)
+    data.table::rbindlist(fill = TRUE, use.names = TRUE)
   if('tic' %in% colnames(timer_log)) timer_log <- timer_log[order(tic)]
   if(all(c('tic', 'toc') %in% colnames(timer_log))) timer_log[, elapsed := toc - tic]
   if(deindent){

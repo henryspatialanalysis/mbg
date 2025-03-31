@@ -192,7 +192,7 @@ aggregate_raster_to_polygons <- function(
     x = px_table,
     y = aggregation_table,
     by = 'pixel_id',
-    allow.cartesian = T
+    allow.cartesian = TRUE
   )
 
   ## Aggregation varies depending on method

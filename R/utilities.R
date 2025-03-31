@@ -10,7 +10,7 @@
 #' @return A string formatted as `'YYYYMMDD_HH_MM_SS(_optional MS)(_optional suffix)'`
 #'
 #' @export
-make_time_stamp <- function(suffix = NULL, milliseconds = T){
+make_time_stamp <- function(suffix = NULL, milliseconds = TRUE){
   if(milliseconds){
     time_stamp <- strftime(x = Sys.time(), format = '%Y%m%d_%H_%M_%OS3') |>
       gsub(pattern = '\\.', replacement = '_')

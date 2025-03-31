@@ -136,7 +136,7 @@ prepare_inla_data_stack <- function(
     )
     # The maximum mesh dimension will be used to determine the SPDE range prior
     max_d <- apply(X = mesh$loc, MARGIN = 2, FUN = function(x) diff(range(x))) |>
-      max(na.rm = T)
+      max(na.rm = TRUE)
     # SPDE object
     spde <- INLA::inla.spde2.pcmatern(
       mesh = mesh,

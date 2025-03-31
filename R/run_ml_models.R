@@ -97,7 +97,7 @@ run_regression_submodels <- function(
       data = terra::extract(x = admin_raster, y = xy_pred)
     ) |> as.data.frame()
     for(adm_unit in colnames(bounds_training)){
-      if(sum(bounds_training[[adm_unit]], na.rm = T) < 3){
+      if(sum(bounds_training[[adm_unit]], na.rm = TRUE) < 3){
         bounds_training[[adm_unit]] <- NULL
         bounds_prediction[[adm_unit]] <- NULL
       }
@@ -125,8 +125,8 @@ run_regression_submodels <- function(
   template_raster <- id_raster
   terra::values(template_raster) <- NA_real_
 
-  min_observed <- min(input_data$data_rate, na.rm = T)
-  max_observed <- max(input_data$data_rate, na.rm = T)
+  min_observed <- min(input_data$data_rate, na.rm = TRUE)
+  max_observed <- max(input_data$data_rate, na.rm = TRUE)
 
   # Run each stacker, then predict to a raster
   model_names <- names(model_settings)
