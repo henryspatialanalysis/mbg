@@ -87,6 +87,9 @@ run_regression_submodels <- function(
     admin_bounds$ADM_ <- factor(make.names(admin_bounds[[admin_bounds_id]]))
     admin_raster <- terra::vect(admin_bounds)[, c('ADM_')] |>
       terra::rasterize(y = id_raster, field = 'ADM_')
+    # Temporarily set na.action to 'na.pass' to avoid dropping NAs in model.matrix
+    old_na_action <- getOption('na.action')
+    on.exit(options(na.action = old_na_action))
     options(na.action = 'na.pass')
     bounds_training <- stats::model.matrix(
       ~ 0 + ADM_,
@@ -96,6 +99,8 @@ run_regression_submodels <- function(
       ~ 0 + ADM_,
       data = terra::extract(x = admin_raster, y = xy_pred)
     ) |> as.data.frame()
+    # Reset na.action
+    options(na.action = old_na_action)
     for(adm_unit in colnames(bounds_training)){
       if(sum(bounds_training[[adm_unit]], na.rm = TRUE) < 3){
         bounds_training[[adm_unit]] <- NULL
