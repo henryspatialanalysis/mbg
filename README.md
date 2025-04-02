@@ -4,11 +4,11 @@
 
 
 
-**`mbg` is an R package for modern model-based geostatistics.**
+**`mbg` is an R package for model-based geostatistics.**
 
-The `mbg` package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.
+The `mbg` package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced observations and, optionally, a set of raster covariates. The package also includes functions to summarize raster estimates by (polygon) region while preserving uncertainty.
 
-![Overview of an example MBG workflow](man/figures/mbg_workflow.png)
+![_Overview of the MBG workflow_\n](man/figures/mbg_workflow.png)
 
 The `mbg` package combines features from the [`sf`](https://r-spatial.github.io/sf/), [`terra`](https://rspatial.github.io/terra/), and [`data.table`](https://CRAN.R-project.org/package=data.table) packages for spatial data processing; [`caret`](https://topepo.github.io/caret/) for spatial ML models; and [`R-INLA`](https://www.r-inla.org/) for geostatistical models.
 
