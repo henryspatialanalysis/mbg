@@ -3,23 +3,34 @@ template:
   bootstrap: 5
   bootswatch: simplex
   theme: arrow-light
+  bslib:
+    base_font: {google: "Figtree"}
+    heading_font: {google: "Figtree"}
+    bg: '#ffffff'
+    fg: '#171717'
+    primary: '#F36E21'
+    secondary: '#058040'
 navbar:
-  left:
-  - text: Home
-    href: index.html
-  - text: Getting started
-    href: articles/mbg.html
-  - text: More tutorials
-    menu:
-    - text: Running spatial ML models
-      href: articles/spatial-ml-models.html
-    - text: All MBG model runner options
-      href: articles/all-model-options.html
-    - text: Model validation and comparison
-      href: articles/model-comparison.html
-  right:
-  - text: Function reference
-    href: reference/index.html
+  title: mbg
+  structure:
+    left: [home, intro, vignettes]
+    right: [search, reference, github]
+  components:
+    home:
+      text: Home
+      href: index.html
+    intro:
+      text: Getting started
+      href: articles/mbg.html
+    vignettes:
+      text: More tutorials
+      menu:
+      - text: Running spatial ML models
+        href: articles/spatial-ml-models.html
+      - text: All MBG model runner options
+        href: articles/all-model-options.html
+      - text: Model validation and comparison
+        href: articles/model-comparison.html
 reference:
 - title: MBG Model Runner
   desc: Model runner class
@@ -44,4 +55,4 @@ reference:
 - title: Other
   desc: Miscellaneous helper functions
   contents: lacks_concepts(c("model_runner", "core_inputs", "model_fit", "prediction",
-    "validation", "aggregation"))
+    "validation", "aggregation", "internal"))
