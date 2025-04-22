@@ -3,6 +3,7 @@ template:
   bootstrap: 5
   bootswatch: simplex
   theme: arrow-light
+  math-rendering: katex
   bslib:
     base_font: {google: "Figtree"}
     heading_font: {google: "Figtree"}
