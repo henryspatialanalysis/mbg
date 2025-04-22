@@ -6,12 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Model validation and comparison • mbg</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Figtree-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Figtree-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Model validation and comparison">
 </head>
 <body>
@@ -86,40 +87,33 @@ and compare models:</p>
 <h3 id="log-predictive-density">Log predictive density<a class="anchor" aria-label="anchor" href="#log-predictive-density"></a>
 </h3>
 <p>In a Bayesian context, we would ideally like to evaluate a posterior
-predictive distribution
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>p</mi><mrow><mi>p</mi><mi>o</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>i</mi><mi>o</mi><mi>r</mi></mrow></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">p_{posterior}(\theta)</annotation></semantics></math>
-against some new data
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>y</mi><mo accent="true">̃</mo></mover><annotation encoding="application/x-tex">\tilde{y}</annotation></semantics></math>
-drawn from the true underlying distribution. If we had this
-newly-observed data, we could calculate the probability of observing
-each new point given the predictive distribution, then multiply these
-across <em>N</em> observations to get the overall <em>predictive density
-(PD)</em>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mi>D</mi><mo>=</mo><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><mover><mi>y</mi><mo accent="true">̃</mo></mover><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><munderover><mo>∏</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+predictive distribution <span class="math inline">p_{posterior}(\theta)</span> against some new data
+<span class="math inline">\tilde{y}</span> drawn from the true
+underlying distribution. If we had this newly-observed data, we could
+calculate the probability of observing each new point given the
+predictive distribution, then multiply these across <em>N</em>
+observations to get the overall <em>predictive density (PD)</em>:</p>
+<p><span class="math display">
 PD = p(\tilde{y}|\theta) = \prod_{i=1}^{N} p(\tilde{y}_i | \theta)
-</annotation></semantics></math></p>
+</span></p>
 <p>When comparing two models against the same new data, the model with
 the higher predictive density can be considered more consistent with
 that data.</p>
 <p>To make the computation more tractable, we can take the log of both
 sides to calculate <em>log predictive density (LPD)</em>:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>P</mi><mi>D</mi><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo>log</mo><mrow><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><mi>θ</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">
 LPD = \sum_{i=1}^N \log{ p(\tilde{y}_i | \theta) }
-</annotation></semantics></math></p>
+</span></p>
 <p>Because we are working with posterior samples rather than the full
 distribution, we will average density across the set of predictive
-samples
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
-to approximate LPD:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover><mrow><mi>L</mi><mi>P</mi><mi>D</mi></mrow><mo accent="true">̂</mo></mover><mo>=</mo><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><mo>log</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mi>S</mi></mfrac><munderover><mo>∑</mo><mrow><mi>s</mi><mo>=</mo><mn>1</mn></mrow><mi>S</mi></munderover><mi>p</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mover><mi>y</mi><mo accent="true">̃</mo></mover><mi>i</mi></msub><mo stretchy="false" form="prefix">|</mo><msub><mi>θ</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
-\widehat{LPD} = \sum_{i=1}^{N} \log \left( \frac{1}{S} \sum_{s=1}^{S} p(\tilde{y}_i | \theta_s) \right)
-</annotation></semantics></math></p>
+samples <span class="math inline">S</span> to approximate LPD:</p>
+<p><span class="math display">
+\widehat{LPD} = \sum_{i=1}^{N} \log \left( \frac{1}{S} \sum_{s=1}^{S}
+p(\tilde{y}_i | \theta_s) \right)
+</span></p>
 <p>In the notation above, we are repeatedly evaluating each data point
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-(for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-= 1 to <em>N</em>) against each predictive posterior draw <em>s</em>
-(for <em>s</em> = 1 to <em>S</em>).</p>
+<span class="math inline">i</span> (for <span class="math inline">i</span> = 1 to <em>N</em>) against each predictive
+posterior draw <em>s</em> (for <em>s</em> = 1 to <em>S</em>).</p>
 <p>The LPD is expressed as a negative number—smaller negative numbers
 (those closer to zero) indicate a higher predictive density and
 therefore a better predictive fit.</p>
@@ -142,22 +136,15 @@ number, where smaller numbers indicate a better fit.</p>
 </h3>
 <p>Root mean squared error will be familiar to anyone who has taken an
 introductory statistics course:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>M</mi><mi>S</mi><mi>E</mi><mo>=</mo><msqrt><mrow><mfrac><mn>1</mn><mi>N</mi></mfrac><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>N</mi></munderover><msup><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>y</mi><mi>i</mi></msub><mo>−</mo><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup></mrow></msqrt></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">
 RMSE = \sqrt{ \frac{1}{N} \sum_{i=1}^{N} (y_i - \hat{y}_i )^{2} }
-</annotation></semantics></math></p>
-<p>In this context,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-is the observed <em>rate</em> of the outcome (calculated as the number
-of positives divided by the sample size) at data point
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-while
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\hat{y}_i</annotation></semantics></math>
-is the model’s <em>mean prediction</em> at the pixel that overlaps with
-data point
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>.
-RMSE can be calculated “in-sample” against data that was used to fit the
-model, or “out-of-sample” against data that was held back from the
-model.</p>
+</span></p>
+<p>In this context, <span class="math inline">y_i</span> is the observed
+<em>rate</em> of the outcome (calculated as the number of positives
+divided by the sample size) at data point <span class="math inline">i</span>, while <span class="math inline">\hat{y}_i</span> is the model’s <em>mean
+prediction</em> at the pixel that overlaps with data point <span class="math inline">i</span>. RMSE can be calculated “in-sample” against
+data that was used to fit the model, or “out-of-sample” against data
+that was held back from the model.</p>
 <p>RMSE is simple to interpret; it can also be used as a point of
 comparison against frequentist estimates like those generated by the
 machine learning submodels. However, using RMSE to evalulate
@@ -165,12 +152,10 @@ geostatistical models has downsides:</p>
 <ul>
 <li>Differences in data sample size are ignored: an observation of 1
 positive/4 sampled is identical to an observation of 250 positive/1,000
-sampled when calculating
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>.</li>
+sampled when calculating <span class="math inline">y_i</span>.</li>
 <li>The uncertainty of model estimates is not taken into account: two
 models with the same mean estimates but different uncertainty intervals
-would end up with the same
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mover><mi>y</mi><mo accent="true">̂</mo></mover><mi>i</mi></msub><annotation encoding="application/x-tex">\hat{y}_i</annotation></semantics></math>
+would end up with the same <span class="math inline">\hat{y}_i</span>
 values and therefore identical RMSE.</li>
 </ul>
 <p>For these reasons, we prefer to use the LPD or WAIC for model
@@ -186,17 +171,14 @@ have a tension between (1) wanting to use all available data to fit the
 model and (2) wanting to hold back some data for model validation. We
 can deal with this tension using cross-validation.</p>
 <p>In <strong>leave one out cross validation</strong>, we evaluate each
-data point
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-against a model that was trained on the entire dataset <em>except</em>
-for
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>;
-we calculate each model’s predictive validity against the one unobserved
-data point, then summarize those predictive validity metrics (summing
-LPD and RMSE) across all subset models. In the aggregate, the
-performance of each subset model against held-out data points should be
-similar to the full model’s predictive performance against a theoretical
-unobserved dataset drawn from the same distribution.</p>
+data point <span class="math inline">y_i</span> against a model that was
+trained on the entire dataset <em>except</em> for <span class="math inline">y_i</span>; we calculate each model’s predictive
+validity against the one unobserved data point, then summarize those
+predictive validity metrics (summing LPD and RMSE) across all subset
+models. In the aggregate, the performance of each subset model against
+held-out data points should be similar to the full model’s predictive
+performance against a theoretical unobserved dataset drawn from the same
+distribution.</p>
 <p>Running one model per data point is often too time-intensive to be
 practical. We can approximate the performance of leave-one-out
 cross-validation using <strong>k-folds cross-validation</strong>, where

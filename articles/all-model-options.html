@@ -6,12 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>All model runner options • mbg</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Figtree-0.4.9/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Figtree-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
+<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="All model runner options">
 </head>
 <body>
@@ -142,21 +143,15 @@ model defaults specify a binomial likelihood:</p>
 <li><code>inla_link = 'logit'</code></li>
 <li><code>inverse_link = 'plogis'</code></li>
 </ul>
-<p>For binomial data, each data point with numerator
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>y</mi><mi>i</mi></msub><annotation encoding="application/x-tex">y_i</annotation></semantics></math>
-and denominator
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_i</annotation></semantics></math>
-is evaluated against a probability
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>p</mi><mi>i</mi></msub><annotation encoding="application/x-tex">p_i</annotation></semantics></math>,
-which is governed by a logit-linear combination of model effects:</p>
-<p><span class="math display">$$
+<p>For binomial data, each data point with numerator <span class="math inline">y_i</span> and denominator <span class="math inline">N_i</span> is evaluated against a probability <span class="math inline">p_i</span>, which is governed by a logit-linear
+combination of model effects:</p>
+<p><span class="math display">
 y_i \sim Binomial(N_i, p_i)
 \\
 logit(p_i) = \ ...
-$$</span></p>
-<p>The actual model effects
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>.</mi><mi>.</mi><mi>.</mi></mrow><annotation encoding="application/x-tex">...</annotation></semantics></math>)
-are described in the following section.</p>
+</span></p>
+<p>The actual model effects (<span class="math inline">...</span>) are
+described in the following section.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -188,17 +183,10 @@ the value of <code>use_stacking</code>:</p>
 </h4>
 <p>Only applied if a covariate effect is included and
 <code>use_stacking</code> is <code>FALSE</code> (the default).</p>
-<p>The covariate effect at observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>γ</mi><mi>i</mi><mrow><mi>c</mi><mi>o</mi><mi>v</mi><mi>a</mi><mi>r</mi><mi>i</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>s</mi></mrow></msubsup><mo>=</mo><mover><mi>β</mi><mo accent="true">→</mo></mover><msub><mi>X</mi><msub><mi>s</mi><mi>i</mi></msub></msub></mrow><annotation encoding="application/x-tex">\gamma^{covariates}_i = \vec{\beta}X_{s_i}</annotation></semantics></math>,
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>β</mi><mo accent="true">→</mo></mover><annotation encoding="application/x-tex">\vec{\beta}</annotation></semantics></math>
-are linear effects on the matrix of covariate values
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
-evaluated at the location of observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>i</mi></msub><annotation encoding="application/x-tex">s_i</annotation></semantics></math>).</p>
+<p>The covariate effect at observation <span class="math inline">i</span> is <span class="math inline">\gamma^{covariates}_i = \vec{\beta}X_{s_i}</span>,
+where <span class="math inline">\vec{\beta}</span> are linear effects on
+the matrix of covariate values <span class="math inline">X</span>
+evaluated at the location of observation <span class="math inline">i</span> (<span class="math inline">s_i</span>).</p>
 <p><strong>Note that an intercept is not included by default.</strong>
 If you want a model with no covariate effects other than an intercept,
 pass a <code>covariate_rasters</code> with an <code>intercept</code>
@@ -207,10 +195,9 @@ raster containing all 1s.</p>
 than the intercept: <code>prior_covariate_effect</code> (default
 <code>list(threshold = 3, prob_above = 0.05)</code>) is a <a href="https://projecteuclid.org/journals/statistical-science/volume-32/issue-1/Penalising-Model-Component-Complexity--A-Principled-Practical-Approach-to/10.1214/16-STS576.full" class="external-link">penalized
 complexity prior</a> that can be expressed as a level of certainty about
-the standard deviation on each fixed effect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>β</mi><annotation encoding="application/x-tex">\beta</annotation></semantics></math>.
-For example, the default prior corresponds to
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>σ</mi><mi>β</mi></msub><mo>&gt;</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">P(\sigma_{\beta} &gt; 3) = 0.05</annotation></semantics></math>.</p>
+the standard deviation on each fixed effect <span class="math inline">\beta</span>. For example, the default prior
+corresponds to <span class="math inline">P(\sigma_{\beta} &gt; 3) =
+0.05</span>.</p>
 </div>
 <div class="section level4">
 <h4 id="a-ii-stacked-ensemble-model">3.A.ii: Stacked ensemble model<a class="anchor" aria-label="anchor" href="#a-ii-stacked-ensemble-model"></a>
@@ -218,31 +205,24 @@ For example, the default prior corresponds to
 <p>Only applied if a covariate effect is included and
 <code>use_stacking</code> is <code>TRUE</code>.</p>
 <p>For a stacked ensemble model, the covariate effect for observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-is: <span class="math display">$$
+<span class="math inline">i</span> is: <span class="math display">
 \gamma^{covariates}_i = \sum_{j=1}^{J}\left[ w_{j}  f_j(X_{s_i}) \right]
 \\
 Constraints: w_j &gt; 0 \ \forall \ j, \ \textstyle \sum_{j=1}^{J}(w_j)
 = 1
-$$</span> Where:</p>
+</span> Where:</p>
 <ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>f</mi><mo accent="true">→</mo></mover><annotation encoding="application/x-tex">\vec{f}</annotation></semantics></math>:
-Predictions from a set of <em>J</em> regression models fit to the raw
-covariate data
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>X</mi><annotation encoding="application/x-tex">X</annotation></semantics></math>
+<span class="math inline">\vec{f}</span>: Predictions from a set of
+<em>J</em> regression models fit to the raw covariate data <span class="math inline">X</span>
 </li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mover><mi>w</mi><mo accent="true">→</mo></mover><annotation encoding="application/x-tex">\vec{w}</annotation></semantics></math>:
-A weighting vector corresponding to each regression model
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>f</mi><mi>j</mi></msub><annotation encoding="application/x-tex">f_j</annotation></semantics></math>.
-The weights are constrained to be strictly greater than zero and to sum
-to one.</li>
+<span class="math inline">\vec{w}</span>: A weighting vector
+corresponding to each regression model <span class="math inline">f_j</span>. The weights are constrained to be
+strictly greater than zero and to sum to one.</li>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>X</mi><msub><mi>s</mi><mi>i</mi></msub></msub><annotation encoding="application/x-tex">X_{s_i}</annotation></semantics></math>:
-The raw covariate values at the location of observation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>s</mi><mi>i</mi></msub><annotation encoding="application/x-tex">s_i</annotation></semantics></math>
+<span class="math inline">X_{s_i}</span>: The raw covariate values
+at the location of observation <span class="math inline">i</span>, <span class="math inline">s_i</span>
 </li>
 </ul>
 <p>Relevant model settings:</p>
@@ -250,10 +230,8 @@ The raw covariate values at the location of observation
 <li>
 <code>stacking_model_settings</code> (default
 <code>list(gbm = NULL, treebag = NULL,     rf = NULL)</code>): Defines
-the list of component models
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>f</mi><mi>j</mi></msub><mrow><mo stretchy="true" form="prefix">(</mo><mi>X</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">f_j(X)</annotation></semantics></math>
-to be fitted to the covariates. A named list—each name corresponds to a
-<a href="https://topepo.github.io/caret/available-models.html" class="external-link">regression
+the list of component models <span class="math inline">f_j(X)</span> to
+be fitted to the covariates. A named list—each name corresponds to a <a href="https://topepo.github.io/caret/available-models.html" class="external-link">regression
 model</a> in the <code>caret</code> package, and each value stores
 optional settings that can be passed to that model.</li>
 <li>
@@ -282,13 +260,11 @@ predict outside of <code>c(0, 1)</code>.</li>
 </h3>
 <p>If the setting <code>use_gp</code> is <code>TRUE</code> (the
 default), adds a spatially correlated effect:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi><mo>∼</mo><mi>G</mi><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msub><mi>Σ</mi><mi>s</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">
 Z \sim GP(0, \Sigma_s)
-</annotation></semantics></math> Where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Z</mi><annotation encoding="application/x-tex">Z</annotation></semantics></math>
-is a Gaussian process with mean zero and stationary isotropic Matern
-covariance over space
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Σ</mi><mi>s</mi></msub><annotation encoding="application/x-tex">\Sigma_s</annotation></semantics></math>).</p>
+</span> Where <span class="math inline">Z</span> is a Gaussian process
+with mean zero and stationary isotropic Matern covariance over space
+(<span class="math inline">\Sigma_s</span>).</p>
 <p>The Gaussian process is informed by priors on the range and
 variance:</p>
 <ul>
@@ -303,17 +279,15 @@ with two items. The <code>threshold</code> is a distance expressed
 default <code>threshold</code> of 0.1 corresponds to a geostatistical
 range equivalent to one-tenth the diameter of the study area. The
 <code>prob_below</code> is the probability that the true range falls
-below this threshold. In other words, the default prior is
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mi>a</mi><mi>n</mi><mi>g</mi><mi>e</mi><mo>&lt;</mo><mfrac><mrow><mi>d</mi><mi>i</mi><mi>a</mi><mi>m</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>r</mi></mrow><mn>10</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">P(range &lt; \frac{diameter}{10}) = 0.05</annotation></semantics></math>
+below this threshold. In other words, the default prior is <span class="math inline">P(range &lt; \frac{diameter}{10}) = 0.05</span>
 </li>
 <li>
 <code>prior_spde_sigma</code> (default
 <code>list(threshold = 3, prob_above     = 0.05)</code>) Penalized
 complexity prior on the variance of the Gaussian process, expressed in
-terms of the standard deviation
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>σ</mi><mi>Z</mi></msub><annotation encoding="application/x-tex">\sigma_Z</annotation></semantics></math>.
-The default corresponds to a prior belief that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>σ</mi><mi>Z</mi></msub><mo>&gt;</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">P(\sigma_Z &gt; 3) = 0.05</annotation></semantics></math>
+terms of the standard deviation <span class="math inline">\sigma_Z</span>. The default corresponds to a prior
+belief that <span class="math inline">P(\sigma_Z &gt; 3) =
+0.05</span>
 </li>
 </ul>
 <p>To simplify estimation, the R-INLA package represents the continuous
@@ -347,19 +321,11 @@ process regression, see the papers at the bottom of this page.</p>
 <p>This effect is a random intercept grouped by administrative unit. The
 administrative level (polygon boundaries) of interest can be set by the
 user. If the effect is on, then the following term is added:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>γ</mi><msub><mi>a</mi><mi>i</mi></msub><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msubsup><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">
 \gamma^{admin}_{a_i} \sim N(0, \sigma^2_{admin})
-</annotation></semantics></math> In other words,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mover><mi>γ</mi><mo accent="true">→</mo></mover><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msup><annotation encoding="application/x-tex">\vec\gamma^{admin}</annotation></semantics></math>
-is an vector of random intercepts with length equal to the total number
-of administrative units, IID normal with mean 0 and variance
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>σ</mi><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow><mn>2</mn></msubsup><annotation encoding="application/x-tex">\sigma^2_{admin}</annotation></semantics></math>.
-All observations
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-in the same administrative division
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>
-share the same intercept
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msubsup><mi>γ</mi><msub><mi>a</mi><mi>i</mi></msub><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msubsup><annotation encoding="application/x-tex">\gamma^{admin}_{a_i}</annotation></semantics></math>.</p>
+</span> In other words, <span class="math inline">\vec\gamma^{admin}</span> is an vector of random
+intercepts with length equal to the total number of administrative
+units, IID normal with mean 0 and variance <span class="math inline">\sigma^2_{admin}</span>. All observations <span class="math inline">i</span> in the same administrative division <span class="math inline">a</span> share the same intercept <span class="math inline">\gamma^{admin}_{a_i}</span>.</p>
 <p>Relevant settings:</p>
 <ul>
 <li>
@@ -370,8 +336,8 @@ the administrative-level effect be included in the model?</li>
 <code>list(threshold = 3, prob_above     = 0.05)</code>): A prior
 applied to the administrative effect variance, expressed in terms of the
 standard deviation. The default settings correspond to the prior belief
-that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>σ</mi><mrow><mi>a</mi><mi>d</mi><mi>m</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>&gt;</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">P(\sigma_{admin} &gt; 3) = 0.05</annotation></semantics></math>
+that <span class="math inline">P(\sigma_{admin} &gt; 3) =
+0.05</span>
 </li>
 <li>
 <code>admin_bounds</code> (default <code>NULL</code>):
@@ -389,9 +355,9 @@ identifier field for <code>admin_bounds</code>
 <p>The nugget is an independently and identically distributed (IID)
 normal effect applied to each observation. It corresponds to
 “irreducible variation” not captured by any other model effect:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>γ</mi><mi>i</mi><mrow><mi>N</mi><mi>u</mi><mi>g</mi><mi>g</mi><mi>e</mi><mi>t</mi></mrow></msubsup><mo>∼</mo><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>n</mi><mi>u</mi><mi>g</mi><mi>g</mi><mi>e</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
+<p><span class="math display">
 \gamma^{Nugget}_i \sim N(0, \sigma^2_{nugget})
-</annotation></semantics></math></p>
+</span></p>
 <p>Relevant settings:</p>
 <ul>
 <li>
@@ -401,14 +367,12 @@ nugget effect be included in model fitting?</li>
 <code>prior_nugget</code> (default
 <code>list(threshold = 3, prob_above = 0.05)</code>): A prior applied to
 the nugget variance, expressed in terms of the standard deviation. The
-default settings correspond to the prior belief that
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>σ</mi><mrow><mi>n</mi><mi>u</mi><mi>g</mi><mi>g</mi><mi>e</mi><mi>t</mi></mrow></msub><mo>&gt;</mo><mn>3</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>=</mo><mn>0.05</mn></mrow><annotation encoding="application/x-tex">P(\sigma_{nugget} &gt; 3) = 0.05</annotation></semantics></math>
+default settings correspond to the prior belief that <span class="math inline">P(\sigma_{nugget} &gt; 3) = 0.05</span>
 </li>
 <li>
 <code>nugget_in_predict</code> (default <code>TRUE</code>): If
-<code>TRUE</code>, independent samples from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>0</mn><mo>,</mo><msubsup><mi>σ</mi><mrow><mi>n</mi><mi>u</mi><mi>g</mi><mi>g</mi><mi>e</mi><mi>t</mi></mrow><mn>2</mn></msubsup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N(0, \sigma^2_{nugget})</annotation></semantics></math>
-are added to each pixel-level predictive draw.</li>
+<code>TRUE</code>, independent samples from <span class="math inline">N(0, \sigma^2_{nugget})</span> are added to each
+pixel-level predictive draw.</li>
 </ul>
 <hr>
 </div>
