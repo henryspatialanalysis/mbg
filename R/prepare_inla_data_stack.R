@@ -121,7 +121,9 @@ prepare_inla_data_stack <- function(
       "y ~ 0 + f(covariates, model = 'iid', fixed = TRUE{constraint_suffix})"
     )
   } else {
-    formula_string <- "y ~ 1"
+    formula_string <- "y ~ 0 + Intercept"
+    effects_list$Intercept <- 1
+    obs_list$Intercept <- rep(1, nrow(input_data))
   }
 
   ## Optionally add the SPDE approximation to a Gaussian process

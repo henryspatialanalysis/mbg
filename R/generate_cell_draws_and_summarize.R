@@ -100,7 +100,7 @@ generate_cell_draws_and_summarize <- function(
     fe_coefficients <- latent_matrix[param_names == 'covariates', ]
     fe_draws <- as.matrix(id_raster_table[, cov_names, with = F]) %*% fe_coefficients
   } else {
-    fe_draws <- latent_matrix[param_names == '(Intercept)', ] |>
+    fe_draws <- latent_matrix[param_names == 'Intercept', ] |>
       matrix(ncol = n_samples, nrow = nrow(transformed_cell_draws), byrow = TRUE)
   }
   transformed_cell_draws <- transformed_cell_draws + fe_draws
