@@ -11,6 +11,9 @@ template:
     fg: '#171717'
     primary: '#F36E21'
     secondary: '#058040'
+  includes:
+    in_header:
+      - '<link rel="icon" type="image/png" href="favicon-96x96.png">'
 navbar:
   title: mbg
   structure:
