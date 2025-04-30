@@ -4,7 +4,12 @@ Version: 1.1.0
 Authors@R: c(
     person("Nathaniel", "Henry", email = "nat@henryspatialanalysis.com",
         role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8150-4988")),
-    person("Benjamin", "Mayala", role = c("aut")))
+    person("Benjamin", "Mayala", role = c("aut")),
+    person("Roy", "Burstein", role = c("ctb"), comment = c(ORCID = "0000-0001-8991-4762")),
+    person("Nafis", "Sadat", role = c("ctb")),
+    person("Michael", "Richards", role = c("ctb")),
+    person("Michael", "Collison", role = c("ctb")),
+    person("Michael", "Cork", role = c("ctb")))
 Description:
     Modern model-based geostatistics for point-referenced data. This package provides a
     simple interface to run spatial machine learning models and geostatistical models
