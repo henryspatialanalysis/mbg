@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Model-Based Geostatistics • mbg</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="katex-auto.js"></script><script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/Figtree-0.4.10/font.css" rel="stylesheet">
@@ -16,6 +22,7 @@
 <meta property="og:title" content="Model-Based Geostatistics">
 <meta name="description" content="Modern model-based geostatistics for point-referenced data. This package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.">
 <meta property="og:description" content="Modern model-based geostatistics for point-referenced data. This package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced outcomes and, optionally, a set of raster covariates. The package also includes functions to summarize raster outcomes by (polygon) region while preserving uncertainty.">
+<meta property="og:image" content="https://henryspatialanalysis.github.io/mbg/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -59,8 +66,10 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="model-based-geostatistics">Model-Based Geostatistics<a class="anchor" aria-label="anchor" href="#model-based-geostatistics"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="model-based-geostatistics">Model-Based Geostatistics<a class="anchor" aria-label="anchor" href="#model-based-geostatistics"></a>
+</h1>
+</div>
 <p><a href="https://cran.r-project.org/package=mbg" class="external-link"><img src="https://www.r-pkg.org/badges/version/mbg?color=ffcc00" alt="CRAN"></a> <a href="https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml" class="external-link"><img src="https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml/badge.svg" alt="Documentation build"></a></p>
 <p><strong><code>mbg</code> is an R package for model-based geostatistics.</strong></p>
 <p>The <code>mbg</code> package provides a simple interface to run spatial machine learning models and geostatistical models that estimate a continuous (raster) surface from point-referenced observations and, optionally, a set of raster covariates. The package also includes functions to summarize raster estimates by (polygon) region while preserving uncertainty.</p>
@@ -97,6 +106,16 @@
 <em>(Optional):</em> <strong>Aggregate</strong> from pixels to administrative boundaries, preserving uncertainty</li>
 </ol>
 <p>For more details, see the <a href="https://henryspatialanalysis.github.io/mbg/articles/mbg.html">introductory vignette</a>.</p>
+<hr>
+<div class="section level3">
+<h3 id="acknowledgments">Acknowledgments<a class="anchor" aria-label="anchor" href="#acknowledgments"></a>
+</h3>
+<p>Many thanks to the following groups of people for their contributions to the package:</p>
+<ul>
+<li>IHME’s Local Burden of Disease core code team, for their development of geostatistical software tools that helped inspire this package. Special thanks to Aaron Osgood-Zimmerman, Ian Davis, John VanderHeide, Jon Mosser, Katie Wilson, Lauren Woyczynski, Michael Collison, Michael Cork, Mike Richards, Nafis Sadat, Neal Marquez, and Roy Burstein.</li>
+<li>The Geospatial Analysis team at the Demographic and Health Surveys Program</li>
+</ul>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -129,6 +148,7 @@
 <ul class="list-unstyled">
 <li>Nathaniel Henry <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0001-8150-4988" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Benjamin Mayala <br><small class="roles"> Author </small>  </li>
+<li><a href="authors.html">More about authors...</a></li>
 </ul>
 </div>
 
