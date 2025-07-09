@@ -1,8 +1,6 @@
 # Model-Based Geostatistics
 
-[![CRAN](https://www.r-pkg.org/badges/version/mbg?color=ffcc00)](https://cran.r-project.org/package=mbg) [![Documentation build](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml)
-
-
+[![CRAN](https://www.r-pkg.org/badges/version/mbg?color=ffcc00)](https://cran.r-project.org/package=mbg) [![Total downloads](https://cranlogs.r-pkg.org/badges/grand-total/mbg?color=blue)] [![Build status](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml)
 
 **`mbg` is an R package for model-based geostatistics.**
 
