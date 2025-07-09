@@ -6,19 +6,18 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Running spatial machine learning models • mbg</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
-<script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
+<!-- katex math --><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous" onload="renderMathInElement(document.body);"></script><script src="../katex-auto.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Figtree-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><link href="../deps/KaTex-0.16.10/katex.min.css" rel="stylesheet">
-<script src="../deps/KaTex-0.16.10/katex.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><link href="../extra.css" rel="stylesheet">
 <meta property="og:title" content="Running spatial machine learning models">
 <link rel="icon" type="image/png" href="favicon-96x96.png">
 </head>
@@ -195,7 +194,7 @@ bagged regression trees. We then plot the results across Benin:</p>
 <span>  range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.45</span><span class="op">)</span>,</span>
 <span>  fill_range <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="spatial-ml-models_files%2Ffigure-gfm%2Frun-ml-models-1.png"><!-- --></p>
+<p><img src="spatial-ml-models_files/figure-gfm/run-ml-models-1.png"><!-- --></p>
 <p>Many machine learning models are robust to handling a large feature
 space, meaning that we can add more candidate predictors to the model
 without over-fitting. The <code><a href="../reference/run_regression_submodels.html">run_regression_submodels()</a></code>
@@ -230,7 +229,7 @@ identifiers to the predictors:</p>
 <span>  range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.45</span><span class="op">)</span>,</span>
 <span>  fill_range <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="spatial-ml-models_files%2Ffigure-gfm%2Frun-with-department-effects-1.png"><!-- --></p>
+<p><img src="spatial-ml-models_files/figure-gfm/run-with-department-effects-1.png"><!-- --></p>
 </div>
 <div class="section level2">
 <h2 id="stacking-ml-models">Stacking ML models<a class="anchor" aria-label="anchor" href="#stacking-ml-models"></a>
@@ -311,7 +310,7 @@ These can be pulled and plotted:</p>
 <span>  range <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">.15</span>, <span class="fl">.45</span><span class="op">)</span>,</span>
 <span>  fill_range <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="spatial-ml-models_files%2Ffigure-gfm%2Fplot-submodels-1.png"><!-- --></p>
+<p><img src="spatial-ml-models_files/figure-gfm/plot-submodels-1.png"><!-- --></p>
 <p>We can also plot mean estimates from the geostatistical model. Note
 how the geostatistical model blends estimates from the component
 submodels, while also including other effects including the latent
@@ -325,7 +324,7 @@ spatial term and the nugget:</p>
 <span>  main <span class="op">=</span> <span class="st">'MBG mean estimates'</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">departments</span><span class="op">)</span></span></code></pre></div>
-<p><img src="spatial-ml-models_files%2Ffigure-gfm%2Fplot-model-results-1.png"><!-- --></p>
+<p><img src="spatial-ml-models_files/figure-gfm/plot-model-results-1.png"><!-- --></p>
 <p>As as with the default model, we can plot uncertainty by pixel:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ui_raster</span> <span class="op">&lt;-</span> <span class="va">grid_cell_predictions</span><span class="op">$</span><span class="va">cell_pred_upper</span> <span class="op">-</span> <span class="va">grid_cell_predictions</span><span class="op">$</span><span class="va">cell_pred_lower</span></span>
@@ -335,7 +334,7 @@ spatial term and the nugget:</p>
 <span>  main <span class="op">=</span> <span class="st">'MBG estimates: 95% uncertainty interval width'</span></span>
 <span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rspatial.github.io/terra/reference/lines.html" class="external-link">lines</a></span><span class="op">(</span><span class="va">departments</span><span class="op">)</span></span></code></pre></div>
-<p><img src="spatial-ml-models_files%2Ffigure-gfm%2Fplot-model-uncertainty-1.png"><!-- --></p>
+<p><img src="spatial-ml-models_files/figure-gfm/plot-model-uncertainty-1.png"><!-- --></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -348,7 +347,7 @@ spatial term and the nugget:</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer>
