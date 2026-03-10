@@ -31,5 +31,5 @@ log_results <- mbg::logging_get_timer_log()
 print(log_results)
 #>       tic    toc          msg                    callback_msg elapsed
 #>     <num>  <num>       <char>                          <char>   <num>
-#> 1: 17.869 17.971 Test logging Test logging: 0.102 sec elapsed   0.102
+#> 1: 16.987 17.089 Test logging Test logging: 0.102 sec elapsed   0.102
 ```
