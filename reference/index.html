@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mbg</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,8 +42,7 @@
 
       <div class="section-desc"><p>Model runner class</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -59,8 +58,7 @@
 
       <div class="section-desc"><p>Functions to build the ID raster and load model covariates</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -71,13 +69,15 @@
 
         </dt>
         <dd>Build ID raster</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="load_covariates.html">load_covariates()</a></code>
 
         </dt>
         <dd>Load covariates</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="make_world_template_raster.html">make_world_template_raster()</a></code>
 
@@ -88,8 +88,7 @@
 
       <div class="section-desc"><p>Individual functions for model fitting and prediction. These can also be executed through the <code>MbgModelRunner</code> class.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -100,31 +99,36 @@
 
         </dt>
         <dd>Fit INLA model</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="prepare_inla_data_stack.html">prepare_inla_data_stack()</a></code>
 
         </dt>
         <dd>Prepare data stack for INLA</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="run_regression_submodels.html">run_regression_submodels()</a></code>
 
         </dt>
         <dd>Run regression sub-models</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="generate_cell_draws_and_summarize.html">generate_cell_draws_and_summarize()</a></code>
 
         </dt>
         <dd>Generate cell draws and summary rasters from INLA model</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="summarize_draws.html">summarize_draws()</a></code>
 
         </dt>
         <dd>Summarize draws</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="values_to_raster.html">values_to_raster()</a></code>
 
@@ -135,8 +139,7 @@
 
       <div class="section-desc"><p>Functions for generating predictive validity metrics. These can also be executed through the <code>MbgModelRunner</code> class.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -147,7 +150,8 @@
 
         </dt>
         <dd>Generate log posterior predictive density from a geostatistical surface onto point data</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="rmse_raster_to_point.html">rmse_raster_to_point()</a></code>
 
@@ -158,8 +162,7 @@
 
       <div class="section-desc"><p>Functions to aggregate rasters and pixel-level predictive draw matrices to polygon boundaries. These can also be executed through the <code>MbgModelRunner</code> class.</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -170,31 +173,26 @@
 
         </dt>
         <dd>Aggregate grid cell draws to polygons</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="aggregate_raster_to_polygons.html">aggregate_raster_to_polygons()</a></code>
 
         </dt>
         <dd>Aggregate a raster to polygons</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="build_aggregation_table.html">build_aggregation_table()</a></code>
 
         </dt>
         <dd>Build aggregation table</dd>
-      </dl><dl><dt>
-
-          <code><a href="calculate_pixel_fractions_single_polygon.html">calculate_pixel_fractions_single_polygon()</a></code>
-
-        </dt>
-        <dd>Calculate fractional pixels in a polygon</dd>
       </dl></div><div class="section level2">
       <h2 id="other">Other<a class="anchor" aria-label="anchor" href="#other"></a></h2>
 
       <div class="section-desc"><p>Miscellaneous helper functions</p></div>
 
-
-    </div><div class="section level2">
+      <dl></dl></div><div class="section level2">
 
 
 
@@ -205,37 +203,43 @@
 
         </dt>
         <dd>Dissolve sf object by attribute</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="dot-onAttach.html">.onAttach()</a></code>
 
         </dt>
         <dd>Behavior when attaching the mbg package</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logging_get_timer_log.html">logging_get_timer_log()</a></code>
 
         </dt>
         <dd>Get timer log</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logging_start_timer.html">logging_start_timer()</a></code>
 
         </dt>
         <dd>Start logging timer</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="logging_stop_timer.html">logging_stop_timer()</a></code>
 
         </dt>
         <dd>End logging timer</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="make_time_stamp.html">make_time_stamp()</a></code>
 
         </dt>
         <dd>Make time stamp</dd>
-      </dl><dl><dt>
+
+        <dt>
 
           <code><a href="vif_covariate_select.html">vif_covariate_select()</a></code>
 
@@ -251,7 +255,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

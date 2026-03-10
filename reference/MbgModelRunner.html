@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mbg</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -51,7 +51,7 @@
     <div class="section level2">
     <h2 id="public-fields">Public fields<a class="anchor" aria-label="anchor" href="#public-fields"></a></h2>
     <p></p><div class="r6-fields"><dl><dt><code>input_data</code></dt>
-<dd><p>(<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>)<br>
+<dd><p>(<a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a>)<br>
 Table containing at least the following fields:<br></p><ul><li><p>x (<code>numeric</code>) location longitude in decimal degrees<br></p></li>
 <li><p>y (<code>numeric</code>) location latitude in decimal degrees<br></p></li>
 <li><p>indicator (<code>integer</code>) The number of events in the population<br></p></li>
@@ -72,7 +72,7 @@ A list containing all predictor covariates. Each covariate is a
 
 
 <dt><code>aggregation_table</code></dt>
-<dd><p>(<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>)<br>
+<dd><p>(<a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a>)<br>
 A table created by <a href="build_aggregation_table.html">build_aggregation_table</a>, used to link each grid cell to
 higher-level administrative units.</p></dd>
 
@@ -327,7 +327,7 @@ List of model outputs yielded by <a href="fit_inla_model.html">fit_inla_model</a
 <div class="section">
 <h4 id="arguments">Arguments<a class="anchor" aria-label="anchor" href="#arguments"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>input_data</code></dt>
-<dd><p>(<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>) Table containing at least
+<dd><p>(<a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a>) Table containing at least
 the following fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as the <code>id_raster</code><br></p></li>
 <li><p>y (<code>numeric</code>) location y position, in the same projection as the <code>id_raster</code><br></p></li>
 <li><p>indicator (<code>integer</code>) The number of events in the population<br></p></li>
@@ -347,7 +347,7 @@ and dimensions as <code>id_raster</code>.</p></dd>
 
 
 <dt><code>aggregation_table</code></dt>
-<dd><p>(<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>) A table created by
+<dd><p>(<a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a>) A table created by
 <a href="build_aggregation_table.html">build_aggregation_table</a>, linking each grid cell to one or more polygons</p></dd>
 
 
@@ -616,7 +616,7 @@ is only useful for in-sample predictive validity.</p></dd>
 
 
 <dt><code>validation_data</code></dt>
-<dd><p>(<a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a>, default NULL) Observed data to
+<dd><p>(<a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a>, default NULL) Observed data to
 compare against. Expected for out-of-sample model validation. Table containing at
 least the following fields:<br></p><ul><li><p>x (<code>numeric</code>) location x position, in the same projection as the <code>id_raster</code><br></p></li>
 <li><p>y (<code>numeric</code>) location y position, in the same projection as the <code>id_raster</code><br></p></li>
@@ -642,7 +642,7 @@ predictive validity).</p>
 
 <div class="section">
 <h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
-<p><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> Containing the following fields:<br></p><ul><li><p>'rmse': Root mean squared error when compared against the mean estimates by
+<p><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a> Containing the following fields:<br></p><ul><li><p>'rmse': Root mean squared error when compared against the mean estimates by
 pixel. Lower RMSE is better.<br></p></li>
 <li><p>'lpd': Log posterior predictive density when compared against pixel-level
 samples from the model. Higher LPD is better.<br></p></li>
@@ -681,7 +681,7 @@ For clarity, these fields will have the suffix "_is" for in-sample models, and
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

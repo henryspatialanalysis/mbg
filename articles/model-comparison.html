@@ -29,7 +29,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mbg</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -217,7 +217,7 @@ raster:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://henryspatialanalysis.github.io/mbg/">mbg</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load input data, covariates, and department boundaries</span></span>
-<span><span class="va">outcomes</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/fread.html" class="external-link">fread</a></span><span class="op">(</span></span>
+<span><span class="va">outcomes</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">fread</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">'extdata/child_stunting.csv'</span>, package <span class="op">=</span> <span class="st">'mbg'</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">covariates</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
@@ -301,7 +301,7 @@ from the stacked ensemble model:</p>
 <code class="sourceCode R"><span><span class="va">outcomes</span><span class="op">[</span>, <span class="va">data_rate</span> <span class="op">:=</span> <span class="va">indicator</span> <span class="op">/</span> <span class="va">samplesize</span><span class="op">]</span></span>
 <span><span class="va">ml_submodels</span> <span class="op">&lt;-</span> <span class="va">stacking_model_is</span><span class="op">$</span><span class="va">model_covariates</span></span>
 <span></span>
-<span><span class="va">submodel_rmse</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
+<span><span class="va">submodel_rmse</span> <span class="op">&lt;-</span> <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table</a></span><span class="op">(</span></span>
 <span>  rmse_is <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="fu">mbg</span><span class="fu">::</span><span class="fu"><a href="../reference/rmse_raster_to_point.html">rmse_raster_to_point</a></span><span class="op">(</span></span>
 <span>      estimates <span class="op">=</span> <span class="va">ml_submodels</span><span class="op">$</span><span class="va">enet</span>,</span>
@@ -390,7 +390,7 @@ runs.</p>
 <span>  <span class="co"># Return the combined metrics for this holdout</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">this_holdout_metrics</span><span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/rbindlist.html" class="external-link">rbindlist</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">rmse_oos</th>
@@ -599,7 +599,7 @@ and widely applicable information criterion in singular learning theory.
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

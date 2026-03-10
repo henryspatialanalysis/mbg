@@ -1,0 +1,186 @@
+# Model-Based Geostatistics
+
+[![CRAN](https://www.r-pkg.org/badges/version/mbg?color=ffcc00)](https://cran.r-project.org/package=mbg)
+[![Total
+downloads](https://cranlogs.r-pkg.org/badges/grand-total/mbg?color=blue)](https://cran.r-project.org/package=mbg)
+[![Build
+status](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml/badge.svg)](https://github.com/henryspatialanalysis/mbg/actions/workflows/pkgdown.yaml)
+
+**`mbg` is an R package for model-based geostatistics.**
+
+The `mbg` package provides a simple interface to run spatial machine
+learning models and geostatistical models that estimate a continuous
+(raster) surface from point-referenced observations and, optionally, a
+set of raster covariates. The package also includes functions to
+summarize raster estimates by (polygon) region while preserving
+uncertainty.
+
+![Overview of the MBG workflow](reference/figures/mbg_workflow.png)
+
+*Overview of the MBG workflow*
+
+The `mbg` package combines features from the
+[`sf`](https://r-spatial.github.io/sf/),
+[`terra`](https://rspatial.github.io/terra/), and
+[`data.table`](https://CRAN.R-project.org/package=data.table) packages
+for spatial data processing; [`caret`](https://topepo.github.io/caret/)
+for spatial ML models; and [`R-INLA`](https://www.r-inla.org/) for
+geostatistical models.
+
+------------------------------------------------------------------------
+
+## Using the package
+
+**You can install the latest stable version of the mbg package from
+CRAN:**
+
+`install.packages("mbg")`
+
+Some core package functions rely on R-INLA, which is not available on
+CRAN. If you do not already have the `INLA` package installed, you can
+download it following [these
+instructions](https://www.r-inla.org/download-install).
+
+After installing and package and loading it using
+[`library(mbg)`](https://henryspatialanalysis.github.io/mbg/), you can
+access the package vignette by running `help(mbg)`, or get documentation
+for a specific function by running
+e.g. [`help(MbgModelRunner)`](https://henryspatialanalysis.github.io/mbg/reference/MbgModelRunner.md).
+
+------------------------------------------------------------------------
+
+## Package workflow
+
+A typical MBG workflow includes the following steps:
+
+1.  Load point data on **outcomes**, raster **covariate surfaces**, and
+    a raster **population surface**
+2.  *(Optional):* Run **machine learning models** relating the input
+    covariate surfaces to the outcome, producing predictive raster
+    surfaces from a variety of methods
+3.  **Prepare inputs** for the geostatistical model. This includes the
+    outcomes point data, model specifications, a spatial 2-D mesh, and
+    either the input covariate surfaces or the ML predictive surfaces
+4.  Run the **geostatistical model**. This model predicts the outcome as
+    a linear combination of the raster surfaces and a SPDE approximation
+    to a Gaussian process over space.
+5.  Using the model fit, **generate gridded predictions** of the outcome
+    across the entire study area. Uncertainty is captured by generating
+    250 posterior predictive draws at each pixel location.
+6.  **Summarize predictive draws** as raster surfaces by taking the
+    mean, median, and 95% uncertainty interval bounds of draws at each
+    pixel location
+7.  *(Optional):* **Aggregate** from pixels to administrative
+    boundaries, preserving uncertainty
+
+For more details, see the [introductory
+vignette](https://henryspatialanalysis.github.io/mbg/articles/mbg.html).
+
+------------------------------------------------------------------------
+
+### Acknowledgments
+
+Many thanks to the following groups of people for their contributions to
+the package:
+
+- IHME’s Local Burden of Disease core code team, for their development
+  of geostatistical software tools that helped inspire this package.
+  Special thanks to Aaron Osgood-Zimmerman, Ian Davis, John VanderHeide,
+  Jon Mosser, Katie Wilson, Lauren Woyczynski, Michael Collison, Michael
+  Cork, Mike Richards, Nafis Sadat, Neal Marquez, and Roy Burstein.
+- The Geospatial Analysis team at the Demographic and Health Surveys
+  Program
+
+# Package index
+
+## MBG Model Runner
+
+Model runner class
+
+- [`MbgModelRunner`](https://henryspatialanalysis.github.io/mbg/reference/MbgModelRunner.md)
+  : MBG model runner class
+
+## MBG core inputs
+
+Functions to build the ID raster and load model covariates
+
+- [`build_id_raster()`](https://henryspatialanalysis.github.io/mbg/reference/build_id_raster.md)
+  : Build ID raster
+- [`load_covariates()`](https://henryspatialanalysis.github.io/mbg/reference/load_covariates.md)
+  : Load covariates
+- [`make_world_template_raster()`](https://henryspatialanalysis.github.io/mbg/reference/make_world_template_raster.md)
+  : Make world template raster
+
+## MBG model fitting and prediction
+
+Individual functions for model fitting and prediction. These can also be
+executed through the `MbgModelRunner` class.
+
+- [`fit_inla_model()`](https://henryspatialanalysis.github.io/mbg/reference/fit_inla_model.md)
+  : Fit INLA model
+- [`prepare_inla_data_stack()`](https://henryspatialanalysis.github.io/mbg/reference/prepare_inla_data_stack.md)
+  : Prepare data stack for INLA
+- [`run_regression_submodels()`](https://henryspatialanalysis.github.io/mbg/reference/run_regression_submodels.md)
+  : Run regression sub-models
+- [`generate_cell_draws_and_summarize()`](https://henryspatialanalysis.github.io/mbg/reference/generate_cell_draws_and_summarize.md)
+  : Generate cell draws and summary rasters from INLA model
+- [`summarize_draws()`](https://henryspatialanalysis.github.io/mbg/reference/summarize_draws.md)
+  : Summarize draws
+- [`values_to_raster()`](https://henryspatialanalysis.github.io/mbg/reference/values_to_raster.md)
+  : Insert values into a raster
+
+## Model validation
+
+Functions for generating predictive validity metrics. These can also be
+executed through the `MbgModelRunner` class.
+
+- [`log_posterior_density()`](https://henryspatialanalysis.github.io/mbg/reference/log_posterior_density.md)
+  : Generate log posterior predictive density from a geostatistical
+  surface onto point data
+- [`rmse_raster_to_point()`](https://henryspatialanalysis.github.io/mbg/reference/rmse_raster_to_point.md)
+  : Generate RMSE from an estimated raster surface and point data
+
+## Pixel-to-polygon aggregation
+
+Functions to aggregate rasters and pixel-level predictive draw matrices
+to polygon boundaries. These can also be executed through the
+`MbgModelRunner` class.
+
+- [`aggregate_draws_to_polygons()`](https://henryspatialanalysis.github.io/mbg/reference/aggregate_draws_to_polygons.md)
+  : Aggregate grid cell draws to polygons
+- [`aggregate_raster_to_polygons()`](https://henryspatialanalysis.github.io/mbg/reference/aggregate_raster_to_polygons.md)
+  : Aggregate a raster to polygons
+- [`build_aggregation_table()`](https://henryspatialanalysis.github.io/mbg/reference/build_aggregation_table.md)
+  : Build aggregation table
+
+## Other
+
+Miscellaneous helper functions
+
+- [`dissolve_sf_by_attribute()`](https://henryspatialanalysis.github.io/mbg/reference/dissolve_sf_by_attribute.md)
+  : Dissolve sf object by attribute
+- [`.onAttach()`](https://henryspatialanalysis.github.io/mbg/reference/dot-onAttach.md)
+  : Behavior when attaching the mbg package
+- [`logging_get_timer_log()`](https://henryspatialanalysis.github.io/mbg/reference/logging_get_timer_log.md)
+  : Get timer log
+- [`logging_start_timer()`](https://henryspatialanalysis.github.io/mbg/reference/logging_start_timer.md)
+  : Start logging timer
+- [`logging_stop_timer()`](https://henryspatialanalysis.github.io/mbg/reference/logging_stop_timer.md)
+  : End logging timer
+- [`make_time_stamp()`](https://henryspatialanalysis.github.io/mbg/reference/make_time_stamp.md)
+  : Make time stamp
+- [`vif_covariate_select()`](https://henryspatialanalysis.github.io/mbg/reference/vif_covariate_select.md)
+  : Run variance inflation factor (VIF) selection on input covariates
+
+# Articles
+
+### All vignettes
+
+- [All model runner
+  options](https://henryspatialanalysis.github.io/mbg/articles/all-model-options.md):
+- [Getting started with
+  MBG](https://henryspatialanalysis.github.io/mbg/articles/mbg.md):
+- [Model validation and
+  comparison](https://henryspatialanalysis.github.io/mbg/articles/model-comparison.md):
+- [Running spatial machine learning
+  models](https://henryspatialanalysis.github.io/mbg/articles/spatial-ml-models.md):

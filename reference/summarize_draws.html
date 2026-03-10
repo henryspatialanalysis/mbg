@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mbg</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,7 @@
 
 
 <dl><dt id="arg-draws">draws<a class="anchor" aria-label="anchor" href="#arg-draws"></a></dt>
-<dd><p>A <code>matrix</code>, <code>data.frame</code>, or <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> of predictive draws.</p></dd>
+<dd><p>A <code>matrix</code>, <code>data.frame</code>, or <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a> of predictive draws.</p></dd>
 
 
 <dt id="arg-id-fields">id_fields<a class="anchor" aria-label="anchor" href="#arg-id-fields"></a></dt>
@@ -87,7 +87,7 @@ summaries across draws?</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <a href="https://rdatatable.gitlab.io/data.table/reference/data.table.html" class="external-link">data.table::data.table</a> containing at least the following fields:</p><ul><li><p>The <code>id_fields</code>, if passed</p></li>
+    <p>A <a href="https://rdrr.io/pkg/data.table/man/data.table.html" class="external-link">data.table::data.table</a> containing at least the following fields:</p><ul><li><p>The <code>id_fields</code>, if passed</p></li>
 <li><p>"mean": Mean across predictive draws</p></li>
 <li><p>"lower": Lower bound of the (X%) uncertainty interval</p></li>
 <li><p>"upper": Upper bound of the (X%) uncertainty interval</p></li>
@@ -100,29 +100,29 @@ summaries across draws?</p></dd>
 <span class="r-in"><span><span class="va">draws_matrix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">10</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">summary_table_a</span> <span class="op">&lt;-</span> <span class="fu">summarize_draws</span><span class="op">(</span><span class="va">draws_matrix</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">summary_table_a</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>          mean     lower    upper ui_width</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>         &lt;num&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1: 0.09737227 -1.696132 1.984732 3.680864</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2: 0.02254290 -1.279289 1.330979 2.610268</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3: 0.24014468 -1.499205 1.975478 3.474683</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4: 0.04991584 -1.476200 1.577184 3.053384</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5: 0.09614328 -2.135038 1.829265 3.964303</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6: 0.49469713 -1.441610 2.456848 3.898458</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           mean     lower    upper ui_width</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;num&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:  0.04883910 -1.696132 1.984732 3.680864</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2: -0.03271432 -1.279289 1.186630 2.465919</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:  0.12182437 -2.075344 1.975478 4.050822</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:  0.06324496 -1.476200 1.577184 3.053384</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:  0.24955491 -1.774292 1.829265 3.603557</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:  0.54884338 -1.441610 2.456848 3.898458</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Summarize a draws data.table with location IDs</span></span></span>
 <span class="r-in"><span><span class="va">draws_table</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">200</span><span class="op">)</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdatatable.gitlab.io/data.table/reference/setattr.html" class="external-link">setnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'location_id'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'draw_'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/as.data.table.html" class="external-link">as.data.table</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu">data.table</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/data.table/man/setattr.html" class="external-link">setnames</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'location_id'</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">'draw_'</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">20</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">summary_table_b</span> <span class="op">&lt;-</span> <span class="fu">summarize_draws</span><span class="op">(</span><span class="va">draws_table</span>, id_fields <span class="op">=</span> <span class="st">'location_id'</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">summary_table_b</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    location_id        mean     lower    upper ui_width</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>          &lt;num&gt;       &lt;num&gt;     &lt;num&gt;    &lt;num&gt;    &lt;num&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           1 -0.02270941 -1.034371 1.411232 2.445603</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           2 -0.37443064 -2.083516 1.721388 3.804904</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           3  0.31381573 -1.106188 1.667994 2.774182</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           4 -0.03861082 -1.697354 1.770278 3.467632</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5:           5  0.12432379 -1.465282 1.878477 3.343759</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 6:           6  0.31366739 -1.823267 1.959878 3.783145</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1:           1 -0.13098397 -1.034371 1.033082 2.067454</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2:           2 -0.26414518 -2.083516 1.741731 3.825247</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3:           3  0.35835144 -1.106188 1.667994 2.774182</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4:           4 -0.10309306 -1.697354 1.770278 3.467632</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5:           5  0.07679248 -1.964361 1.878477 3.842837</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6:           6  0.37618266 -1.823267 1.959878 3.783145</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -135,7 +135,7 @@ summaries across draws?</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
