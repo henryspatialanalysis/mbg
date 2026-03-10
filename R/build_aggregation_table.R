@@ -115,7 +115,7 @@ build_aggregation_table <- function(
     data.table::as.data.table() |>
     data.table::setnames(c('dummy_id', 'pixel_id', 'area_fraction'))
   (agg_table
-    [, polygon_id := sapply(dummy_id, function(x) poly_ids[x])])[, dummy_id := NULL]
+    [, polygon_id := sapply(dummy_id, function(x) poly_ids[x])]
     [, dummy_id := NULL]
   )
 
