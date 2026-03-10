@@ -113,9 +113,11 @@ build_aggregation_table <- function(
     ID = TRUE
   ) |>
     data.table::as.data.table() |>
-    data.table::setnames(c('dummy_id', 'pixel_id', 'area_fraction')) |>
-    _[, polygon_id := sapply(dummy_id, function(x) poly_ids[x])] |>
-    _[, dummy_id := NULL]
+    data.table::setnames(c('dummy_id', 'pixel_id', 'area_fraction'))
+  (agg_table
+    [, polygon_id := sapply(dummy_id, function(x) poly_ids[x])])[, dummy_id := NULL]
+    [, dummy_id := NULL]
+  )
 
   # Merge on 'masked_pixel_id'
   masked_pixel_table <- data.table::data.table(
