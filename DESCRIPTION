@@ -1,6 +1,6 @@
 Package: mbg
 Title: Model-Based Geostatistics
-Version: 1.1.1
+Version: 1.1.2
 Authors@R: c(
     person("Nathaniel", "Henry", email = "nat@henryspatialanalysis.com",
         role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8150-4988")),
