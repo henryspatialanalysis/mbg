@@ -97,7 +97,13 @@ build_aggregation_table <- function(
 
   # Crop the polygons to the id raster
   polygons_cropped <- terra::crop(x = polygons, y = id_raster, ext = TRUE)
-  poly_ids <- polys_dt[[polygon_id_field]]
+  if(verbose){
+    dropped_rows <- nrow(polygons) - nrow(polygons_cropped)
+    if(dropped_rows > 0L) message(paste(
+      "Dropped", dropped_rows, "polygons not in the id_raster extent."
+    ))
+  }
+  poly_ids <- polygons_cropped[[polygon_id_field]]
 
   agg_table <- terra::extract(
     x = id_raster,
