@@ -1,6 +1,6 @@
 Package: mbg
 Title: Model-Based Geostatistics
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(
     person("Nathaniel", "Henry", email = "nat@henryspatialanalysis.com",
         role = c("aut", "cre"), comment = c(ORCID = "0000-0001-8150-4988")),
@@ -29,7 +29,7 @@ Imports:
     purrr,
     R6,
     sf,
-    terra,
+    terra (>= 1.9.1),
     tictoc
 Suggests:
     INLA,
@@ -40,7 +40,7 @@ Suggests:
 Additional_repositories: https://inla.r-inla-download.org/R/stable/
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE, r6 = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.3
 VignetteBuilder: knitr
 URL: https://henryspatialanalysis.github.io/mbg/
 BugReports: https://github.com/henryspatialanalysis/mbg/issues
