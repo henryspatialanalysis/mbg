@@ -24,12 +24,12 @@ Source:
 [`DESCRIPTION`](https://github.com/henryspatialanalysis/mbg/blob/main/DESCRIPTION)
 
 Henry N, Mayala B (2026). *mbg: Model-Based Geostatistics*. R package
-version 1.1.2, <https://henryspatialanalysis.github.io/mbg/>.
+version 1.2.0, <https://henryspatialanalysis.github.io/mbg/>.
 
     @Manual{,
       title = {mbg: Model-Based Geostatistics},
       author = {Nathaniel Henry and Benjamin Mayala},
       year = {2026},
-      note = {R package version 1.1.2},
+      note = {R package version 1.2.0},
       url = {https://henryspatialanalysis.github.io/mbg/},
     }
