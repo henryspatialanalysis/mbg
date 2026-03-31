@@ -474,6 +474,10 @@ aggregate_draws_to_polygons <- function(
     } else {
       stop("ISSUE: Weighting raster has a different number of layers from data raster.")
     }
+    if(na.rm){
+      # Change NA weights to 0
+      draws_table[is.na(w__), w__ := 0.0]
+    }
   } else {
     draws_table$w__ <- 1L
   }
